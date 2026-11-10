@@ -3,6 +3,16 @@
 All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.2] - 2026-11-10
+
+### Added
+
+- Plugin icon `pix/icon.svg` (24x24 line icon of a person, house style), shown on `/admin/plugins.php`.
+
+### Changed
+
+- `$plugin->version` 2026111000, `$plugin->release` 0.1.2. No code changes.
+
 ## [0.1.1] - 2026-10-11
 
 ### Added
