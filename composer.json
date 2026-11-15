@@ -1,0 +1,11 @@
+{
+    "name": "adamjenkins/moodle-local_vravatar",
+    "description": "Lets each user design the avatar that stands for them in VR room live rooms, from ready-made parts",
+    "type": "moodle-local",
+    "require": {
+        "moodle/moodle": ">=5.2 <5.4",
+        "moodle/composer-installer": "^1.0",
+        "adamjenkins/moodle-mod_vrroom": "^0.1"
+    },
+    "license": "GPL-3.0-or-later"
+}
