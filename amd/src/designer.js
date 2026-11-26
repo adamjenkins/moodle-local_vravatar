@@ -246,7 +246,7 @@ const wrapAngle = (angle) => {
  * @param {Object} assets The models it names ({outfit, hat}).
  * @param {Object} config Page config.
  * @returns {Object|null} {update(design, assets), setVideo(video|null), setFraming(framing),
- *     getFraming()} or null when it
+ *     getFraming(), reframe()} or null when it
  *     cannot draw.
  */
 const createPreview = (canvas, design, assets, config) => {
@@ -553,12 +553,24 @@ const createPreview = (canvas, design, assets, config) => {
         if (!closeup) {
             // Room under the feet for the shadow, and for the toolbar where it lies over the preview.
             const under = toolbarOver() ? 0.16 : 0.05;
-            aim(box.min.y - size.y * under, box.max.y, width, size.z, 1.04);
+            // Room over the name tag for the tip, while one is shown over the top of the preview.
+            const over = tipShown() ? 0.14 : 0;
+            aim(box.min.y - size.y * under, box.max.y + size.y * over, width, size.z, 1.04);
         } else if (device) {
             aim(box.min.y, box.max.y + HEADROOM, width, size.z, 1.1);
         } else {
             aim(box.min.y - SHOULDERS, box.max.y + HEADROOM, Math.max(width, SHOULDERS * 1.6, shoulders), size.z, 1.05);
         }
+    };
+
+    /**
+     * Whether a coached-start tip is shown over the top of the preview.
+     *
+     * @returns {boolean}
+     */
+    const tipShown = () => {
+        const tip = canvas.parentNode ? canvas.parentNode.querySelector('[data-region="coach"]') : null;
+        return !!tip && !tip.hidden;
     };
 
     /**
@@ -855,6 +867,10 @@ const createPreview = (canvas, design, assets, config) => {
             faceFront();
         },
         getFraming: () => framing,
+        reframe: () => {
+            frame();
+            dirty = true;
+        },
     };
 };
 
@@ -1058,7 +1074,13 @@ export const init = async(config) => {
         paintPanel(panel, true);
     }, nodesign ? 0 : 1);
 
-    // The coached start, for a first visit; "?" shows it again.
+    // The coached start, for a first visit; "?" shows it again. The preview reframes when a tip
+    // comes or goes, to keep the name tag clear of it.
+    root.addEventListener('local-vravatar:coach', () => {
+        if (preview) {
+            preview.reframe();
+        }
+    });
     const coach = setupCoach(root, !!nodesign);
     const currentTab = () => {
         const panel = tabs ? tabs.active() : null;

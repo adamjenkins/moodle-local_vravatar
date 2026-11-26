@@ -84,8 +84,15 @@ export const setupCoach = (root, firstrun) => {
      * @param {string|null} key The tip.
      */
     const show = (key) => {
+        const wasshown = !box.hidden;
         step = key;
         unglow();
+        // The preview makes room at its top while a tip is shown (event 'local-vravatar:coach').
+        const told = () => {
+            if (wasshown !== !box.hidden) {
+                root.dispatchEvent(new CustomEvent('local-vravatar:coach', {detail: {shown: !box.hidden}}));
+            }
+        };
         if (timer) {
             window.clearTimeout(timer);
             timer = null;
@@ -94,6 +101,7 @@ export const setupCoach = (root, firstrun) => {
         if (!hint) {
             step = null;
             box.hidden = true;
+            told();
             return;
         }
         text.textContent = hint.textContent.trim();
@@ -106,6 +114,7 @@ export const setupCoach = (root, firstrun) => {
         if (key === 'done') {
             timer = window.setTimeout(() => show(null), DONE_MS);
         }
+        told();
     };
 
     if (close) {
