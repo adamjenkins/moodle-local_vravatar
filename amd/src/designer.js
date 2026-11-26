@@ -364,10 +364,12 @@ const createPreview = (canvas, design, assets, config) => {
             return;
         }
         // The avatar looks along -Z, so its left hand is on +X.
+        // Held up beside the head, palms to the viewer (not pointing at the camera, which would
+        // foreshorten them), or by the hips.
         const up = framing === 'hands';
-        const y = up ? HEAD - 0.3 : HEAD - 0.7;
-        const z = up ? -0.22 : -0.08;
-        const x = up ? 0.27 : 0.3;
+        const y = up ? HEAD - 0.12 : HEAD - 0.7;
+        const z = up ? -0.1 : -0.08;
+        const x = up ? 0.36 : 0.3;
         const waving = now - wavefrom < 1400;
         const wave = waving ? Math.sin((now - wavefrom) / 1000 * Math.PI * 4) * 0.05 : 0;
         const lift = waving && !up ? 0.45 : 0;
@@ -549,7 +551,9 @@ const createPreview = (canvas, design, assets, config) => {
         // Keep the axis in the middle of the picture: as wide as the widest side of it.
         const width = 2 * Math.max(Math.abs(box.min.x), Math.abs(box.max.x));
         if (!closeup) {
-            aim(box.min.y, box.max.y, width, size.z, 1.12);
+            // Room under the feet for the shadow, and for the toolbar where it lies over the preview.
+            const under = toolbarOver() ? 0.16 : 0.05;
+            aim(box.min.y - size.y * under, box.max.y, width, size.z, 1.04);
         } else if (device) {
             aim(box.min.y, box.max.y + HEADROOM, width, size.z, 1.1);
         } else {
@@ -557,13 +561,58 @@ const createPreview = (canvas, design, assets, config) => {
         }
     };
 
-    // Frame without the idle motion and the bounce.
+    /**
+     * Whether the toolbar lies over the bottom of the preview (on a phone it has its own strip).
+     *
+     * @returns {boolean}
+     */
+    const toolbarOver = () => {
+        const bar = canvas.parentNode ? canvas.parentNode.querySelector('[data-region="tools"]') : null;
+        if (!bar || bar.hidden) {
+            return false;
+        }
+        const barrect = bar.getBoundingClientRect();
+        return barrect.top < canvas.getBoundingClientRect().bottom - 1;
+    };
+
+    /**
+     * The builder's soft shadow lies on the room's floor, 1.6 m under the head. The preview has no
+     * floor: the shadow goes just under the bottom of the body, so the figure stands on it instead
+     * of floating high above it, and it is left out when framing.
+     *
+     * @returns {Object|null} The shadow, or null.
+     */
+    const groundShadow = () => {
+        const shadow = avatar.group.getObjectByName('shadow');
+        if (!shadow) {
+            return null;
+        }
+        const shown = shadow.visible;
+        shadow.visible = false;
+        avatar.group.updateMatrixWorld(true);
+        const box = visibleBox(avatar.group, new THREE.Box3());
+        shadow.visible = shown;
+        if (!box.isEmpty()) {
+            shadow.position.y = box.min.y - 0.01;
+        }
+        return shadow;
+    };
+
+    // Frame without the idle motion, the bounce and the shadow.
     const frame = () => {
         const y = bouncer.position.y;
         const scale = bouncer.scale.x;
         bouncer.position.y = 0;
         bouncer.scale.setScalar(1);
+        const shadow = groundShadow();
+        const shown = shadow ? shadow.visible : false;
+        if (shadow) {
+            shadow.visible = false;
+        }
         frameNow();
+        if (shadow) {
+            shadow.visible = shown;
+        }
         bouncer.position.y = y;
         bouncer.scale.setScalar(scale);
     };
@@ -654,6 +703,7 @@ const createPreview = (canvas, design, assets, config) => {
             bouncer.scale.setScalar(1 + bounce * 0.04);
             if (now - wavefrom < 1500) {
                 poseHands(now);
+                groundShadow();
             }
             moved = true;
         }

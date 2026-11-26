@@ -360,8 +360,8 @@ final class design_test extends \advanced_testcase {
     }
 
     /**
-     * The standard look: drawn face, a bright body colour that is always the same for a user, a white
-     * accent, no picture; and a saved design without the newer keys still reads as the screen face.
+     * The standard look: drawn face, a real skin tone and a bright body colour that are always the same
+     * for a user, a white accent, no picture; and a saved design without the newer keys still reads as the screen face.
      */
     public function test_standard(): void {
         $a = design::standard(17);
@@ -371,6 +371,13 @@ final class design_test extends \advanced_testcase {
         $this->assertSame('white', $a['accent']);
         $this->assertFalse($a['picture']);
         $this->assertContains($a['color'], design::STANDARD_COLOURS);
+        // A real skin tone, not the body colour; across a class, every tone.
+        $this->assertNotSame('match', $a['skin']);
+        $tones = [];
+        foreach (range(1, 8) as $id) {
+            $tones[] = design::standard($id)['skin'];
+        }
+        $this->assertCount(8, array_unique($tones));
         $colours = [];
         foreach (range(1, 10) as $id) {
             $colours[] = design::standard($id)['color'];

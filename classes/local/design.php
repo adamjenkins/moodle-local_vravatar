@@ -211,8 +211,9 @@ final class design {
      * The standard look of a person who has not saved an avatar: a friendly figure with the face
      * drawn on the head (round eyes, thin brows, a small nose) and short brown hair, in a body
      * colour that is always the same for that person (picked from their user id), with a white
-     * accent and round hands. The skin follows the body colour, as in the first version: a cartoon
-     * colour, not a guess at anyone's skin tone. No profile picture: they did not choose
+     * accent and round hands. The skin is a real skin tone, also always the same for that person but
+     * picked by a different step through the user ids than the colour, so a class shows the whole
+     * range of tones, and the bright colour is on the clothes only. No profile picture: they did not choose
      * one. Saved designs never use this: a stored document is cleaned against defaults(), so it
      * keeps the look it had.
      *
@@ -221,8 +222,11 @@ final class design {
      */
     public static function standard(int $userid): array {
         $colours = self::STANDARD_COLOURS;
+        // Every tone but "match" (the body colour).
+        $tones = array_values(array_diff(self::SKINS, ['match']));
         return self::clean(array_merge(self::defaults(), [
             'color' => $colours[abs($userid) % count($colours)],
+            'skin' => $tones[(abs($userid) * 5 + 3) % count($tones)],
             'accent' => 'white',
             'face' => 'drawn',
             'eyes' => 'round',
