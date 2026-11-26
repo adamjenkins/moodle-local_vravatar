@@ -40,6 +40,7 @@ import {getString, getStrings} from 'core/str';
 import {createTiles} from 'local_vravatar/tiles';
 import {setupTabs, setupCostumeFilter} from 'local_vravatar/tabs';
 import {buildHand} from 'local_vravatar/handmodels';
+import {setupCoach} from 'local_vravatar/coach';
 
 /** Speed of the idle sway (radians per second at its middle, halved). */
 const SPIN_SPEED = 0.25;
@@ -83,7 +84,7 @@ const VIDEO = {width: {ideal: 320}, height: {ideal: 240}, frameRate: {ideal: 15}
 /** Keys of the document that take a name (radio groups; "outfit" is the costume picker). */
 const CHOICES = [
     'body', 'head', 'skin', 'color', 'accent', 'hair', 'haircolor', 'eyes', 'brows', 'nose', 'beard', 'hat', 'outfit',
-    'hands', 'handcolor',
+    'hands', 'handcolor', 'face',
 ];
 
 /** Keys Surprise me leaves alone: the skin tone is the user's own. */
@@ -854,8 +855,9 @@ const setupCamera = (button, preview, status, str) => {
     let video = null;
     // The button's words (beside its icon); on a phone they are for screen readers only.
     const setText = (text) => {
-        const words = button.querySelector('.local-vravatar-btntext');
+        const words = button.querySelector('[data-region="cameralabel"]');
         (words || button).textContent = text;
+        button.title = text;
     };
     const stop = () => {
         if (stream) {
@@ -1006,6 +1008,17 @@ export const init = async(config) => {
         paintPanel(panel, true);
     }, nodesign ? 0 : 1);
 
+    // The coached start, for a first visit; "?" shows it again.
+    const coach = setupCoach(root, !!nodesign);
+    const currentTab = () => {
+        const panel = tabs ? tabs.active() : null;
+        return panel ? panel.getAttribute('aria-labelledby') || '' : '';
+    };
+    const toolbar = root.querySelector('[data-region="tools"]');
+    if (toolbar) {
+        toolbar.hidden = false;
+    }
+
     // The group headings stick under the tabs: the tabs' height, as it is now.
     const tablist = root.querySelector('[data-region="tablist"]');
     if (tablist && window.ResizeObserver) {
@@ -1149,12 +1162,16 @@ export const init = async(config) => {
         }
         status(str.surprisedone);
     };
-    surprisebuttons.forEach((button) => button.addEventListener('click', surprise));
+    surprisebuttons.forEach((button) => button.addEventListener('click', () => {
+        surprise();
+        coach.changed(currentTab());
+    }));
 
     presetbuttons.forEach((button) => {
         button.addEventListener('click', async() => {
             writeForm(form, Object.assign(readForm(form, config.defaults), presetOf(button)));
             changed(true);
+            coach.changed(currentTab());
             if (setZoom) {
                 setZoom.whole();
             }
@@ -1163,7 +1180,10 @@ export const init = async(config) => {
         });
     });
 
-    form.addEventListener('change', () => changed(true));
+    form.addEventListener('change', () => {
+        changed(true);
+        coach.changed(currentTab());
+    });
 
     resetbutton.hidden = false;
     // Reset is one step that Undo takes back, so a slip loses nothing.
@@ -1191,6 +1211,7 @@ export const init = async(config) => {
                 nodesign.hidden = true;
             }
             status(str.saved);
+            coach.saved();
             return result;
         }).catch((error) => {
             status('');

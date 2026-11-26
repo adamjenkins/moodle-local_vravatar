@@ -70,6 +70,7 @@ final class design_test extends \advanced_testcase {
             'outfit' => 'none',
             'hands' => 'sphere',
             'handcolor' => 'skin',
+            'face' => 'plate',
             'picture' => true,
         ];
         $this->assertSame($expected, design::defaults());
@@ -180,6 +181,8 @@ final class design_test extends \advanced_testcase {
         // Hands as before hand styles existed: two balls in the skin colour.
         $this->assertSame('sphere', $clean['hands']);
         $this->assertSame('skin', $clean['handcolor']);
+        // The face screen, as before face styles existed.
+        $this->assertSame('plate', $clean['face']);
     }
 
     /**

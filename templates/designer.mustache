@@ -17,8 +17,10 @@
 {{!
     @template local_vravatar/designer
 
-    The "My VR avatar" designer: a 3D preview with its tools (presets, surprise me, undo and redo)
-    and the choices on six tabs (head and face, hair, body, costume, hands, extras). Every choice is
+    The "My VR avatar" designer: a 3D preview with a toolbar over it (surprise me, undo, redo, the
+    whole avatar, camera, the tips again) and the coached start's tip (both in the shared MAVR
+    "glass" style), ready-made looks on the first tab, and the choices on six more tabs (face, hair,
+    body, costume, hands, extras). Every choice is
     a real radio button or checkbox whose label is a picture tile (a large swatch for a colour), so
     keyboard and screen reader use is that of a plain form. The costumes are a wrapping grid of
     thumbnails by category, with the credits of the costume models. A save bar stays at the bottom
@@ -264,35 +266,47 @@
                     aria-label="{{#str}}previewlabel, local_vravatar{{/str}}"
                     aria-describedby="local-vravatar-previewhelp" hidden></canvas>
                 <p class="local-vravatar-fallback" data-region="fallback">{{#str}}previewunavailable, local_vravatar{{/str}}</p>
+                <div class="local-vravatar-coach local-vravatar-glass" data-region="coach" hidden>
+                    <p class="local-vravatar-coachtext" data-region="coachtext" role="status" aria-live="polite"></p>
+                    <button type="button" class="local-vravatar-gbtn local-vravatar-gbtn-close" data-action="coachclose"
+                        title="{{#str}}coach_close, local_vravatar{{/str}}">
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span class="visually-hidden">{{#str}}coach_close, local_vravatar{{/str}}</span>
+                    </button>
+                    <span hidden data-hint="look" data-glow="look">{{#str}}coach_look, local_vravatar{{/str}}</span>
+                    <span hidden data-hint="part" data-glow="parttab">{{#str}}coach_part, local_vravatar{{/str}}</span>
+                    <span hidden data-hint="save" data-glow="save">{{#str}}coach_save, local_vravatar{{/str}}</span>
+                    <span hidden data-hint="done" data-glow="">{{#str}}coach_done, local_vravatar{{/str}}</span>
+                </div>
+                <div class="local-vravatar-tools local-vravatar-glass" role="group" aria-label="{{#str}}tools, local_vravatar{{/str}}"
+                    data-region="tools" hidden>
+                    <button type="button" class="local-vravatar-gbtn" data-action="surprise" title="{{#str}}surprise, local_vravatar{{/str}}" data-region="surprisetool" hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h.01M16 8h.01M12 12h.01M8 16h.01M16 16h.01"/></svg><span class="visually-hidden" data-region="surpriselabel">{{#str}}surprise, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn" data-action="undo" title="{{#str}}undo, local_vravatar{{/str}}" disabled hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg><span class="visually-hidden" data-region="undolabel">{{#str}}undo, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn" data-action="redo" title="{{#str}}redo, local_vravatar{{/str}}" disabled hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg><span class="visually-hidden" data-region="redolabel">{{#str}}redo, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn" data-action="zoom" title="{{#str}}showwhole, local_vravatar{{/str}}" aria-controls="local-vravatar-stage" aria-pressed="false" hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span class="visually-hidden" data-region="zoomlabel">{{#str}}showwhole, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn" data-action="camera" title="{{#str}}camerapreview, local_vravatar{{/str}}" aria-pressed="false" hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><span class="visually-hidden" data-region="cameralabel">{{#str}}camerapreview, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn" data-action="coachagain" title="{{#str}}coach_again, local_vravatar{{/str}}" hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span class="visually-hidden" data-region="coachagainlabel">{{#str}}coach_again, local_vravatar{{/str}}</span>
+                    </button>
+                </div>
             </div>
             <p class="small text-muted local-vravatar-previewhelp" id="local-vravatar-previewhelp" data-region="previewhelp" hidden>
                 {{#str}}previewhelp, local_vravatar{{/str}}
             </p>
-            <div class="local-vravatar-previewbuttons">
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="surprise" data-region="surprisetool"
-                    title="{{#str}}surprise, local_vravatar{{/str}}" hidden>
-                    <span class="local-vravatar-dice-small" aria-hidden="true"></span>
-                    <span class="local-vravatar-btntext">{{#str}}surprise, local_vravatar{{/str}}</span>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="undo"
-                    title="{{#str}}undo, local_vravatar{{/str}}" disabled hidden>
-                    {{#pix}}e/undo, core{{/pix}}<span class="local-vravatar-btntext">{{#str}}undo, local_vravatar{{/str}}</span>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="redo"
-                    title="{{#str}}redo, local_vravatar{{/str}}" disabled hidden>
-                    {{#pix}}e/redo, core{{/pix}}<span class="local-vravatar-btntext">{{#str}}redo, local_vravatar{{/str}}</span>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="zoom" aria-controls="local-vravatar-stage"
-                    title="{{#str}}showwhole, local_vravatar{{/str}}" aria-pressed="false" hidden>
-                    {{#pix}}e/fullscreen, core{{/pix}}<span class="local-vravatar-btntext">{{#str}}showwhole, local_vravatar{{/str}}</span>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="camera" aria-pressed="false" hidden>
-                    {{#pix}}e/insert_edit_video, core{{/pix}}<span class="local-vravatar-btntext">{{#str}}camerapreview, local_vravatar{{/str}}</span>
-                </button>
-                <button type="button" class="btn btn-link btn-sm local-vravatar-reset" data-action="reset" hidden>
+            <p class="small mb-0">
+                <button type="button" class="btn btn-link btn-sm p-0 local-vravatar-reset" data-action="reset" hidden>
                     {{#str}}reset, local_vravatar{{/str}}
                 </button>
-            </div>
+            </p>
         </div>
 
         <div class="local-vravatar-choices">

@@ -205,6 +205,12 @@ final class designer_test extends \advanced_testcase {
         $this->assertMatchesRegularExpression('~data-action="surprise"[^>]*\shidden>~', $html);
         $this->assertMatchesRegularExpression('~data-action="undo"[^>]*\sdisabled hidden>~', $html);
         $this->assertStringContainsString('data-region="savebar"', $html);
+        // The coached start's tips are on the page (hidden), one per step, and the face styles are tiles.
+        foreach (['look', 'part', 'save', 'done'] as $step) {
+            $this->assertStringContainsString('data-hint="' . $step . '"', $html);
+        }
+        $this->assertStringContainsString(get_string('coach_save', 'local_vravatar'), $html);
+        $this->assertMatchesRegularExpression('~name="face" value="drawn" id="local-vravatar-face-drawn"~', $html);
         $this->assertStringContainsString(get_string('preset_explorer', 'local_vravatar'), $html);
         $this->assertStringNotContainsString('[[', $html);
     }

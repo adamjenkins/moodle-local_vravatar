@@ -34,7 +34,7 @@ final class presets_test extends \advanced_testcase {
         $this->assertNotEmpty($all);
         foreach ($all as $id => $preset) {
             // Every key of the source list survived cleaning (a misspelt value would be dropped).
-            $this->assertCount(15, $preset, $id);
+            $this->assertCount(16, $preset, $id);
             $this->assertArrayNotHasKey('skin', $preset, $id);
             $this->assertArrayNotHasKey('picture', $preset, $id);
             $clean = design::clean($preset);

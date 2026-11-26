@@ -43,7 +43,7 @@ class designer implements renderable, templatable {
      * @var array
      */
     private const SECTIONS = [
-        'section_head' => ['head', 'skin', 'eyes', 'brows', 'nose', 'ears', 'beard'],
+        'section_head' => ['face', 'head', 'skin', 'eyes', 'brows', 'nose', 'ears', 'beard'],
         'section_hair' => ['hair', 'haircolor'],
         'section_body' => ['body', 'color', 'accent'],
         'section_costume' => ['outfit'],
@@ -88,6 +88,7 @@ class designer implements renderable, templatable {
      * @var string[]
      */
     private const RENDERS = [
+        'face' => 'face',
         'head' => 'face',
         'eyes' => 'face',
         'brows' => 'face',
@@ -116,6 +117,7 @@ class designer implements renderable, templatable {
         'hat' => 'hat',
         'hands' => 'hands',
         'handcolor' => 'handcolor',
+        'face' => 'face',
     ];
 
     /**

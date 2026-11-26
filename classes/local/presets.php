@@ -29,37 +29,46 @@ namespace local_vravatar\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class presets {
-    /** @var array id => the keys the preset sets. Names are the lang strings preset_<id>. */
+    /**
+     * @var array id => the keys the preset sets. Names are the lang strings preset_<id>. Most looks
+     *     have the face drawn on the skin; the scientist and the robot keep the face screen.
+     */
     private const PRESETS = [
         'explorer' => [
             'body' => 'broad', 'head' => 'round', 'color' => 'green', 'accent' => 'brown', 'hair' => 'short',
             'haircolor' => 'brown', 'eyes' => 'round', 'brows' => 'thick', 'nose' => 'small', 'beard' => 'stubble',
             'hat' => 'sunhat', 'glasses' => false, 'outfit' => 'none', 'hands' => 'glove', 'handcolor' => 'brown',
+            'face' => 'drawn',
         ],
         'scientist' => [
             'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal', 'hair' => 'bun',
             'haircolor' => 'black', 'eyes' => 'almond', 'brows' => 'arched', 'nose' => 'small', 'beard' => 'none',
             'hat' => 'none', 'glasses' => true, 'outfit' => 'none', 'hands' => 'glove', 'handcolor' => 'cyan',
+            'face' => 'plate',
         ],
         'artist' => [
             'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow', 'hair' => 'curly',
             'haircolor' => 'auburn', 'eyes' => 'round', 'brows' => 'thin', 'nose' => 'round', 'beard' => 'none',
             'hat' => 'beanie', 'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin',
+            'face' => 'drawn',
         ],
         'athlete' => [
             'body' => 'broad', 'head' => 'square', 'color' => 'red', 'accent' => 'white', 'hair' => 'buzz',
             'haircolor' => 'black', 'eyes' => 'dots', 'brows' => 'thick', 'nose' => 'small', 'beard' => 'none',
             'hat' => 'cap', 'glasses' => false, 'outfit' => 'none', 'hands' => 'mitten', 'handcolor' => 'red',
+            'face' => 'drawn',
         ],
         'dreamer' => [
             'body' => 'slim', 'head' => 'round', 'color' => 'indigo', 'accent' => 'pink', 'hair' => 'long',
             'haircolor' => 'pink', 'eyes' => 'sleepy', 'brows' => 'thin', 'nose' => 'none', 'beard' => 'none',
             'hat' => 'none', 'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin',
+            'face' => 'drawn',
         ],
         'robot' => [
             'body' => 'capsule', 'head' => 'square', 'color' => 'grey', 'accent' => 'cyan', 'hair' => 'none',
             'haircolor' => 'grey', 'eyes' => 'dots', 'brows' => 'none', 'nose' => 'none', 'beard' => 'none',
             'hat' => 'none', 'glasses' => false, 'outfit' => 'none', 'hands' => 'robot', 'handcolor' => 'grey',
+            'face' => 'plate',
         ],
     ];
 

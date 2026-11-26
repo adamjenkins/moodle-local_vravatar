@@ -118,6 +118,7 @@ class save_design extends external_api {
             'outfit' => new external_value(PARAM_ALPHANUMEXT, 'Costume id (lower case, digits, hyphens), or none'),
             'hands' => new external_value(PARAM_ALPHA, 'Hand style'),
             'handcolor' => new external_value(PARAM_ALPHA, 'Hand colour name, or skin for the skin tone'),
+            'face' => new external_value(PARAM_ALPHA, 'Face style: plate (a face screen) or drawn (on the skin)'),
             'picture' => new external_value(PARAM_BOOL, 'Show the profile picture on the avatar'),
         ]);
     }

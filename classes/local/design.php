@@ -167,6 +167,8 @@ final class design {
             'outfit' => array_merge(['none'], costumes::outfit_ids()),
             'hands' => self::HANDSTYLES,
             'handcolor' => self::handcolours(),
+            // The value "plate" is the first version's face screen; "drawn" paints the face on the skin.
+            'face' => ['plate', 'drawn'],
         ];
     }
 
@@ -196,6 +198,7 @@ final class design {
             'outfit' => 'none',
             'hands' => 'sphere',
             'handcolor' => 'skin',
+            'face' => 'plate',
             // On by default (owner, 2026-10-10); the site setting allowpicture can turn it off.
             'picture' => true,
         ];
