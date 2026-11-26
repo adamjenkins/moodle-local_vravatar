@@ -30,13 +30,14 @@ use local_vravatar\local\design;
 #[\PHPUnit\Framework\Attributes\CoversClass(designer::class)]
 final class designer_test extends \advanced_testcase {
     /**
-     * Every choice but the costume is shown exactly once as a radio group or checkbox, under the five
-     * headings, every value with a lang string, and the current design is the one checked.
+     * Every choice but the costume is shown exactly once as a radio group or checkbox, on the six
+     * tabs, every value with a lang string, and the current design is the one checked.
      */
     public function test_sections(): void {
         global $PAGE;
         $this->resetAfterTest();
-        $current = design::clean(['skin' => 'dark', 'hair' => 'mohawk', 'ears' => true, 'beard' => 'stubble']);
+        $current = design::clean(['skin' => 'dark', 'hair' => 'mohawk', 'ears' => true, 'beard' => 'stubble',
+            'hands' => 'robot', 'handcolor' => 'teal']);
         $designer = new designer($current, true, true, false, new \core\url('/local/vravatar/index.php'));
         $data = $designer->export_for_template($PAGE->get_renderer('core'));
 
@@ -46,10 +47,18 @@ final class designer_test extends \advanced_testcase {
                 get_string('section_hair', 'local_vravatar'),
                 get_string('section_body', 'local_vravatar'),
                 get_string('section_costume', 'local_vravatar'),
+                get_string('section_hands', 'local_vravatar'),
                 get_string('section_extras', 'local_vravatar'),
             ],
             array_column($data['sections'], 'heading')
         );
+        // Each tab has a short name and an icon; a body tab frames the whole avatar, the hands tab the hands.
+        foreach ($data['sections'] as $section) {
+            $this->assertStringNotContainsString('[[', $section['tablabel']);
+            $this->assertStringContainsString('tabs/', $section['icon']);
+        }
+        $this->assertSame([true, false, false, false, false, false], array_column($data['sections'], 'first'));
+        $this->assertSame(['face', 'face', 'whole', 'whole', 'hands', 'face'], array_column($data['sections'], 'frame'));
 
         $radios = [];
         $checks = [];
@@ -66,8 +75,10 @@ final class designer_test extends \advanced_testcase {
         }
         $expected = array_diff(array_keys(design::choices()), ['outfit']);
         $this->assertEqualsCanonicalizing($expected, array_keys($radios));
-        $this->assertSame(['ears'], array_keys($checks));
+        $this->assertSame(['ears', 'glasses'], array_keys($checks));
         $this->assertTrue($checks['ears']['checked']);
+        $this->assertFalse($checks['glasses']['checked']);
+        $this->assertSame('face', $checks['glasses']['render']);
 
         foreach ($radios as $key => $group) {
             $this->assertSame(design::choices()[$key], array_column($group['options'], 'value'), $key);
@@ -91,6 +102,29 @@ final class designer_test extends \advanced_testcase {
         $this->assertStringContainsString('CC BY 3.0', $hats['pirate']['credit']);
         $this->assertSame('', $hats['cap']['model']);
         $this->assertSame('', $hats['cap']['credit']);
+        // A drawn hat's tile is drawn by the page; the pirate hat shows its thumbnail.
+        $this->assertSame('face', $hats['cap']['render']);
+        $this->assertSame('', $hats['pirate']['render']);
+        $this->assertStringContainsString('costumes/hat-pirate', $hats['pirate']['pic']);
+        $this->assertSame('whole', $radios['body']['options'][0]['render']);
+
+        // Hand styles are silhouettes; the hand colours are swatches, "skin" following the skin tone.
+        foreach ($radios['hands']['options'] as $option) {
+            $this->assertStringContainsString('hands/' . $option['value'], $option['mask']);
+            $this->assertSame('', $option['render']);
+        }
+        $this->assertTrue($radios['handcolor']['isswatch']);
+        $this->assertSame('skin', $radios['handcolor']['options'][0]['value']);
+        $this->assertTrue($radios['handcolor']['options'][0]['follows']);
+        $this->assertSame(get_string('handcolour_skin', 'local_vravatar'), $radios['handcolor']['options'][0]['label']);
+        $this->assertFalse($radios['handcolor']['options'][1]['follows']);
+
+        // The ready-made looks, each with a name and the keys it sets.
+        $this->assertTrue($data['haspresets']);
+        foreach ($data['presets'] as $preset) {
+            $this->assertStringNotContainsString('[[', $preset['name']);
+            $this->assertIsArray(json_decode($preset['json'], true));
+        }
     }
 
     /**
@@ -155,6 +189,24 @@ final class designer_test extends \advanced_testcase {
         $this->assertMatchesRegularExpression('~data-action="zoom"[^>]*\shidden>~', $html);
         $this->assertMatchesRegularExpression('~data-action="zoom"[^>]*aria-pressed="false"~', $html);
         $this->assertStringContainsString(get_string('showwhole', 'local_vravatar'), $html);
+
+        // The tab list is hidden until the page turns the sections into tabs; each tab names its panel.
+        $this->assertMatchesRegularExpression('~role="tablist"[^>]*\shidden>~', $html);
+        $this->assertMatchesRegularExpression(
+            '~role="tab" id="local-vravatar-section-hands-tab" aria-controls="local-vravatar-section-hands"~',
+            $html
+        );
+        // Tiles are real radio buttons with labels; the tools are hidden until the page starts them.
+        $this->assertMatchesRegularExpression(
+            '~<input class="local-vravatar-tile-input" type="radio" name="hands" value="mitten" id="local-vravatar-hands-mitten"~',
+            $html
+        );
+        $this->assertStringContainsString('<label class="local-vravatar-tile-label" for="local-vravatar-hands-mitten">', $html);
+        $this->assertMatchesRegularExpression('~data-action="surprise"[^>]*\shidden>~', $html);
+        $this->assertMatchesRegularExpression('~data-action="undo"[^>]*\sdisabled hidden>~', $html);
+        $this->assertStringContainsString('data-region="savebar"', $html);
+        $this->assertStringContainsString(get_string('preset_explorer', 'local_vravatar'), $html);
+        $this->assertStringNotContainsString('[[', $html);
     }
 
     /**

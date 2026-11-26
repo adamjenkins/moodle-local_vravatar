@@ -120,6 +120,24 @@ final class design {
         'deep' => '#472a19',
     ];
 
+    /**
+     * The hand styles, in the order the designer shows them. "sphere" is the look hands had before
+     * hand styles existed (two balls), so it is the default. Live rooms draw them (VR room).
+     *
+     * @var string[]
+     */
+    public const HANDSTYLES = ['sphere', 'mitten', 'cartoon', 'glove', 'robot', 'paw'];
+
+    /**
+     * The hand colours: "skin" follows the skin tone (or the body colour when the skin is "match"),
+     * the look before hand colours existed; any body colour makes the hands a pair of gloves.
+     *
+     * @return string[]
+     */
+    public static function handcolours(): array {
+        return array_merge(['skin'], self::COLOURS);
+    }
+
     /** @var string[] Keys of the document that are true or false. */
     public const FLAGS = ['ears', 'glasses', 'picture'];
 
@@ -147,6 +165,8 @@ final class design {
             'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
             'hat' => ['none', 'cap', 'beanie', 'sunhat', 'pirate'],
             'outfit' => array_merge(['none'], costumes::outfit_ids()),
+            'hands' => self::HANDSTYLES,
+            'handcolor' => self::handcolours(),
         ];
     }
 
@@ -174,6 +194,8 @@ final class design {
             'glasses' => false,
             'hat' => 'none',
             'outfit' => 'none',
+            'hands' => 'sphere',
+            'handcolor' => 'skin',
             // On by default (owner, 2026-10-10); the site setting allowpicture can turn it off.
             'picture' => true,
         ];

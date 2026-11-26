@@ -3,6 +3,19 @@
 All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Hand styles and hand colours (appearance keys `hands` and `handcolor`; defaults keep today's
+  look).
+- Ready-made looks, Surprise me, Undo and Redo on the designer.
+
+### Changed
+
+- The designer shows its choices on tabs as picture tiles and large swatches, with a save bar that
+  stays in view and a preview that stays in view on phones.
+
 ## [0.1.3] - 2026-11-15
 
 ### Added

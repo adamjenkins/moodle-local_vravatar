@@ -14,8 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The "My VR avatar" designer: a 3D preview of the avatar that follows the form, saving through
- * the local_vravatar_save_design web service, Reset to default and a local camera preview.
+ * The "My VR avatar" designer: a 3D preview of the avatar that follows the form, the choices on
+ * tabs as picture tiles, ready-made looks, Surprise me, Undo and Redo, a save bar that says when
+ * there are unsaved changes, saving through the local_vravatar_save_design web service, Reset to
+ * default and a local camera preview.
  *
  * The preview is drawn by VR room's own avatar builder (vrroomruntime_builtin/live/avatarmodel), the
  * same module that draws the avatars in live rooms, so what a user designs is what others see. The
@@ -34,10 +36,16 @@ import Ajax from 'core/ajax';
 import Log from 'core/log';
 import Notification from 'core/notification';
 import Pending from 'core/pending';
-import {getStrings} from 'core/str';
+import {getString, getStrings} from 'core/str';
+import {createTiles} from 'local_vravatar/tiles';
+import {setupTabs, setupCostumeFilter} from 'local_vravatar/tabs';
+import {buildHand} from 'local_vravatar/handmodels';
 
-/** Turntable speed (radians per second): slow, so the face is seen often. */
+/** Speed of the idle sway (radians per second at its middle, halved). */
 const SPIN_SPEED = 0.25;
+
+/** How far the idle sway turns the avatar each way (radians). */
+const SWAY = 0.5;
 
 /** How long the preview holds the face towards the viewer after a change or at the start (ms). */
 const HOLD_MS = 3000;
@@ -75,7 +83,14 @@ const VIDEO = {width: {ideal: 320}, height: {ideal: 240}, frameRate: {ideal: 15}
 /** Keys of the document that take a name (radio groups; "outfit" is the costume picker). */
 const CHOICES = [
     'body', 'head', 'skin', 'color', 'accent', 'hair', 'haircolor', 'eyes', 'brows', 'nose', 'beard', 'hat', 'outfit',
+    'hands', 'handcolor',
 ];
+
+/** Keys Surprise me leaves alone: the skin tone is the user's own. */
+const KEEP_ON_SURPRISE = ['skin', 'picture'];
+
+/** Most steps Undo remembers. */
+const HISTORY_MAX = 50;
 
 /** The keys whose chosen radio button may name a model to load (data-model), by asset name. */
 const ASSETS = {outfit: 'outfit', hat: 'hat'};
@@ -85,8 +100,8 @@ const FLAGS = ['ears', 'glasses', 'picture'];
 
 /** The strings the page uses, in this order. */
 const STRINGS = [
-    'saving', 'saved', 'resetdone', 'camera_on', 'camera_off', 'camera_error', 'camerapreview', 'camerapreviewstop',
-    'showwhole',
+    'saving', 'saved', 'camera_on', 'camera_off', 'camera_error', 'camerapreview', 'camerapreviewstop',
+    'showwhole', 'surprisedone', 'undone', 'redone', 'costumefilter', 'costumeall', 'resetundo',
 ];
 
 /**
@@ -229,7 +244,8 @@ const wrapAngle = (angle) => {
  * @param {Object} design The document to show first.
  * @param {Object} assets The models it names ({outfit, hat}).
  * @param {Object} config Page config.
- * @returns {Object|null} {update(design, assets), setVideo(video|null), setWhole(bool)} or null when it
+ * @returns {Object|null} {update(design, assets), setVideo(video|null), setFraming(framing),
+ *     getFraming()} or null when it
  *     cannot draw.
  */
 const createPreview = (canvas, design, assets, config) => {
@@ -273,11 +289,116 @@ const createPreview = (canvas, design, assets, config) => {
         seed: config.seed,
         assets,
     });
-    turntable.add(avatar.group);
+    // The bouncer carries the idle motion and the little bounce after a change, so the framing
+    // (worked out without it) stays still.
+    const bouncer = new THREE.Group();
+    turntable.add(bouncer);
+    bouncer.add(avatar.group);
     // The avatar stands on the turntable's axis (its head is at x = z = 0), so it turns on the spot.
     avatar.group.position.set(0, 0, 0);
 
-    let whole = false;
+    // "face": the head close up; "whole": all of it, with the name tag; "hands": head, shoulders and
+    // the hands held up.
+    let framing = 'face';
+    const HEAD = AvatarModel.STANDING_HEAD_HEIGHT || 1.6;
+    let wavefrom = -Infinity;
+    let bouncefrom = -Infinity;
+
+    // Hand styles: drawn here until the avatar builder knows them.
+    const ownhands = !(AvatarModel.CHOICES && AvatarModel.CHOICES.hands);
+    let handmodels = [];
+    let look = design;
+    const cssColour = (list, name) => {
+        const value = list ? list[name] : undefined;
+        if (typeof value === 'number') {
+            return '#' + value.toString(16).padStart(6, '0');
+        }
+        return typeof value === 'string' ? value : '#c99266';
+    };
+    const dressHands = () => {
+        if (!ownhands) {
+            return;
+        }
+        const body = cssColour(AvatarModel.COLOURS, look.color);
+        const skin = look.skin === 'match' ? body : cssColour(AvatarModel.SKIN_TONES, look.skin);
+        const colour = look.handcolor && look.handcolor !== 'skin' ? cssColour(AvatarModel.COLOURS, look.handcolor) : skin;
+        const accent = cssColour(AvatarModel.COLOURS, look.accent);
+        handmodels.forEach((made) => {
+            made.group.removeFromParent();
+            made.dispose();
+        });
+        handmodels = [];
+        ['lefthand', 'righthand'].forEach((name) => {
+            const mesh = avatar.group.getObjectByName(name);
+            if (!mesh) {
+                return;
+            }
+            if (!mesh.userData.localvravatar) {
+                // The builder's ball is replaced by the style: the mesh keeps its place and visibility.
+                mesh.geometry = new THREE.BufferGeometry();
+                mesh.userData.localvravatar = true;
+            }
+            const made = buildHand(THREE, look.hands || 'sphere', colour, accent);
+            if (name === 'lefthand') {
+                made.group.scale.x = -1;
+            }
+            mesh.add(made.group);
+            handmodels.push(made);
+        });
+    };
+
+    /**
+     * Pose the hands for the framing (the builder shows hands only in an immersive mode, so the
+     * preview poses them as for a person in a headset), waving after a hand change.
+     *
+     * @param {number} now Time (ms).
+     */
+    const poseHands = (now) => {
+        if (typeof avatar.setPose !== 'function') {
+            return;
+        }
+        const head = [0, HEAD, 0, 0, 0, 0, 1];
+        if (framing === 'face') {
+            avatar.setPose({h: head, l: null, r: null}, '3d');
+            return;
+        }
+        // The avatar looks along -Z, so its left hand is on +X.
+        const up = framing === 'hands';
+        const y = up ? HEAD - 0.3 : HEAD - 0.7;
+        const z = up ? -0.22 : -0.08;
+        const x = up ? 0.27 : 0.3;
+        const waving = now - wavefrom < 1400;
+        const wave = waving ? Math.sin((now - wavefrom) / 1000 * Math.PI * 4) * 0.05 : 0;
+        const lift = waving && !up ? 0.45 : 0;
+        // Hand rotations in the hand's grip frame (-Z along the index finger, +Y the back of the
+        // hand): turned +90 degrees about X the fingers point up and the palm faces the viewer;
+        // -90 degrees, the fingers hang down.
+        const s = Math.SQRT1_2;
+        const raised = [s, 0, 0, s];
+        const hanging = [-s, 0, 0, s];
+        const left = (up ? raised : hanging);
+        const right = (up || lift ? raised : hanging);
+        avatar.setPose({h: head, l: [x, y, z].concat(left),
+            r: [-x + wave, y + lift, z - (lift ? 0.1 : 0)].concat(right)}, 'vr');
+        handmodels.forEach((made) => {
+            // Fingers up when the hands are held up (or waving), down by the hips.
+            made.group.rotation.z = up || (lift && made.group.scale.x > 0) ? 0 : Math.PI;
+        });
+    };
+
+    /**
+     * The name tag shows only with the whole avatar ("how others see me").
+     */
+    const showLabel = () => {
+        const label = avatar.group.getObjectByName('label');
+        if (label) {
+            label.visible = framing === 'whole';
+        }
+        const ring = avatar.group.getObjectByName('ring');
+        if (ring) {
+            ring.visible = framing === 'whole';
+        }
+    };
 
     /**
      * Point the camera at a box (in turntable coordinates) from -Z so that it fits the canvas.
@@ -348,10 +469,31 @@ const createPreview = (canvas, design, assets, config) => {
 
     // Frame the avatar with the turntable facing front: the head and shoulders, or all of it.
     // eslint-disable-next-line complexity
-    const frame = () => {
+    const frameNow = () => {
+        const whole = framing === 'whole';
         const angle = turntable.rotation.y;
         turntable.rotation.y = 0;
         turntable.updateMatrixWorld(true);
+        if (framing === 'hands') {
+            // The head and both hands, with a little room round them.
+            const handsbox = new THREE.Box3();
+            ['head', 'lefthand', 'righthand'].forEach((name) => {
+                const part = avatar.group.getObjectByName(name);
+                if (part && part.visible) {
+                    visibleBox(part, handsbox);
+                }
+            });
+            turntable.rotation.y = angle;
+            turntable.updateMatrixWorld(true);
+            if (!handsbox.isEmpty()) {
+                const hsize = handsbox.getSize(new THREE.Vector3());
+                const hwidth = 2 * Math.max(Math.abs(handsbox.min.x), Math.abs(handsbox.max.x));
+                aim(handsbox.min.y - 0.08, handsbox.max.y + HEADROOM, hwidth, hsize.z, 1.15);
+                return;
+            }
+            turntable.rotation.y = 0;
+            turntable.updateMatrixWorld(true);
+        }
         // Looked up each time: a costume may change the parts.
         const head = avatar.group.getObjectByName('head');
         const label = avatar.group.getObjectByName('label');
@@ -414,6 +556,17 @@ const createPreview = (canvas, design, assets, config) => {
         }
     };
 
+    // Frame without the idle motion and the bounce.
+    const frame = () => {
+        const y = bouncer.position.y;
+        const scale = bouncer.scale.x;
+        bouncer.position.y = 0;
+        bouncer.scale.setScalar(1);
+        frameNow();
+        bouncer.position.y = y;
+        bouncer.scale.setScalar(scale);
+    };
+
     const resize = () => {
         const width = canvas.clientWidth || 300;
         const height = canvas.clientHeight || 400;
@@ -429,6 +582,8 @@ const createPreview = (canvas, design, assets, config) => {
     let hovering = false;
     let focused = false;
     let last = performance.now();
+    // Time spent swaying (s).
+    let swaytime = 0;
     // Hold the face towards the viewer until then, then turn slowly.
     let holduntil = last + HOLD_MS;
     // The user turned the avatar: leave it as they put it until then.
@@ -447,6 +602,7 @@ const createPreview = (canvas, design, assets, config) => {
      */
     const faceFront = () => {
         holduntil = performance.now() + HOLD_MS;
+        swaytime = 0;
         touched = -Infinity;
         if (still()) {
             turntable.rotation.y = 0;
@@ -478,7 +634,26 @@ const createPreview = (canvas, design, assets, config) => {
             }
             moved = true;
         } else if (!dragging && !hovering && !focused && !still() && now >= holduntil && now - touched >= IDLE_MS) {
-            turntable.rotation.y = wrapAngle(turntable.rotation.y + SPIN_SPEED * dt);
+            // A slow sway from side to side, never far from the front, so the face stays in view.
+            // Turned further by the user: back to the front first.
+            if (Math.abs(wrapAngle(turntable.rotation.y)) > SWAY + 0.01) {
+                turntable.rotation.y = wrapAngle(turntable.rotation.y);
+                returning = true;
+                swaytime = 0;
+            }
+            swaytime += dt;
+            turntable.rotation.y = SWAY * Math.sin(swaytime * SPIN_SPEED * 2);
+            moved = true;
+        }
+        // A gentle breathing motion, a bounce after a change, a wave after a hand change.
+        if (!still()) {
+            const since = now - bouncefrom;
+            const bounce = since < 450 ? Math.sin(since / 450 * Math.PI) : 0;
+            bouncer.position.y = Math.sin(now / 900) * 0.006 + bounce * 0.035;
+            bouncer.scale.setScalar(1 + bounce * 0.04);
+            if (now - wavefrom < 1500) {
+                poseHands(now);
+            }
             moved = true;
         }
         const fading = now < videofade;
@@ -506,6 +681,8 @@ const createPreview = (canvas, design, assets, config) => {
     const turn = (by) => {
         turntable.rotation.y = wrapAngle(turntable.rotation.y + by);
         returning = false;
+        // The sway starts again from where the user left the avatar.
+        swaytime = Math.asin(Math.max(-1, Math.min(1, turntable.rotation.y / SWAY))) / (SPIN_SPEED * 2);
         touched = performance.now();
         dirty = true;
     };
@@ -567,6 +744,9 @@ const createPreview = (canvas, design, assets, config) => {
             dirty = true;
         });
     }
+    dressHands();
+    showLabel();
+    poseHands(performance.now());
     turntable.rotation.y = 0;
     resize();
     draw();
@@ -595,9 +775,19 @@ const createPreview = (canvas, design, assets, config) => {
 
     return {
         update: (next, nextassets) => {
+            const handschanged = next.hands !== look.hands || next.handcolor !== look.handcolor;
+            look = next;
             whenLoaded(avatar.setAppearance(next, next.picture ? config.pictureurl : '', nextassets));
+            dressHands();
+            showLabel();
+            poseHands(performance.now());
             frame();
             faceFront();
+            if (handschanged) {
+                wavefrom = performance.now();
+            } else {
+                bouncefrom = performance.now();
+            }
         },
         setVideo: (video) => {
             avatar.setVideo(video);
@@ -606,11 +796,14 @@ const createPreview = (canvas, design, assets, config) => {
             videofade = performance.now() + (AvatarModel.FADE_MS || 300) + 400;
             faceFront();
         },
-        setWhole: (value) => {
-            whole = !!value;
+        setFraming: (value) => {
+            framing = value === 'whole' || value === 'hands' ? value : 'face';
+            showLabel();
+            poseHands(performance.now());
             frame();
             faceFront();
         },
+        getFraming: () => framing,
     };
 };
 
@@ -619,18 +812,29 @@ const createPreview = (canvas, design, assets, config) => {
  *
  * @param {HTMLButtonElement} button The button.
  * @param {Object} preview The preview.
+ * @returns {Object} {tab(framing): the tab's framing ("face", "whole" or "hands"), whole(): the whole
+ *     avatar for now (after a new look)}
  */
 const setupZoom = (button, preview) => {
     // A toggle button: the label stays "Show the whole avatar", aria-pressed (and the active look)
-    // says whether it is on.
-    let whole = false;
-    button.hidden = false;
-    button.addEventListener('click', () => {
-        whole = !whole;
-        preview.setWhole(whole);
+    // says whether it is on. Each tab chooses its own framing; the button switches between that and
+    // the whole avatar.
+    let tabframing = 'face';
+    const show = (value) => {
+        preview.setFraming(value);
+        const whole = value === 'whole';
         button.setAttribute('aria-pressed', whole ? 'true' : 'false');
         button.classList.toggle('active', whole);
-    });
+    };
+    button.hidden = false;
+    button.addEventListener('click', () => show(preview.getFraming() === 'whole' && tabframing !== 'whole' ? tabframing : 'whole'));
+    return {
+        tab: (value) => {
+            tabframing = value;
+            show(value);
+        },
+        whole: () => show('whole'),
+    };
 };
 
 /**
@@ -648,6 +852,11 @@ const setupCamera = (button, preview, status, str) => {
     }
     let stream = null;
     let video = null;
+    // The button's words (beside its icon); on a phone they are for screen readers only.
+    const setText = (text) => {
+        const words = button.querySelector('.local-vravatar-btntext');
+        (words || button).textContent = text;
+    };
     const stop = () => {
         if (stream) {
             stream.getTracks().forEach((track) => track.stop());
@@ -656,7 +865,7 @@ const setupCamera = (button, preview, status, str) => {
         video = null;
         preview.setVideo(null);
         button.setAttribute('aria-pressed', 'false');
-        button.textContent = str.camerapreview;
+        setText(str.camerapreview);
     };
     button.hidden = false;
     button.addEventListener('click', async() => {
@@ -675,7 +884,7 @@ const setupCamera = (button, preview, status, str) => {
             await video.play();
             preview.setVideo(video);
             button.setAttribute('aria-pressed', 'true');
-            button.textContent = str.camerapreviewstop;
+            setText(str.camerapreviewstop);
             status(str.camera_on);
         } catch (e) {
             Log.debug('local_vravatar: camera preview: ' + e);
@@ -722,34 +931,246 @@ export const init = async(config) => {
     };
 
     paintSwatches(root);
+    root.classList.add('local-vravatar-js');
+    // The user context's header offers "Message" (to oneself) on this page of one's own: hidden. Its
+    // Bootstrap d-block class is !important, so only an inline !important hides it.
+    const headerbuttons = document.querySelector('.page-context-header .header-button-group');
+    if (headerbuttons) {
+        headerbuttons.style.setProperty('display', 'none', 'important');
+    }
 
     let preview = null;
+    let setZoom = null;
     if (hasWebgl()) {
         canvas.hidden = false;
         preview = createPreview(canvas, readForm(form, config.defaults), readAssets(form), config);
         if (preview) {
             fallback.hidden = true;
             previewhelp.hidden = false;
-            setupZoom(zoombutton, preview);
+            setZoom = setupZoom(zoombutton, preview);
             setupCamera(camerabutton, preview, status, str);
         } else {
             canvas.hidden = true;
         }
     }
+    const tilepainter = hasWebgl() ? createTiles(config) : null;
 
-    form.addEventListener('change', () => {
+    /**
+     * The colour of a palette entry: the avatar builder's own, else the page's swatch.
+     *
+     * @param {string} palette "colour", "hair" or "skin".
+     * @param {string} name Entry.
+     * @returns {string} A CSS colour, or ''.
+     */
+    const colourOf = (palette, name) => {
+        const list = builderPalette(palette);
+        const colour = list && list[name];
+        if (typeof colour === 'string') {
+            return colour;
+        }
+        if (typeof colour === 'number') {
+            return '#' + colour.toString(16).padStart(6, '0');
+        }
+        const swatch = root.querySelector(`[data-palette="${palette}"][data-swatch="${name}"]`);
+        return swatch ? swatch.style.backgroundColor : '';
+    };
+
+    /**
+     * Paint what follows other choices: the hand silhouettes (in the hand colour), "Same as body
+     * colour" (the body colour) and "Same as skin" (the skin colour).
+     *
+     * @param {Object} design The design in the form.
+     */
+    const paintFollowers = (design) => {
+        const body = colourOf('colour', design.color);
+        const skin = design.skin === 'match' ? body : colourOf('skin', design.skin);
+        const hand = design.handcolor === 'skin' ? skin : colourOf('colour', design.handcolor);
+        root.querySelectorAll('[data-region="handpic"]').forEach((pic) => {
+            pic.style.backgroundColor = hand;
+        });
+        root.querySelectorAll('.local-vravatar-swatch-follows').forEach((swatch) => {
+            swatch.style.backgroundColor = swatch.dataset.palette === 'skin' ? body : skin;
+        });
+    };
+
+    const paintPanel = (panel, first) => {
+        if (tilepainter && panel) {
+            tilepainter.paint(readForm(form, config.defaults), Array.from(panel.querySelectorAll('[data-render]')), first);
+        }
+    };
+    const panels = Array.from(form.querySelectorAll('[data-region="panel"]'));
+    const tabs = setupTabs(root, (panel, tab) => {
+        if (setZoom && tab.dataset.frame) {
+            setZoom.tab(tab.dataset.frame);
+        }
+        paintPanel(panel, true);
+    }, nodesign ? 0 : 1);
+
+    // The group headings stick under the tabs: the tabs' height, as it is now.
+    const tablist = root.querySelector('[data-region="tablist"]');
+    if (tablist && window.ResizeObserver) {
+        new ResizeObserver(() => {
+            root.style.setProperty('--local-vravatar-tabs', tablist.offsetHeight + 'px');
+        }).observe(tablist);
+    }
+
+    /**
+     * Name the chosen colour beside each colour group's heading (the swatches show no names).
+     */
+    const nameChosen = () => {
+        root.querySelectorAll('[data-region="chosen"]').forEach((chosen) => {
+            const group = chosen.closest('fieldset');
+            const checked = group ? group.querySelector('input:checked + label .local-vravatar-tile-name') : null;
+            chosen.textContent = checked ? checked.textContent.trim() : '';
+        });
+    };
+    setupCostumeFilter(root.querySelector('.local-vravatar-costumes'), str.costumefilter, str.costumeall);
+
+    /**
+     * Draw the tile pictures that are out of date: the tab in view first.
+     */
+    const repaint = () => {
+        const active = tabs ? tabs.active() : null;
+        if (active) {
+            paintPanel(active, true);
+        }
+        panels.filter((panel) => panel !== active).forEach((panel) => paintPanel(panel, false));
+    };
+
+    // Ready-made looks, drawn on the user's own avatar.
+    const presetbuttons = Array.from(root.querySelectorAll('[data-action="preset"]'));
+    const presetOf = (button) => {
+        try {
+            const keys = JSON.parse(button.dataset.design || '{}');
+            return keys && typeof keys === 'object' ? keys : {};
+        } catch (e) {
+            return {};
+        }
+    };
+
+    // Undo and Redo: the designs the form has held, as JSON.
+    let saved = JSON.stringify(readForm(form, config.defaults));
+    const history = [saved];
+    let at = 0;
+    const dirtyflag = root.querySelector('[data-region="dirty"]');
+    const surprisebuttons = Array.from(root.querySelectorAll('[data-action="surprise"]'));
+    const undobutton = root.querySelector('[data-action="undo"]');
+    const redobutton = root.querySelector('[data-action="redo"]');
+    const isDirty = () => JSON.stringify(readForm(form, config.defaults)) !== saved;
+
+    /**
+     * After the form changed: the preview, the followers, the history, the save bar and the tiles.
+     *
+     * @param {boolean} record Whether this is a new step for Undo (not an Undo or Redo itself).
+     */
+    const changed = (record) => {
+        const design = readForm(form, config.defaults);
         if (preview) {
-            preview.update(readForm(form, config.defaults), readAssets(form));
+            preview.update(design, readAssets(form));
+        }
+        paintFollowers(design);
+        nameChosen();
+        const json = JSON.stringify(design);
+        if (record && json !== history[at]) {
+            history.splice(at + 1);
+            history.push(json);
+            if (history.length > HISTORY_MAX) {
+                history.shift();
+            }
+            at = history.length - 1;
+        }
+        undobutton.disabled = at === 0;
+        redobutton.disabled = at >= history.length - 1;
+        dirtyflag.hidden = !isDirty();
+        repaint();
+    };
+
+    const go = (index, message) => {
+        at = index;
+        writeForm(form, JSON.parse(history[at]));
+        changed(false);
+        status(message);
+    };
+    const undo = () => {
+        if (at > 0) {
+            go(at - 1, str.undone);
+        }
+    };
+    const redo = () => {
+        if (at < history.length - 1) {
+            go(at + 1, str.redone);
+        }
+    };
+    undobutton.addEventListener('click', undo);
+    redobutton.addEventListener('click', redo);
+    root.addEventListener('keydown', (e) => {
+        if (!(e.ctrlKey || e.metaKey) || e.altKey) {
+            return;
+        }
+        const keyname = e.key.toLowerCase();
+        if (keyname === 'z' && !e.shiftKey) {
+            e.preventDefault();
+            undo();
+        } else if (keyname === 'y' || (keyname === 'z' && e.shiftKey)) {
+            e.preventDefault();
+            redo();
         }
     });
 
+    // Surprise me: a random choice for every part but the skin tone, with fewer hats, beards and
+    // costumes than plain chance would give.
+    const valuesOf = (name) => Array.from(form.querySelectorAll(`input[type="radio"][name="${name}"]`)).map((r) => r.value);
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    const surprise = () => {
+        const design = readForm(form, config.defaults);
+        CHOICES.forEach((key) => {
+            const list = valuesOf(key);
+            if (KEEP_ON_SURPRISE.indexOf(key) >= 0 || !list.length) {
+                return;
+            }
+            if (key === 'outfit') {
+                // A costume hides most of the other choices: it is chosen on purpose, not by chance.
+                design[key] = 'none';
+            } else if (key === 'hat' || key === 'beard') {
+                design[key] = Math.random() < 0.6 ? 'none' : pick(list);
+            } else if (key === 'handcolor') {
+                design[key] = Math.random() < 0.5 ? 'skin' : pick(list);
+            } else {
+                design[key] = pick(list);
+            }
+        });
+        design.ears = Math.random() < 0.5;
+        design.glasses = Math.random() < 0.25;
+        writeForm(form, design);
+        changed(true);
+        // A new look is seen whole.
+        if (setZoom) {
+            setZoom.whole();
+        }
+        status(str.surprisedone);
+    };
+    surprisebuttons.forEach((button) => button.addEventListener('click', surprise));
+
+    presetbuttons.forEach((button) => {
+        button.addEventListener('click', async() => {
+            writeForm(form, Object.assign(readForm(form, config.defaults), presetOf(button)));
+            changed(true);
+            if (setZoom) {
+                setZoom.whole();
+            }
+            const name = button.querySelector('.local-vravatar-tile-name');
+            status(await getString('presetdone', 'local_vravatar', name ? name.textContent.trim() : ''));
+        });
+    });
+
+    form.addEventListener('change', () => changed(true));
+
     resetbutton.hidden = false;
+    // Reset is one step that Undo takes back, so a slip loses nothing.
     resetbutton.addEventListener('click', () => {
         writeForm(form, config.defaults);
-        if (preview) {
-            preview.update(readForm(form, config.defaults), readAssets(form));
-        }
-        status(str.resetdone);
+        changed(true);
+        status(str.resetundo);
     });
 
     form.addEventListener('submit', (e) => {
@@ -763,9 +1184,8 @@ export const init = async(config) => {
             args: {design: JSON.stringify(readForm(form, config.defaults))},
         }])[0]).then((result) => {
             writeForm(form, result.design);
-            if (preview) {
-                preview.update(readForm(form, config.defaults), readAssets(form));
-            }
+            saved = JSON.stringify(readForm(form, config.defaults));
+            changed(true);
             removeform.hidden = false;
             if (nodesign) {
                 nodesign.hidden = true;
@@ -780,6 +1200,25 @@ export const init = async(config) => {
             savepending.resolve();
         });
     });
+
+    // Ask before leaving with unsaved changes.
+    window.addEventListener('beforeunload', (e) => {
+        if (isDirty()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    surprisebuttons.concat([undobutton, redobutton]).forEach((button) => {
+        button.hidden = false;
+    });
+    paintFollowers(readForm(form, config.defaults));
+    nameChosen();
+    repaint();
+    if (tilepainter) {
+        tilepainter.presets(readForm(form, config.defaults),
+            presetbuttons.map((button) => [button.querySelector('[data-region="presetpic"]'), presetOf(button)]));
+    }
 
     pending.resolve();
 };

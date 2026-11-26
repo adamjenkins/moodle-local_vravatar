@@ -1,5 +1,31 @@
 /* The "My VR avatar" designer page. */
 
+/*
+ * This page uses the full width of the window: Boost limits the standard layout to a narrow column
+ * ($course-content-maxwidth, theme/boost/scss/moodle/layout.scss), too small for a preview beside
+ * the choices.
+ */
+#page-local-vravatar-index #page.drawers .main-inner,
+#page-local-vravatar-index .header-maxwidth {
+    max-width: none;
+}
+
+/*
+ * The page is the user's own: the user context's header picture says nothing here, so only the
+ * heading stays (the page hides the header's "Message" button too).
+ */
+#page-local-vravatar-index .page-context-header .page-header-image {
+    display: none;
+}
+
+.local-vravatar-intro {
+    margin-bottom: 1rem;
+}
+
+.local-vravatar-intro summary {
+    cursor: pointer;
+}
+
 .local-vravatar-layout {
     display: flex;
     flex-wrap: wrap;
@@ -9,7 +35,7 @@
 
 .local-vravatar-preview {
     flex: 1 1 280px;
-    max-width: 420px;
+    max-width: 520px;
 }
 
 /*
@@ -25,24 +51,167 @@
     .local-vravatar-preview {
         position: sticky;
         top: calc(var(--navbar-height, 60px) + 1rem);
-        flex: 0 1 40%;
+        flex: 0 0 36%;
         align-self: flex-start;
     }
 
+    /* As tall as the window allows, so the whole avatar is seen without scrolling. */
     .local-vravatar-stage {
-        min-height: 16rem;
-        max-height: calc(100vh - var(--navbar-height, 60px) - 9rem);
+        height: calc(100vh - var(--navbar-height, 60px) - 15rem);
+        min-height: 18rem;
+        aspect-ratio: auto;
+    }
+
+    /* The save bar is at the bottom of the window on every tab, short or long. */
+    .local-vravatar-js [data-region="form"] {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - var(--navbar-height, 60px) - 1rem);
+    }
+
+    .local-vravatar-js .local-vravatar-savebar {
+        margin-top: auto;
+    }
+
+    .local-vravatar .local-vravatar-lookgrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .local-vravatar-tablist {
+        position: sticky;
+        top: var(--navbar-height, 60px);
+        z-index: 3;
+    }
+
+    .local-vravatar .local-vravatar-grouphead {
+        top: calc(var(--navbar-height, 60px) + var(--local-vravatar-tabs, 4.5rem));
+    }
+}
+
+/*
+ * On a phone the preview is a strip at the top of the screen that stays while the choices scroll
+ * under it, with one row of tabs just below it: the avatar is always in view while choosing. The
+ * preview column's own box is dropped (display: contents) so the strip can stick for the whole page.
+ */
+@media (max-width: 767.98px) {
+    .local-vravatar-layout {
+        display: block;
+    }
+
+    .local-vravatar-js [data-region="nodesign"] {
+        display: none;
+    }
+
+    .local-vravatar-js .local-vravatar-preview {
+        display: contents;
+    }
+
+    .local-vravatar-js .local-vravatar-previewhelp {
+        display: none;
+    }
+
+    .local-vravatar-js .local-vravatar-stage {
+        position: sticky;
+        top: var(--navbar-height, 60px);
+        z-index: 4;
+        height: 30vh;
+        aspect-ratio: auto;
+        border-radius: 0 0 0.5rem 0.5rem;
+    }
+
+    .local-vravatar-js .local-vravatar-tablist {
+        position: sticky;
+        top: calc(var(--navbar-height, 60px) + 30vh);
+        z-index: 3;
+        flex-wrap: nowrap;
+        gap: 0.1rem;
+    }
+
+    /* All seven tabs fit: smaller icons and names, sharing the width. */
+    .local-vravatar-js .local-vravatar-tab {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 0.35rem 0.1rem 0.25rem;
+        font-size: 0.68rem;
+    }
+
+    .local-vravatar-js .local-vravatar-tabicon {
+        width: 1.3rem;
+        height: 1.3rem;
+    }
+
+    .local-vravatar .local-vravatar-lookgrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .local-vravatar .local-vravatar-grouphead {
+        top: calc(var(--navbar-height, 60px) + 30vh + var(--local-vravatar-tabs, 4rem));
+    }
+
+    .local-vravatar-previewbuttons {
+        margin-top: 0.5rem;
+    }
+
+    /* Icons only on a phone; the words stay for screen readers and as tooltips. */
+    .local-vravatar-btntext {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .local-vravatar-previewbuttons .icon {
+        margin-right: 0;
+    }
+
+    .local-vravatar-savebar {
+        padding: 0.5rem 4.25rem 0.5rem 0;
+        gap: 0.4rem;
+    }
+
+    .local-vravatar-status {
+        min-height: 0;
+        font-size: 0.85rem;
     }
 }
 
 .local-vravatar-previewbuttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.local-vravatar-previewbuttons .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.local-vravatar-previewbuttons .icon {
+    margin-right: 0;
+}
+
+.local-vravatar-dice-small {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.2rem;
+    background:
+        radial-gradient(circle at 28% 28%, #1d2125 0.09rem, transparent 0.1rem),
+        radial-gradient(circle at 72% 28%, #1d2125 0.09rem, transparent 0.1rem),
+        radial-gradient(circle at 50% 50%, #1d2125 0.09rem, transparent 0.1rem),
+        radial-gradient(circle at 28% 72%, #1d2125 0.09rem, transparent 0.1rem),
+        radial-gradient(circle at 72% 72%, #1d2125 0.09rem, transparent 0.1rem),
+        #fff;
+    box-shadow: 0 0 0 1.5px #1d2125 inset;
+    transform: rotate(-12deg);
 }
 
 .local-vravatar-choices {
-    flex: 2 1 320px;
+    flex: 1 1 320px;
     min-width: 0;
 }
 
@@ -51,8 +220,8 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     border: 1px solid var(--bs-border-color, #dee2e6);
-    border-radius: 0.5rem;
-    background: linear-gradient(180deg, #f6f4f1 0%, #e4ded6 100%);
+    border-radius: 0.75rem;
+    background: radial-gradient(circle at 50% 35%, #fffaf2 0%, #ece4d8 70%, #ddd3c4 100%);
     overflow: hidden;
 }
 
@@ -78,10 +247,73 @@
     padding: 1rem;
 }
 
+/* Tabs: an icon over a short name. Without JavaScript the tab list stays hidden. */
+
+.local-vravatar-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-body-bg, #fff);
+}
+
+.local-vravatar-tablist[hidden] {
+    display: none;
+}
+
+.local-vravatar-tab {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    min-width: 4.25rem;
+    padding: 0.4rem 0.5rem 0.3rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: transparent;
+    color: var(--bs-body-color, #1d2125);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.local-vravatar-tab:hover {
+    background: var(--bs-tertiary-bg, #f1f3f5);
+}
+
+.local-vravatar-tab[aria-selected="true"] {
+    background: var(--bs-primary, #0f6cbf);
+    color: #fff;
+}
+
+.local-vravatar-tab:focus-visible {
+    outline: 3px solid var(--bs-primary, #0f6cbf);
+    outline-offset: 2px;
+}
+
+.local-vravatar-tabicon {
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+    background-color: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+}
+
 .local-vravatar-section {
     margin-bottom: 1.25rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.local-vravatar-panel {
+    border-bottom: 0;
 }
 
 .local-vravatar-section-heading {
@@ -89,32 +321,324 @@
 }
 
 .local-vravatar-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+/* The heading of a group of choices stays in view under the tabs while its tiles scroll. */
+.local-vravatar-grouphead {
+    position: sticky;
+    top: var(--navbar-height, 60px);
+    z-index: 2;
+    margin-bottom: 0.4rem;
+    padding: 0.3rem 0;
+    background: var(--bs-body-bg, #fff);
+    font-weight: 600;
+}
+
+.local-vravatar-chosen {
+    margin-left: 0.5rem;
+    color: var(--bs-secondary-color, #6a737b);
+    font-weight: 400;
 }
 
 .local-vravatar-option {
     margin-bottom: 0.25rem;
 }
 
-.local-vravatar-swatch {
-    display: inline-block;
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: 0.3rem;
-    vertical-align: -0.2rem;
-    border: 1px solid rgba(0, 0, 0, 0.35);
-    border-radius: 50%;
+/* Ready-made looks: big head-and-shoulders pictures, Surprise me beside them. */
+
+.local-vravatar-lookgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+    gap: 0.75rem;
 }
 
-.local-vravatar-buttons {
+.local-vravatar-look {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0.4rem 0.6rem;
+    border: 2px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.9rem;
+    background: var(--bs-body-bg, #fff);
+    color: inherit;
+    font-weight: 600;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.local-vravatar-look:hover {
+    border-color: var(--bs-primary, #0f6cbf);
+    transform: translateY(-2px);
+}
+
+.local-vravatar-look:focus-visible {
+    outline: 3px solid var(--bs-primary, #0f6cbf);
+    outline-offset: 2px;
+}
+
+.local-vravatar-look .local-vravatar-pic {
+    width: 7.5rem;
+    height: 7.5rem;
+}
+
+/* A die, for Surprise me. */
+.local-vravatar-dice {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    background:
+        radial-gradient(circle at 25% 25%, #1d2125 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 75% 25%, #1d2125 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 50% 50%, #1d2125 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 25% 75%, #1d2125 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 75% 75%, #1d2125 0.3rem, transparent 0.32rem),
+        #fff;
+    box-shadow: 0 2px 0 #c9c2b6, 0 0 0 2px #1d2125 inset;
+    transform: rotate(-12deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .local-vravatar-look {
+        transition: none;
+    }
+
+    .local-vravatar-look:hover {
+        transform: none;
+    }
+}
+
+/*
+ * Picture tiles. Each tile is a real radio button (or checkbox) over the whole tile, almost
+ * transparent: clicks, the keyboard (arrow keys within a group, Space) and screen readers work as on
+ * a plain form. The label draws the picture, the name, the chosen state (a border and a check mark)
+ * and the keyboard focus.
+ */
+
+.local-vravatar-tiles {
+    display: grid;
+    padding: 0.5rem 0.5rem 0 0;
+    grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
     gap: 0.5rem;
 }
 
+.local-vravatar-tile {
+    position: relative;
+}
+
+.local-vravatar-tile-input {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0.01;
+    cursor: pointer;
+}
+
+.local-vravatar-tile-label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 0.4rem 0.25rem 0.45rem;
+    border: 2px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.75rem;
+    background: var(--bs-body-bg, #fff);
+    text-align: center;
+}
+
+.local-vravatar-tile-input:hover + .local-vravatar-tile-label {
+    border-color: var(--bs-secondary, #6a737b);
+}
+
+.local-vravatar-tile-input:checked + .local-vravatar-tile-label {
+    border-color: var(--bs-primary, #0f6cbf);
+    background: var(--bs-primary-bg-subtle, #e7f0f9);
+    box-shadow: inset 0 0 0 1px var(--bs-primary, #0f6cbf);
+}
+
+/* The check mark of the chosen tile. */
+.local-vravatar-tile-input:checked + .local-vravatar-tile-label::after {
+    content: "";
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    border: 2px solid var(--bs-body-bg, #fff);
+    border-radius: 50%;
+    background: var(--bs-primary, #0f6cbf) url([[pix:local_vravatar|check]]) center / 75% no-repeat;
+}
+
+.local-vravatar-tile-input:focus-visible + .local-vravatar-tile-label {
+    outline: 3px solid var(--bs-primary, #0f6cbf);
+    outline-offset: 2px;
+}
+
+.local-vravatar-tile-name {
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.local-vravatar-pic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.6rem;
+    background: radial-gradient(circle at 50% 40%, #fffaf2 0%, #e9e1d5 100%);
+    overflow: hidden;
+}
+
+/* A picture drawn by the page: none without JavaScript, so the tile shows its name only. */
+.local-vravatar-pic[data-render] {
+    display: none;
+}
+
+.local-vravatar-js .local-vravatar-pic[data-render] {
+    display: flex;
+}
+
+.local-vravatar-pic img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* A hand style: its silhouette, painted in the hand colour by the page. */
+.local-vravatar-handpic {
+    display: block;
+    width: 78%;
+    height: 78%;
+    background-color: #c99266;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+}
+
+/*
+ * Colours: a compact row of round swatches. The chosen colour's name is shown beside the group's
+ * heading, every name is the swatch's tooltip, and screen readers read the names as labels.
+ */
+
+.local-vravatar-swatchgrid {
+    display: flex;
+    padding: 0.35rem 0.35rem 0 0;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.local-vravatar-tile-swatch .local-vravatar-tile-label {
+    padding: 0.2rem;
+    border-color: transparent;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.local-vravatar-tile-swatch .local-vravatar-tile-input:checked + .local-vravatar-tile-label {
+    border-color: var(--bs-primary, #0f6cbf);
+    background: transparent;
+}
+
+.local-vravatar-tile-swatch .local-vravatar-tile-input:checked + .local-vravatar-tile-label::after {
+    top: -0.3rem;
+    right: -0.3rem;
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.local-vravatar-swatch {
+    display: block;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+}
+
+/* "Same as body colour" and "Same as skin": the colour they follow, with a white ring inside. */
+.local-vravatar-swatch-follows {
+    box-shadow: inset 0 0 0 4px var(--bs-body-bg, #fff);
+}
+
+.local-vravatar-tile-swatch .local-vravatar-tile-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* Costume categories as buttons over the costume grid. */
+
+.local-vravatar-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.5rem 0;
+}
+
+.local-vravatar-chip {
+    padding: 0.2rem 0.75rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 2rem;
+    background: var(--bs-body-bg, #fff);
+    color: inherit;
+    font-size: 0.85rem;
+}
+
+.local-vravatar-chip[aria-pressed="true"] {
+    border-color: var(--bs-primary, #0f6cbf);
+    background: var(--bs-primary-bg-subtle, #e7f0f9);
+    font-weight: 600;
+}
+
+.local-vravatar-chip:focus-visible {
+    outline: 3px solid var(--bs-primary, #0f6cbf);
+    outline-offset: 2px;
+}
+
+/*
+ * The save bar stays at the bottom of the screen while the form scrolls. Its right end stays clear
+ * of floating page buttons (an accessibility toolbar's, the footer's).
+ */
+
+.local-vravatar-savebar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem 5rem 0.75rem 0;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-body-bg, #fff);
+}
+
+.local-vravatar-dirty {
+    color: var(--bs-warning-text-emphasis, #997404);
+    font-weight: 600;
+}
+
+.local-vravatar-reset {
+    color: var(--bs-secondary-color, #6a737b);
+}
+
 .local-vravatar-status {
-    min-height: 1.5rem;
-    margin-top: 0.5rem;
+    flex: 1 0 100%;
+    min-height: 1.25rem;
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 /* Costumes: a grid of thumbnails that wraps, two or more to a row even on a phone. */

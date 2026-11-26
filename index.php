@@ -42,7 +42,8 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($title);
-$PAGE->set_heading(fullname($USER));
+// The page heading is the page's name; the user's picture beside it comes from the user context.
+$PAGE->set_heading($title);
 $PAGE->navbar->add($title, $url);
 
 $userid = (int)$USER->id;
@@ -84,6 +85,5 @@ $PAGE->requires->js_call_amd('local_vravatar/designer', 'init', [[
 ]]);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($title);
 echo $OUTPUT->render($designer);
 echo $OUTPUT->footer();

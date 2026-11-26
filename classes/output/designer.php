@@ -21,10 +21,12 @@ use core\output\renderer_base;
 use core\output\templatable;
 use local_vravatar\local\costumes;
 use local_vravatar\local\design;
+use local_vravatar\local\presets;
 
 /**
- * The "My VR avatar" designer: the choices as labelled radio groups under five headings (head and
- * face, hair, body, costume, extras), the preview and the buttons.
+ * The "My VR avatar" designer: the preview with its tools (presets, surprise me, undo), and the
+ * choices as picture tiles and swatches (labelled radio groups) on six tabs: head and face, hair,
+ * body, costume, hands, extras.
  *
  * @package    local_vravatar
  * @copyright  2026 Adam Jenkins <adam@wisecat.net>
@@ -32,11 +34,11 @@ use local_vravatar\local\design;
  */
 class designer implements renderable, templatable {
     /**
-     * The sections of the form, in page (and keyboard) order: lang string of the heading => keys.
-     * A key in FLAGS is a checkbox, "outfit" the costume picker (thumbnails by category), any other
-     * a radio group. The Extras section also holds the glasses and profile picture checkboxes, drawn
-     * by the template. The costume comes after the body: a costume replaces the body (a device the
-     * head too), and some costumes take the accent colour.
+     * The tabs of the designer, in page (and keyboard) order: lang string of the heading => keys.
+     * A key in FLAGS is a checkbox (ears and glasses as picture tiles, picture as a plain box drawn
+     * by the template in the Extras tab), "outfit" the costume picker (thumbnails by category), a
+     * colour key a row of large swatches and any other key a row of picture tiles. Without
+     * JavaScript every tab is shown, one under the other, as headed sections.
      *
      * @var array
      */
@@ -45,7 +47,57 @@ class designer implements renderable, templatable {
         'section_hair' => ['hair', 'haircolor'],
         'section_body' => ['body', 'color', 'accent'],
         'section_costume' => ['outfit'],
-        'section_extras' => ['hat'],
+        'section_hands' => ['hands', 'handcolor'],
+        'section_extras' => ['hat', 'glasses'],
+    ];
+
+    /**
+     * How the preview frames each tab (data-frame): "face" a close-up of the head, "whole" the whole
+     * avatar, "hands" the head, shoulders and raised hands.
+     *
+     * @var string[]
+     */
+    private const FRAMES = [
+        'section_head' => 'face',
+        'section_hair' => 'face',
+        'section_body' => 'whole',
+        'section_costume' => 'whole',
+        'section_hands' => 'hands',
+        'section_extras' => 'face',
+    ];
+
+    /**
+     * The short name (lang string) and icon (pix/tabs/) of each tab.
+     *
+     * @var array
+     */
+    private const TABS = [
+        'section_head' => ['tab_head', 'face'],
+        'section_hair' => ['tab_hair', 'hair'],
+        'section_body' => ['tab_body', 'body'],
+        'section_costume' => ['tab_costume', 'costume'],
+        'section_hands' => ['tab_hands', 'hands'],
+        'section_extras' => ['tab_extras', 'extras'],
+    ];
+
+    /**
+     * How the picture on each tile of a key is drawn by the page (data-render): "face" the user's
+     * avatar with that choice, seen close up; "whole" the whole avatar. Keys not listed have no
+     * drawn picture (colours are swatches, hands are silhouettes).
+     *
+     * @var string[]
+     */
+    private const RENDERS = [
+        'head' => 'face',
+        'eyes' => 'face',
+        'brows' => 'face',
+        'nose' => 'face',
+        'beard' => 'face',
+        'ears' => 'face',
+        'hair' => 'face',
+        'hat' => 'face',
+        'glasses' => 'face',
+        'body' => 'whole',
     ];
 
     /** @var string[] Lang string of the legend of each group of choices. */
@@ -62,6 +114,8 @@ class designer implements renderable, templatable {
         'nose' => 'nose',
         'beard' => 'beard',
         'hat' => 'hat',
+        'hands' => 'hands',
+        'handcolor' => 'handcolor',
     ];
 
     /**
@@ -109,16 +163,35 @@ class designer implements renderable, templatable {
                         'legend' => get_string($key, 'local_vravatar'),
                         'label' => get_string($key . '_show', 'local_vravatar'),
                         'checked' => !empty($this->current[$key]),
+                        'render' => self::RENDERS[$key] ?? '',
                     ]];
                 } else {
-                    $items[] = ['radio' => $this->radio_group($key, $choices[$key])];
+                    $items[] = ['radio' => $this->radio_group($output, $key, $choices[$key])];
                 }
             }
+            $id = 'local-vravatar-' . str_replace('_', '-', $heading);
+            [$tabstring, $icon] = self::TABS[$heading];
             $sections[] = [
-                'id' => 'local-vravatar-' . str_replace('_', '-', $heading),
+                'id' => $id,
+                'tabid' => $id . '-tab',
                 'heading' => get_string($heading, 'local_vravatar'),
+                'tablabel' => get_string($tabstring, 'local_vravatar'),
+                'icon' => $output->image_url('tabs/' . $icon, 'local_vravatar')->out(false),
+                'frame' => self::FRAMES[$heading],
+                'first' => !$sections,
                 'items' => $items,
                 'isextras' => $heading === 'section_extras',
+                'ishands' => $heading === 'section_hands',
+            ];
+        }
+
+        $presets = [];
+        foreach (presets::for_page() as $preset) {
+            $presets[] = [
+                'id' => $preset['id'],
+                'name' => $preset['name'],
+                // Read by the page (data-design): only allowlisted names, true and false.
+                'json' => json_encode($preset['design']),
             ];
         }
 
@@ -134,6 +207,9 @@ class designer implements renderable, templatable {
             'hasdesign' => $this->hasdesign,
             'credits' => $credits,
             'hascredits' => (bool)$credits,
+            'presets' => $presets,
+            'haspresets' => (bool)$presets,
+            'looksicon' => $output->image_url('tabs/looks', 'local_vravatar')->out(false),
         ];
     }
 
@@ -229,40 +305,60 @@ class designer implements renderable, templatable {
     }
 
     /**
-     * One group of radio buttons for the template.
+     * One group of radio buttons for the template: large swatches for a colour, picture tiles for
+     * anything else.
      *
+     * A tile's picture is drawn by the page from the avatar builder (render), or is a fixed picture:
+     * a hat that is a costume model shows its thumbnail, a hand style its silhouette (mask, painted
+     * in the hand colour by the page).
+     *
+     * @param renderer_base $output Renderer.
      * @param string $key Document key.
      * @param string[] $values Allowed values, in order.
-     * @return array {name, id, legend, isswatch, options: [{value, id, label, checked, swatch, palette, model,
-     *     credit}]}
+     * @return array {name, id, legend, isswatch, render, options: [{value, id, label, checked, swatch,
+     *     palette, model, credit, pic, mask}]}
      */
-    protected function radio_group(string $key, array $values): array {
+    protected function radio_group(renderer_base $output, string $key, array $values): array {
         [$swatches, $palette] = match ($key) {
             'color', 'accent' => [design::SWATCHES, 'colour'],
             'haircolor' => [design::HAIRSWATCHES, 'hair'],
             'skin' => [design::SKINSWATCHES, 'skin'],
+            'handcolor' => [design::SWATCHES, 'colour'],
             default => [[], ''],
         };
+        $isswatch = (bool)$swatches;
         $options = [];
         foreach ($values as $value) {
             // A hat that is a costume model: the preview loads it, and its credit is shown.
             $hatcostume = $key === 'hat' && isset(costumes::HATS[$value]) ? costumes::get(costumes::HATS[$value]) : null;
+            $pic = '';
+            $mask = '';
+            if ($hatcostume) {
+                $pic = $output->image_url('costumes/' . $hatcostume['id'], 'local_vravatar')->out(false);
+            } else if ($key === 'hands') {
+                $mask = $output->image_url('hands/' . $value, 'local_vravatar')->out(false);
+            }
             $options[] = [
                 'value' => $value,
                 'id' => 'local-vravatar-' . $key . '-' . $value,
                 'label' => get_string(self::option_string($key, $value), 'local_vravatar'),
                 'checked' => $this->current[$key] === $value,
                 'swatch' => $swatches[$value] ?? '',
+                // The values "match" and "skin" have no colour of their own: the page paints the one they follow.
+                'follows' => $isswatch && !isset($swatches[$value]),
                 'palette' => $palette,
                 'model' => $hatcostume ? costumes::model_url($hatcostume['id'])->out(false) : '',
                 'credit' => $hatcostume ? self::credit_line($hatcostume) : '',
+                'pic' => $pic,
+                'mask' => $mask,
+                'render' => ($pic === '' && $mask === '') ? (self::RENDERS[$key] ?? '') : '',
             ];
         }
         return [
             'name' => $key,
             'id' => 'local-vravatar-group-' . $key,
             'legend' => get_string(self::LEGENDS[$key], 'local_vravatar'),
-            'isswatch' => (bool)$swatches,
+            'isswatch' => $isswatch,
             'options' => $options,
         ];
     }
@@ -278,6 +374,7 @@ class designer implements renderable, templatable {
         return match ($key) {
             'color', 'accent' => 'colour_' . $value,
             'haircolor' => 'haircolour_' . $value,
+            'handcolor' => $value === 'skin' ? 'handcolour_skin' : 'colour_' . $value,
             'skin' => 'skin_' . $value,
             default => $key . '_' . $value,
         };

@@ -68,6 +68,8 @@ final class design_test extends \advanced_testcase {
             'glasses' => false,
             'hat' => 'none',
             'outfit' => 'none',
+            'hands' => 'sphere',
+            'handcolor' => 'skin',
             'picture' => true,
         ];
         $this->assertSame($expected, design::defaults());
@@ -175,6 +177,26 @@ final class design_test extends \advanced_testcase {
         $this->assertFalse($clean['ears']);
         $this->assertSame('none', $clean['beard']);
         $this->assertSame('none', $clean['outfit']);
+        // Hands as before hand styles existed: two balls in the skin colour.
+        $this->assertSame('sphere', $clean['hands']);
+        $this->assertSame('skin', $clean['handcolor']);
+    }
+
+    /**
+     * Every hand style and hand colour is kept; anything else falls back to today's hands.
+     */
+    public function test_hands(): void {
+        foreach (design::HANDSTYLES as $style) {
+            $this->assertSame($style, design::clean(['hands' => $style])['hands']);
+        }
+        foreach (design::handcolours() as $colour) {
+            $this->assertSame($colour, design::clean(['handcolor' => $colour])['handcolor']);
+        }
+        $this->assertSame('skin', design::handcolours()[0]);
+        $clean = design::clean(['hands' => 'claw', 'handcolor' => 'gold']);
+        $this->assertSame('sphere', $clean['hands']);
+        $this->assertSame('skin', $clean['handcolor']);
+        $this->assertSame('sphere', design::clean(['hands' => ['mitten']])['hands']);
     }
 
     /**
