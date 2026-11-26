@@ -209,8 +209,10 @@ final class design {
 
     /**
      * The standard look of a person who has not saved an avatar: a friendly figure with the face
-     * drawn on the head, in a body colour that is always the same for that person (picked from
-     * their user id), with a white accent and round hands. No profile picture: they did not choose
+     * drawn on the head (round eyes, thin brows, a small nose) and short brown hair, in a body
+     * colour that is always the same for that person (picked from their user id), with a white
+     * accent and round hands. The skin follows the body colour, as in the first version: a cartoon
+     * colour, not a guess at anyone's skin tone. No profile picture: they did not choose
      * one. Saved designs never use this: a stored document is cleaned against defaults(), so it
      * keeps the look it had.
      *
@@ -223,6 +225,11 @@ final class design {
             'color' => $colours[abs($userid) % count($colours)],
             'accent' => 'white',
             'face' => 'drawn',
+            'eyes' => 'round',
+            'brows' => 'thin',
+            'nose' => 'small',
+            'hair' => 'short',
+            'haircolor' => 'brown',
             'picture' => false,
         ]));
     }
