@@ -14,7 +14,9 @@ Feature: Users design their own VR avatar
     Given I log in as "student1"
     And I follow "Profile" in the user menu
     When I click on "My VR avatar" "link"
-    Then I should see "The same avatar is used in every live room on this site"
+    Then I should see "How you look in the live rooms of VR room activities"
+    And I click on "Who sees my avatar?" "text"
+    And I should see "The same avatar is used in every live room on this site"
     And I should see "Only the people in the same live room as you see your avatar"
     And I should see "You have not saved an avatar yet"
     And I should see "Pick a look to start, then change anything"

@@ -98,8 +98,22 @@
         display: block;
     }
 
-    .local-vravatar-js [data-region="nodesign"] {
+    .local-vravatar-js [data-region="nodesign"],
+    .local-vravatar-js .local-vravatar-lookshelp {
         display: none;
+    }
+
+    .local-vravatar .local-vravatar-intro {
+        margin-bottom: 0.5rem;
+    }
+
+    .local-vravatar-looks h3 {
+        font-size: 1rem;
+    }
+
+    .local-vravatar .local-vravatar-look .local-vravatar-pic {
+        width: 6.5rem;
+        height: 6.5rem;
     }
 
     .local-vravatar-js .local-vravatar-preview {
@@ -114,14 +128,14 @@
         position: sticky;
         top: var(--navbar-height, 60px);
         z-index: 4;
-        height: 30vh;
+        height: 26vh;
         aspect-ratio: auto;
         border-radius: 0 0 0.5rem 0.5rem;
     }
 
     .local-vravatar-js .local-vravatar-tablist {
         position: sticky;
-        top: calc(var(--navbar-height, 60px) + 30vh);
+        top: calc(var(--navbar-height, 60px) + 26vh);
         z-index: 3;
         flex-wrap: nowrap;
         gap: 0.1rem;
@@ -131,8 +145,8 @@
     .local-vravatar-js .local-vravatar-tab {
         flex: 1 1 0;
         min-width: 0;
-        padding: 0.35rem 0.1rem 0.25rem;
-        font-size: 0.68rem;
+        padding: 0.35rem 0.05rem 0.25rem;
+        font-size: 0.62rem;
     }
 
     .local-vravatar-js .local-vravatar-tabicon {
@@ -145,7 +159,7 @@
     }
 
     .local-vravatar .local-vravatar-grouphead {
-        top: calc(var(--navbar-height, 60px) + 30vh + var(--local-vravatar-tabs, 4rem));
+        top: calc(var(--navbar-height, 60px) + 26vh + var(--local-vravatar-tabs, 4rem));
     }
 
     .local-vravatar-previewbuttons {
@@ -641,7 +655,11 @@
     font-size: 0.9rem;
 }
 
-/* Costumes: a grid of thumbnails that wraps, two or more to a row even on a phone. */
+/* Costumes: picture tiles like the other choices, by category; "No costume" shows the user's own avatar. */
+
+.local-vravatar-costumenone {
+    margin-bottom: 0.5rem;
+}
 
 .local-vravatar-costumecategory {
     margin: 0.75rem 0 0;
@@ -655,48 +673,9 @@
 
 .local-vravatar-costumegrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
     gap: 0.5rem;
-}
-
-.local-vravatar-costume {
-    position: relative;
-}
-
-.local-vravatar-costume-input {
-    position: absolute;
-    top: 0.4rem;
-    left: 0.4rem;
-    width: 1.1rem;
-    height: 1.1rem;
-    margin: 0;
-}
-
-.local-vravatar-costume-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    padding: 0.4rem 0.3rem 0.35rem;
-    border: 2px solid var(--bs-border-color, #dee2e6);
-    border-radius: 0.5rem;
-    background: var(--bs-body-bg, #fff);
-    text-align: center;
-    cursor: pointer;
-}
-
-.local-vravatar-costume-label:hover {
-    border-color: var(--bs-secondary, #6a737b);
-}
-
-.local-vravatar-costume-input:checked + .local-vravatar-costume-label {
-    border-color: var(--bs-primary, #0f6cbf);
-    background: var(--bs-primary-bg-subtle, #e7f0f9);
-}
-
-.local-vravatar-costume-input:focus-visible + .local-vravatar-costume-label {
-    outline: 3px solid var(--bs-primary, #0f6cbf);
-    outline-offset: 2px;
+    padding: 0.5rem 0.5rem 0 0;
 }
 
 .local-vravatar-costume-thumb {
@@ -706,12 +685,6 @@
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: contain;
-}
-
-.local-vravatar-costume-name {
-    margin-top: 0.25rem;
-    font-size: 0.85rem;
-    line-height: 1.2;
 }
 
 .local-vravatar-credit {

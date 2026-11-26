@@ -245,9 +245,10 @@
 }}
 <div class="local-vravatar" data-region="local-vravatar-designer">
     <div class="local-vravatar-intro">
-        <p class="mb-1">{{#str}}intro, local_vravatar{{/str}}</p>
+        <p class="mb-1">{{#str}}introshort, local_vravatar{{/str}}</p>
         <details class="small text-muted">
             <summary>{{#str}}whosees_title, local_vravatar{{/str}}</summary>
+            <p class="mb-1">{{#str}}intro, local_vravatar{{/str}}</p>
             <p class="mb-0">{{#str}}whosees, local_vravatar{{/str}}</p>
         </details>
         {{^hasdesign}}
@@ -321,7 +322,7 @@
                     <section class="local-vravatar-section local-vravatar-looks" id="local-vravatar-section-looks"
                         aria-labelledby="local-vravatar-looks-heading" data-region="looks" hidden>
                         <h3 class="h5" id="local-vravatar-looks-heading">{{#str}}looks_heading, local_vravatar{{/str}}</h3>
-                        <p class="small text-muted" id="local-vravatar-presets-help">{{#str}}presets_help, local_vravatar{{/str}}</p>
+                        <p class="small text-muted local-vravatar-lookshelp" id="local-vravatar-presets-help">{{#str}}presets_help, local_vravatar{{/str}}</p>
                         <div class="local-vravatar-lookgrid">
                             {{#presets}}
                                 <button type="button" class="local-vravatar-look" data-action="preset" data-preset="{{id}}"
@@ -384,10 +385,16 @@
                                     <legend class="h6">{{legend}}</legend>
                                     <p class="form-text text-muted" id="local-vravatar-outfit-help">{{#str}}outfit_help, local_vravatar{{/str}}</p>
                                     {{#none}}
-                                        <div class="form-check local-vravatar-option">
-                                            <input class="form-check-input" type="radio" name="{{name}}" value="{{value}}" id="{{id}}"
-                                                {{#checked}}checked{{/checked}}>
-                                            <label class="form-check-label" for="{{id}}">{{label}}</label>
+                                        <div class="local-vravatar-tiles local-vravatar-costumenone">
+                                            <div class="local-vravatar-tile">
+                                                <input class="local-vravatar-tile-input" type="radio" name="{{name}}" value="{{value}}"
+                                                    id="{{id}}" {{#checked}}checked{{/checked}}>
+                                                <label class="local-vravatar-tile-label" for="{{id}}">
+                                                    <span class="local-vravatar-pic" aria-hidden="true" data-render="whole" data-key="outfit"
+                                                        data-value="none"></span>
+                                                    <span class="local-vravatar-tile-name">{{label}}</span>
+                                                </label>
+                                            </div>
                                         </div>
                                     {{/none}}
                                     {{#categories}}
@@ -395,14 +402,14 @@
                                             <legend class="local-vravatar-costumelegend">{{legend}}</legend>
                                             <div class="local-vravatar-costumegrid">
                                                 {{#options}}
-                                                    <div class="local-vravatar-costume">
-                                                        <input class="local-vravatar-costume-input" type="radio" name="outfit"
+                                                    <div class="local-vravatar-tile local-vravatar-costume">
+                                                        <input class="local-vravatar-tile-input" type="radio" name="outfit"
                                                             value="{{value}}" id="{{id}}" data-model="{{model}}" data-kind="{{kind}}"
                                                             {{#checked}}checked{{/checked}}>
-                                                        <label class="local-vravatar-costume-label" for="{{id}}">
+                                                        <label class="local-vravatar-tile-label" for="{{id}}">
                                                             <img class="local-vravatar-costume-thumb" src="{{thumb}}" alt="" width="96" height="96"
                                                                 loading="lazy">
-                                                            <span class="local-vravatar-costume-name">{{label}}</span>
+                                                            <span class="local-vravatar-tile-name">{{label}}</span>
                                                             {{#credit}}<span class="local-vravatar-credit">{{credit}}</span>{{/credit}}
                                                         </label>
                                                     </div>

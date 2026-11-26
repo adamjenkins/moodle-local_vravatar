@@ -230,19 +230,19 @@ final class designer_test extends \advanced_testcase {
 
         $this->assertStringContainsString(get_string('section_costume', 'local_vravatar'), $html);
         $this->assertMatchesRegularExpression(
-            '~<input class="form-check-input" type="radio" name="outfit" value="none" id="local-vravatar-outfit-none"~',
+            '~<input class="local-vravatar-tile-input" type="radio" name="outfit" value="none"\s+id="local-vravatar-outfit-none"~',
             $html
         );
         foreach (costumes::outfit_ids() as $id) {
             $this->assertMatchesRegularExpression(
-                '~<input class="local-vravatar-costume-input" type="radio" name="outfit"\s+value="' . preg_quote($id, '~') .
+                '~<input class="local-vravatar-tile-input" type="radio" name="outfit"\s+value="' . preg_quote($id, '~') .
                     '" id="local-vravatar-outfit-' . preg_quote($id, '~') . '" data-model="[^"]*/local/vravatar/costumes/' .
                     preg_quote($id, '~') . '\.glb"~',
                 $html,
                 $id
             );
             $this->assertStringContainsString(
-                '<label class="local-vravatar-costume-label" for="local-vravatar-outfit-' . $id . '">',
+                '<label class="local-vravatar-tile-label" for="local-vravatar-outfit-' . $id . '">',
                 $html
             );
         }

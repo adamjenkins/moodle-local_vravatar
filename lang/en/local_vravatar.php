@@ -175,6 +175,7 @@ $string['head_oval'] = 'Oval';
 $string['head_round'] = 'Round';
 $string['head_square'] = 'Rounded square';
 $string['intro'] = 'Choose how you look to others in the live rooms of VR room activities. The same avatar is used in every live room on this site, in all your courses.';
+$string['introshort'] = 'How you look in the live rooms of VR room activities, in all your courses.';
 $string['looks_heading'] = 'Pick a look to start, then change anything';
 $string['myavatar'] = 'My VR avatar';
 $string['nodesign'] = 'You have not saved an avatar yet, so you have the standard look: a simple figure in a colour picked for you.';
