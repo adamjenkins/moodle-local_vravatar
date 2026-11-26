@@ -204,6 +204,29 @@ final class design {
         ];
     }
 
+    /** @var string[] The body colours a standard look is picked from (the bright ones). */
+    public const STANDARD_COLOURS = ['red', 'orange', 'yellow', 'green', 'teal', 'cyan', 'blue', 'indigo', 'purple', 'pink'];
+
+    /**
+     * The standard look of a person who has not saved an avatar: a friendly figure with the face
+     * drawn on the head, in a body colour that is always the same for that person (picked from
+     * their user id), with a white accent and round hands. No profile picture: they did not choose
+     * one. Saved designs never use this: a stored document is cleaned against defaults(), so it
+     * keeps the look it had.
+     *
+     * @param int $userid User id.
+     * @return array A clean document.
+     */
+    public static function standard(int $userid): array {
+        $colours = self::STANDARD_COLOURS;
+        return self::clean(array_merge(self::defaults(), [
+            'color' => $colours[abs($userid) % count($colours)],
+            'accent' => 'white',
+            'face' => 'drawn',
+            'picture' => false,
+        ]));
+    }
+
     /**
      * Clean a document against the allowlist.
      *

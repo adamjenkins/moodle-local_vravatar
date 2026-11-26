@@ -128,14 +128,15 @@
         position: sticky;
         top: var(--navbar-height, 60px);
         z-index: 4;
-        height: 26vh;
+        /* The 3D view (24vh) and, under it, the toolbar's own strip, so no button covers the avatar. */
+        height: calc(24vh + 3.25rem);
         aspect-ratio: auto;
         border-radius: 0 0 0.5rem 0.5rem;
     }
 
     .local-vravatar-js .local-vravatar-tablist {
         position: sticky;
-        top: calc(var(--navbar-height, 60px) + 26vh);
+        top: calc(var(--navbar-height, 60px) + 24vh + 3.25rem);
         z-index: 3;
         flex-wrap: nowrap;
         gap: 0.1rem;
@@ -159,14 +160,42 @@
     }
 
     .local-vravatar .local-vravatar-grouphead {
-        top: calc(var(--navbar-height, 60px) + 26vh + var(--local-vravatar-tabs, 4rem));
+        top: calc(var(--navbar-height, 60px) + 24vh + 3.25rem + var(--local-vravatar-tabs, 4rem));
     }
 
-    /* Nearer the edge on a small preview. */
+    /* Nearer the edge and smaller on a small preview, so the avatar stays in view. */
     .local-vravatar .local-vravatar-coach {
-        top: 0.5rem;
-        left: 0.5rem;
-        right: 0.5rem;
+        top: 0.4rem;
+        left: 0.4rem;
+        right: 0.4rem;
+        padding: 0.25rem 0.25rem 0.25rem 0.6rem;
+    }
+
+    .local-vravatar .local-vravatar-coachtext {
+        font-size: 0.8125rem;
+    }
+
+    .local-vravatar .local-vravatar-gbtn-close {
+        width: 30px;
+        height: 30px;
+    }
+
+    .local-vravatar-js .local-vravatar-canvas {
+        height: calc(100% - 3.25rem);
+    }
+
+    .local-vravatar .local-vravatar-tools {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        justify-content: center;
+        gap: 0.25rem;
+        height: 3.25rem;
+        padding: 0.25rem;
+        border-width: 1px 0 0;
+        border-radius: 0 0 0.5rem 0.5rem;
+        transform: none;
+        box-shadow: none;
     }
 
     .local-vravatar-savebar {

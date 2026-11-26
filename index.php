@@ -70,14 +70,16 @@ if ($action === 'remove') {
 }
 
 $saved = design::load($userid);
-$current = $saved ?? design::defaults();
+// Someone without a saved avatar starts from their standard look, the one others see now.
+$current = $saved ?? design::standard($userid);
 $user = \core_user::get_user($userid, design::picture_fields(), MUST_EXIST);
 $pictureurl = design::picture_url($user, $PAGE);
 
 $designer = new \local_vravatar\output\designer($current, $saved !== null, $pictureallowed, $pictureurl !== '', $url);
 $PAGE->requires->js_call_amd('local_vravatar/designer', 'init', [[
     'design' => $current,
-    'defaults' => design::defaults(),
+    // Reset to default goes back to the standard look.
+    'defaults' => design::standard($userid),
     'pictureurl' => $pictureurl,
     'pictureallowed' => $pictureallowed,
     'name' => fullname($USER),

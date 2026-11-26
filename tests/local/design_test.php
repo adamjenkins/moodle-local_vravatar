@@ -358,4 +358,24 @@ final class design_test extends \advanced_testcase {
         $CFG->enablegravatar = 1;
         $this->assertStringContainsString('gravatar.com/avatar/', design::picture_url($userwithout, $PAGE));
     }
+
+    /**
+     * The standard look: drawn face, a bright body colour that is always the same for a user, a white
+     * accent, no picture; and a saved design without the newer keys still reads as the screen face.
+     */
+    public function test_standard(): void {
+        $a = design::standard(17);
+        $this->assertSame($a, design::standard(17));
+        $this->assertSame($a, design::clean($a));
+        $this->assertSame('drawn', $a['face']);
+        $this->assertSame('white', $a['accent']);
+        $this->assertFalse($a['picture']);
+        $this->assertContains($a['color'], design::STANDARD_COLOURS);
+        $colours = [];
+        foreach (range(1, 10) as $id) {
+            $colours[] = design::standard($id)['color'];
+        }
+        $this->assertCount(10, array_unique($colours));
+        $this->assertSame('plate', design::clean(['color' => 'red'])['face']);
+    }
 }

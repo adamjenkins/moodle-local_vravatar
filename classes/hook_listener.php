@@ -32,7 +32,8 @@ final class hook_listener {
      *
      * mod_vrroom dispatches the hook while it builds the list of the people in one live room, so
      * the designs (and profile picture addresses) reach only the others in that room. People without
-     * a saved design are left alone and keep the standard look. The profile picture is given only when
+     * a saved design get the standard look (design::standard(): a friendly figure with a drawn face,
+     * in a colour that is always theirs). The profile picture is given only when
      * the site allows it, the user chose it and the user has a picture worth showing. A design that
      * wears a costume, or a hat that is a costume model, also gives the addresses of those models
      * (assets "outfit" and "hat", static files of this plugin).
@@ -48,9 +49,6 @@ final class hook_listener {
             return;
         }
         $designs = design::load_many(array_column($peers, 'userid'));
-        if (!$designs) {
-            return;
-        }
 
         $pictures = [];
         if (design::picture_allowed()) {
@@ -65,7 +63,11 @@ final class hook_listener {
 
         foreach ($peers as $peer) {
             $userid = (int)($peer['userid'] ?? 0);
+            if ($userid <= 0) {
+                continue;
+            }
             if (!isset($designs[$userid])) {
+                $hook->set_appearance((string)$peer['peerid'], design::standard($userid), '', []);
                 continue;
             }
             $url = $pictures[$userid] ?? '';

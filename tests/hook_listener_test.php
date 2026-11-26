@@ -85,7 +85,7 @@ final class hook_listener_test extends \advanced_testcase {
     }
 
     /**
-     * Only users with a design get an appearance; the picture only for the user who chose it and has one.
+     * Users with a design get it, the others the standard look; the picture only for the user who chose it and has one.
      */
     public function test_fills_designs_and_pictures(): void {
         // As in a live room: a logged-in user asks (with forced login, others get the default picture).
@@ -94,8 +94,12 @@ final class hook_listener_test extends \advanced_testcase {
         hook_listener::avatar_appearance($hook);
         $appearances = $hook->get_appearances();
 
-        $this->assertEqualsCanonicalizing(['peera', 'peerb', 'peerd'], array_keys($appearances));
-        $this->assertArrayNotHasKey('peerc', $appearances);
+        $this->assertEqualsCanonicalizing(['peera', 'peerb', 'peerc', 'peerd'], array_keys($appearances));
+        // No saved design: the standard look, drawn face, no picture.
+        $this->assertSame(design::standard((int)$this->nodesign->id), $appearances['peerc']['appearance']);
+        $this->assertSame('drawn', $appearances['peerc']['appearance']['face']);
+        $this->assertFalse($appearances['peerc']['appearance']['picture']);
+        $this->assertSame('', $appearances['peerc']['picture']);
 
         $this->assertSame('red', $appearances['peera']['appearance']['color']);
         $this->assertTrue($appearances['peera']['appearance']['picture']);
@@ -175,16 +179,18 @@ final class hook_listener_test extends \advanced_testcase {
     }
 
     /**
-     * Nothing happens for an empty room or a room of people without designs.
+     * Nothing happens for an empty room; a room of people without designs gets their standard looks.
      */
-    public function test_nothing_without_designs(): void {
+    public function test_rooms_without_designs(): void {
         $hook = new avatar_appearance([], $this->context);
         hook_listener::avatar_appearance($hook);
         $this->assertSame([], $hook->get_appearances());
 
         $hook = new avatar_appearance([['peerid' => 'peerc', 'userid' => (int)$this->nodesign->id]], $this->context);
         hook_listener::avatar_appearance($hook);
-        $this->assertSame([], $hook->get_appearances());
+        $appearances = $hook->get_appearances();
+        $this->assertSame(['peerc'], array_keys($appearances));
+        $this->assertSame(design::standard((int)$this->nodesign->id), $appearances['peerc']['appearance']);
     }
 
     /**
