@@ -366,6 +366,28 @@ final class design {
     ];
 
 
+    /**
+     * The costumes made in code by the avatar builder (no model file, so no asset): group => ids, in
+     * the designer's order. Mirrors COSTUMES and GROUPS of vrroomruntime_builtin/live/avatarwardrobe
+     * (VR room). Printed by the wardrobe tools' print-choices.mjs (dev-docs); print it again when the
+     * module's list changes.
+     *
+     * @var array
+     */
+    public const WARDROBE = [
+        'travel' => ['pilot', 'cabincrew', 'groundstaff'],
+        'work' => ['security', 'police', 'firefighter', 'builder', 'farmer'],
+        'service' => ['waiter', 'chef', 'barista', 'receptionist', 'porter', 'postal', 'shop', 'market', 'guide'],
+        'health' => ['doctor', 'nurse', 'scrubs'],
+        'science' => ['labcoat'],
+        'school' => ['teacher', 'librarian', 'gown'],
+        'everyday' => ['summer', 'hoodie', 'cardigan', 'wintercoat', 'dress', 'skirt'],
+        'formal' => ['office', 'suit', 'tailcoat'],
+        'traditional' => ['kilt', 'yukata', 'hanbok', 'sari', 'kurta', 'dashiki', 'qipao'],
+        'sport' => ['athlete', 'tracksuit'],
+        'fun' => ['astronaut', 'knight', 'wizard', 'detective', 'explorer', 'superhero', 'captain', 'deckhand'],
+    ];
+
     /** @var string[] Keys of the document that are true or false. */
     public const FLAGS = ['ears', 'glasses', 'picture'];
 
@@ -389,8 +411,9 @@ final class design {
     /**
      * The allowed values of every key that takes a name.
      *
-     * "outfit" is "none" or the id of one of the costumes this plugin ships whose kind is body or
-     * device (costumes/costumes.json, see costumes::outfit_ids()). The hat "pirate" is a costume
+     * "outfit" is "none", one of the costumes the avatar builder makes in code (WARDROBE), or the id
+     * of one of the costume models this plugin ships whose kind is body or device
+     * (costumes/costumes.json, see costumes::outfit_ids()). The hat "pirate" is a costume
      * model too (costumes::HATS). The face, hair and headwear keys and the head shapes are the
      * avatar builder's lists (MODULE_KEYS), with every value of the first versions.
      *
@@ -403,7 +426,7 @@ final class design {
             'color' => self::COLOURS,
             'accent' => self::COLOURS,
             'haircolor' => self::HAIRCOLOURS,
-            'outfit' => array_merge(['none'], costumes::outfit_ids()),
+            'outfit' => array_merge(['none'], self::wardrobe_ids(), costumes::outfit_ids()),
             'hands' => self::HANDSTYLES,
             'handcolor' => self::handcolours(),
             // The value "plate" is the first version's face screen; "drawn" paints the face on the skin.
@@ -414,6 +437,15 @@ final class design {
             $choices[$key] = array_values(array_unique(array_merge($values, self::FIRST_CHOICES[$key] ?? [])));
         }
         return $choices;
+    }
+
+    /**
+     * The ids of the costumes made in code (WARDROBE), in the designer's order.
+     *
+     * @return string[]
+     */
+    public static function wardrobe_ids(): array {
+        return array_merge(...array_values(self::WARDROBE));
     }
 
     /**

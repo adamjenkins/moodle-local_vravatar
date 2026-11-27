@@ -209,7 +209,10 @@ final class designer_test extends \advanced_testcase {
         $this->assertFalse($picker['none']['checked']);
 
         $categories = array_map(fn($c) => substr($c['id'], strlen('local-vravatar-costumes-')), $picker['categories']);
-        $this->assertSame(costumes::CATEGORIES, $categories);
+        // The groups of the costumes made in code first, then the models' categories, unchanged.
+        $this->assertSame(array_merge(['travel', 'work', 'service', 'health', 'science', 'school', 'everyday', 'formal',
+            'traditional', 'sport', 'fun'], costumes::CATEGORIES), $categories);
+        $this->assertSame(get_string('costumecat_travel', 'local_vravatar'), $picker['categories'][0]['legend']);
 
         $options = [];
         foreach ($picker['categories'] as $category) {
@@ -218,8 +221,19 @@ final class designer_test extends \advanced_testcase {
                 $options[$option['value']] = $option;
             }
         }
-        $this->assertSame(costumes::outfit_ids(), array_keys($options));
+        $this->assertSame(array_merge(design::wardrobe_ids(), costumes::outfit_ids()), array_keys($options));
+        // A costume made in code is drawn on the user's avatar: no thumbnail, model or credit.
+        foreach (design::wardrobe_ids() as $id) {
+            $option = $options[$id];
+            unset($options[$id]);
+            $this->assertSame(get_string(costumes::name_string($id), 'local_vravatar'), $option['label']);
+            $this->assertStringNotContainsString('[[', $option['label']);
+            $drawn = [$option['thumb'], $option['model'], $option['credit'], $option['render']];
+            $this->assertSame(['', '', '', 'whole'], $drawn, $id);
+            $this->assertFalse($option['checked'], $id);
+        }
         foreach ($options as $id => $option) {
+            $this->assertSame('', $option['render'], $id);
             $this->assertSame(get_string(costumes::name_string($id), 'local_vravatar'), $option['label']);
             $this->assertStringContainsString('costumes/' . $id, $option['thumb']);
             $this->assertStringEndsWith('/local/vravatar/costumes/' . $id . '.glb', $option['model']);

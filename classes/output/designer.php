@@ -283,18 +283,42 @@ class designer implements renderable, templatable {
     }
 
     /**
-     * The costume picker: "No costume", then one group of thumbnails per category.
+     * The costume picker: "No costume", then one group of tiles per category: first the groups of
+     * the costumes the avatar builder makes in code (drawn live on the user's avatar, render
+     * "whole"), then the categories of the costume models (thumbnails).
      *
-     * Each costume is a radio button whose label holds its thumbnail, its name and, when its licence
-     * asks for it, the author's credit. data-model gives the designer's preview the model's address.
+     * Each costume is a radio button whose label holds its picture, its name and, when its licence
+     * asks for it, the author's credit. data-model gives the designer's preview a model's address.
      *
      * @param renderer_base $output Renderer.
      * @param string[] $allowed Allowed values of "outfit": "none" and the costume ids.
      * @return array {name, id, legend, none: option, categories: [{id, legend, options}]}
      */
     protected function costume_group(renderer_base $output, array $allowed): array {
-        $bycategory = array_fill_keys(costumes::CATEGORIES, []);
+        // The costumes made in code come first, by their groups; then the models' categories.
+        $wardrobe = [];
+        foreach (design::WARDROBE as $group => $ids) {
+            foreach ($ids as $id) {
+                $wardrobe[$id] = $group;
+            }
+        }
+        $bycategory = array_fill_keys(array_merge(array_keys(design::WARDROBE), costumes::CATEGORIES), []);
         foreach ($allowed as $id) {
+            if (isset($wardrobe[$id])) {
+                // Drawn live on the user's own avatar: no thumbnail, no model, no credit.
+                $bycategory[$wardrobe[$id]][] = [
+                    'value' => $id,
+                    'id' => 'local-vravatar-outfit-' . $id,
+                    'label' => get_string(costumes::name_string($id), 'local_vravatar'),
+                    'checked' => $this->current['outfit'] === $id,
+                    'thumb' => '',
+                    'model' => '',
+                    'credit' => '',
+                    'kind' => 'body',
+                    'render' => 'whole',
+                ];
+                continue;
+            }
             $entry = costumes::get($id);
             if ($entry === null) {
                 continue;
@@ -308,6 +332,7 @@ class designer implements renderable, templatable {
                 'model' => costumes::model_url($id)->out(false),
                 'credit' => self::credit_line($entry),
                 'kind' => $entry['kind'],
+                'render' => '',
             ];
         }
         $categories = [];

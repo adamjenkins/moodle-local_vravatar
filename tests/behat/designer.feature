@@ -128,6 +128,8 @@ Feature: Users design their own VR avatar
     And the "aria-pressed" attribute of "Show the whole avatar" "button" should contain "false"
     When I click on "Costume" "button" in the "[role='tablist']" "css_element"
     Then the "aria-pressed" attribute of "Show the whole avatar" "button" should contain "true"
+    # The costume tab opens on its first category (the costumes made in code).
+    And I press "Pirates"
     And I set the field "Pirate captain" to "1"
     And "[data-region='canvas']" "css_element" should be visible
     And "[data-render='face'] img" "css_element" should exist
@@ -215,9 +217,12 @@ Feature: Users design their own VR avatar
     When I click on "Costume" "button" in the "[role='tablist']" "css_element"
     Then I should see "Pirates"
     And I should see "Computers"
+    And I should see "Travel"
+    And I press "Suits"
     And I should see "by Ian MacGillivray, CC BY 3.0"
     And the field "No costume" matches value "1"
-    When I set the field "Pirate captain" to "1"
+    When I press "Pirates"
+    And I set the field "Pirate captain" to "1"
     And I click on "Extras" "button" in the "[role='tablist']" "css_element"
     # The pirate hat's label also holds its credit line, so it is found by its id.
     And I set the field "local-vravatar-hat-pirate" to "1"

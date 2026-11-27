@@ -33,6 +33,7 @@
 
 import * as THREE from 'vrroomruntime_builtin/three';
 import * as AvatarModel from 'vrroomruntime_builtin/live/avatarmodel';
+import * as Wardrobe from 'vrroomruntime_builtin/live/avatarwardrobe';
 import Log from 'core/log';
 
 /** Size of a picture (px, before the device pixel ratio). */
@@ -47,6 +48,21 @@ const FOV = 26;
 /** The keys a tile picture never shows: models need loading, the picture is the user's own. */
 const NEUTRAL = {outfit: 'none', picture: false};
 
+/**
+ * What a picture shows of a design: a costume made in code is kept (it needs no model), a costume
+ * model and the profile picture are not.
+ *
+ * @param {Object} design The design.
+ * @returns {Object} A new design.
+ */
+const neutral = (design) => {
+    const shown = Object.assign({}, design, NEUTRAL);
+    if (Array.isArray(Wardrobe.COSTUMES) && Wardrobe.COSTUMES.indexOf(design.outfit) >= 0) {
+        shown.outfit = design.outfit;
+    }
+    return shown;
+};
+
 /** The keys whose tiles are drawn without eyewear: what they change is round the eyes. */
 const EYE_KEYS = ['eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'makeup', 'lines'];
 
@@ -60,7 +76,7 @@ const EYE_KEYS = ['eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'makeup'
  * @returns {Object} The design to draw.
  */
 const tileDesign = (design, key, value) => {
-    const shown = Object.assign({}, design, NEUTRAL);
+    const shown = neutral(design);
     if (key !== 'hat') {
         shown.hat = 'none';
     } else if (Array.isArray(AvatarModel.MODEL_HATS) && AvatarModel.MODEL_HATS.indexOf(value) >= 0) {
@@ -297,7 +313,7 @@ export const createTiles = (config) => {
         presets(design, presets) {
             presets.forEach(([holder, keys]) => {
                 queue.push(() => {
-                    const shown = Object.assign({}, design, keys, NEUTRAL);
+                    const shown = neutral(Object.assign({}, design, keys));
                     show(holder, draw(shown, 'bust', LOOKSIZE), LOOKSIZE);
                 });
             });

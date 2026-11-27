@@ -96,13 +96,15 @@ export const setupTabs = (root, onSelect, first = 0) => {
 };
 
 /**
- * Category buttons over the costumes: All, or one category at a time.
+ * Category buttons over the costumes: All, or one category at a time. The first category is shown
+ * at the start, so only its pictures are drawn.
  *
  * @param {HTMLElement|null} fieldset The costume picker.
  * @param {string} label Accessible name of the group of buttons.
  * @param {string} all Name of the button that shows every category.
+ * @param {Function} onShow Called after the categories shown change.
  */
-export const setupCostumeFilter = (fieldset, label, all) => {
+export const setupCostumeFilter = (fieldset, label, all, onShow = () => null) => {
     if (!fieldset) {
         return;
     }
@@ -121,13 +123,18 @@ export const setupCostumeFilter = (fieldset, label, all) => {
         chip.type = 'button';
         chip.className = 'local-vravatar-chip';
         chip.textContent = text;
-        chip.setAttribute('aria-pressed', target === null ? 'true' : 'false');
-        chip.addEventListener('click', () => {
+        chip.setAttribute('aria-pressed', 'false');
+        const show = () => {
             chips.forEach((other) => other.setAttribute('aria-pressed', other === chip ? 'true' : 'false'));
             categories.forEach((category) => {
                 category.hidden = target !== null && category !== target;
             });
+        };
+        chip.addEventListener('click', () => {
+            show();
+            onShow();
         });
+        chip.localvravatarShow = show;
         chips.push(chip);
         bar.appendChild(chip);
     };
@@ -137,6 +144,7 @@ export const setupCostumeFilter = (fieldset, label, all) => {
         make(legend ? legend.textContent.trim() : '', category);
     });
     help.after(bar);
+    chips[1].localvravatarShow();
 };
 
 /**

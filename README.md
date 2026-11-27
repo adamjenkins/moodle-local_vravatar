@@ -22,7 +22,7 @@ there is nothing to moderate:
 | Facial hair | 19 styles (stubble, moustaches, chin, sideburns, beards), in the hair colour, greying, or any hair colour |
 | Body | capsule · slim · broad |
 | Colours | body colour and accent colour from 14 named colours (black and white among them, for a black suit with a white or black tie) |
-| Costume | none, or one of 44 ready-made costumes (pirates, suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
+| Costume | none, one of 50 outfits drawn on the avatar itself (travel, work, service, health, science, school, everyday, formal, traditional dress, sport, fun and fantasy), or one of 44 ready-made costume models (pirates, suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
 | Hands | round · mittens · cartoon · gloves · robot · paws, in the skin colour or any of the named colours |
 | Extras | 33 hats (everyday, smart, faith and tradition, work and uniform, celebration, dress-up), 17 eyewear (glasses, sunglasses, sport and safety, monocle, eye patch) in 13 frame colours |
 | Picture | the user's Moodle profile picture as a round badge on the face (shown by default; each user can untick it) |

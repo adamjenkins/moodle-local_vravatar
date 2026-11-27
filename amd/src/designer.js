@@ -1162,12 +1162,17 @@ export const init = async(config) => {
         });
     };
 
-    // Only the pictures of the part in view: a part hidden behind its button draws when it is shown.
+    // Only the pictures in view: a part or costume category hidden behind its button draws when shown.
     const paintPanel = (panel, first) => {
         if (tilepainter && panel) {
+            // Hidden behind a part's or a costume category's button: drawn when shown.
             const holders = Array.from(panel.querySelectorAll('[data-render]')).filter((holder) => {
-                const part = holder.closest('[data-region="part"]');
-                return !part || !part.hidden;
+                for (let node = holder.parentElement; node && node !== panel; node = node.parentElement) {
+                    if (node.hidden) {
+                        return false;
+                    }
+                }
+                return true;
             });
             tilepainter.paint(readForm(form, config.defaults), holders, first);
         }
@@ -1219,7 +1224,9 @@ export const init = async(config) => {
             chosen.textContent = checked ? checked.textContent.trim() : '';
         });
     };
-    setupCostumeFilter(root.querySelector('.local-vravatar-costumes'), str.costumefilter, str.costumeall);
+    const costumes = root.querySelector('.local-vravatar-costumes');
+    setupCostumeFilter(costumes, str.costumefilter, str.costumeall,
+        () => paintPanel(costumes.closest('[data-region="panel"]'), true));
 
     /**
      * Draw the tile pictures that are out of date: those of the tab in view (after a change the

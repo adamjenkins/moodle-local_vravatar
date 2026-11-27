@@ -34,7 +34,8 @@ final class presets {
      *     are the lang strings preset_<id>. The looks span ages (a young teen with braces and freckles
      *     to an older scientist with white hair and gentle lines) and hair types, and none is tied to
      *     a gender. The people have the face drawn on the skin and cartoon hands in the user's own
-     *     skin tone; the robot keeps the face screen and robot hands.
+     *     skin tone; the robot keeps the face screen and robot hands. Three wear a costume the avatar
+     *     builder makes in code (explorer, lab coat, athlete's kit).
      */
     private const PRESETS = [
         'explorer' => [
@@ -44,7 +45,7 @@ final class presets {
             'nose' => 'wide', 'mouth' => 'grin', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
             'freckles' => 'none', 'cheeks' => 'sunkissed', 'marks' => 'none', 'lines' => 'crow', 'makeup' => 'none',
             'beard' => 'stubble', 'beardcolor' => 'greying', 'hat' => 'sunhat', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'explorer', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'scientist' => [
             'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal',
@@ -53,7 +54,7 @@ final class presets {
             'nose' => 'aquiline', 'mouth' => 'soft', 'lips' => 'none', 'ears' => true, 'earshape' => 'lobe',
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'molecheek', 'lines' => 'gentle', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'round', 'eyewearcolor' => 'gold',
-            'glasses' => true, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => true, 'outfit' => 'labcoat', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'artist' => [
             'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow',
@@ -71,7 +72,7 @@ final class presets {
             'nose' => 'straight', 'mouth' => 'teeth', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'cap', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'athlete', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'dreamer' => [
             'body' => 'slim', 'head' => 'round', 'color' => 'indigo', 'accent' => 'pink',

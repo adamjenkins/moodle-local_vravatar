@@ -192,7 +192,7 @@ final class design_test extends \advanced_testcase {
             ['match', 'porcelain', 'fair', 'light', 'medium', 'tan', 'brown', 'dark', 'deep'],
             $choices['skin']
         );
-        $this->assertSame(array_merge(['none'], costumes::outfit_ids()), $choices['outfit']);
+        $this->assertSame(array_merge(['none'], design::wardrobe_ids(), costumes::outfit_ids()), $choices['outfit']);
         $this->assertContains('ears', design::FLAGS);
         // At least 16 eyes and 16 eyebrows (owner, 2026-11-27), and plenty of the rest.
         $this->assertGreaterThanOrEqual(16, count($choices['eyes']));
@@ -360,12 +360,30 @@ final class design_test extends \advanced_testcase {
             $this->assertSame($id, design::clean(json_encode(['outfit' => $id]))['outfit'], $id);
         }
         foreach (
-            ['pirate', 'sailor', 'suit', 'hat-pirate', 'Pirate-Captain', 'pirate-captain ', '../pirate-captain',
+            ['pirate', 'sailor', 'Suit', 'hat-pirate', 'Pirate-Captain', 'pirate-captain ', '../pirate-captain',
                 'blocky-z', '', 'None', 1, true, ['none']] as $value
         ) {
             $this->assertSame('none', design::clean(['outfit' => $value])['outfit'], var_export($value, true));
         }
         $this->assertSame('pirate', design::clean(['hat' => 'pirate'])['hat']);
+    }
+
+    /**
+     * The costumes the avatar builder makes in code are kept, with no model to give; an id that is
+     * neither one of them nor a shipped model becomes "none".
+     */
+    public function test_outfit_wardrobe(): void {
+        $this->assertCount(50, design::wardrobe_ids());
+        foreach (['labcoat', 'pilot', 'kilt', 'cabincrew', 'hanbok', 'captain'] as $id) {
+            $this->assertSame($id, design::clean(['outfit' => $id])['outfit'], $id);
+            $this->assertSame($id, design::clean(json_encode(['outfit' => $id]))['outfit'], $id);
+            $this->assertSame([], costumes::assets_for(design::clean(['outfit' => $id])), $id);
+        }
+        foreach (['spacesuit', 'lab-coat', 'Labcoat', 'plain', 'travel'] as $id) {
+            $this->assertSame('none', design::clean(['outfit' => $id])['outfit'], $id);
+        }
+        // No id is both a costume made in code and a model.
+        $this->assertSame([], array_intersect(design::wardrobe_ids(), array_keys(costumes::all())));
     }
 
     /**

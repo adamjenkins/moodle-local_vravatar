@@ -49,7 +49,8 @@
       swatch, follows, followed, palette, model, credit, pic, mask and render), a checkbox
       (check: name, id, groupid, legend, label, checked and render) or the costume picker (costume:
       name, id, legend, none with value, id, label and checked, and categories, each with id, legend
-      and options, each option with value, id, label, checked, thumb, model, credit and kind); the
+      and options, each option with value, id, label, checked, thumb, model, credit, kind and render: a
+      costume made in code has no thumb or model and is drawn on the user's avatar); the
       section with isextras also shows the picture checkbox
     * presets - the ready-made looks, each with id, name and json (the keys it sets)
     * haspresets - whether there are presets (they make the first tab, Looks)
@@ -602,11 +603,13 @@
                                                     {{#options}}
                                                         <div class="local-vravatar-tile local-vravatar-costume">
                                                             <input class="local-vravatar-tile-input" type="radio" name="outfit"
-                                                                value="{{value}}" id="{{id}}" data-model="{{model}}" data-kind="{{kind}}"
+                                                                value="{{value}}" id="{{id}}"{{#model}} data-model="{{model}}"{{/model}} data-kind="{{kind}}"
                                                                 {{#checked}}checked{{/checked}}>
                                                             <label class="local-vravatar-tile-label" for="{{id}}">
-                                                                <img class="local-vravatar-costume-thumb" src="{{thumb}}" alt="" width="96" height="96"
-                                                                    loading="lazy">
+                                                                {{#thumb}}<img class="local-vravatar-costume-thumb" src="{{thumb}}" alt="" width="96" height="96"
+                                                                    loading="lazy">{{/thumb}}
+                                                                {{^thumb}}<span class="local-vravatar-pic" aria-hidden="true" data-render="{{render}}" data-key="outfit"
+                                                                    data-value="{{value}}"></span>{{/thumb}}
                                                                 <span class="local-vravatar-tile-name">{{label}}</span>
                                                                 {{#credit}}<span class="local-vravatar-credit">{{credit}}</span>{{/credit}}
                                                             </label>
