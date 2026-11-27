@@ -65,7 +65,7 @@ final class services_test extends \advanced_testcase {
 
         $before = $this->get();
         $this->assertFalse($before['hasdesign']);
-        $this->assertSame(design::defaults(), $before['design']);
+        $this->assertSame(design::standard((int)$user->id), $before['design']);
         $this->assertTrue($before['pictureallowed']);
 
         $result = $this->save(['body' => 'slim', 'color' => 'purple', 'hat' => 'crown', 'glasses' => true, 'picture' => true,

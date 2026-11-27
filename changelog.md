@@ -20,7 +20,8 @@ All notable changes to this plugin are documented here. The format follows
 - The designer shows its choices on tabs as picture tiles and large swatches (`amd/src/tabs.js`,
   `amd/src/tiles.js`), with a save bar that stays in view, an unsaved-changes warning, and a
   preview that frames the part being chosen and stays in view on phones.
-- Users with no saved design get `design::standard()` in live rooms: a drawn face, short brown
+- Users with no saved design get `design::standard()` in live rooms and from
+  `local_vravatar_get_design`: a drawn face, short brown
   hair, a white accent, and a body colour and skin tone picked from the user id.
 - Requires mod_vrroom 2026112700 (0.2.0), whose avatar builder draws the hand styles and faces;
   `composer.json` requires `adamjenkins/moodle-mod_vrroom` `^0.2`.

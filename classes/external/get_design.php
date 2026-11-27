@@ -50,7 +50,8 @@ class get_design extends external_api {
         $saved = design::load($userid);
         return [
             'hasdesign' => $saved !== null,
-            'design' => $saved ?? design::defaults(),
+            // Without a saved design: the standard look, as on the page and in live rooms.
+            'design' => $saved ?? design::standard($userid),
             'pictureallowed' => design::picture_allowed(),
         ];
     }
