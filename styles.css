@@ -757,10 +757,12 @@
 }
 
 /*
- * Acceptance tests click the middle of a choice, which the sticky bar can cover in a short test
- * window; there the bar stays in the page flow.
+ * Acceptance tests click the middle of a choice, which a sticky bar (the save bar, the tabs, a group
+ * heading) can cover in a short test window; there the bars stay in the page flow.
  */
-.behat-site .local-vravatar-savebar {
+.behat-site .local-vravatar .local-vravatar-savebar,
+.behat-site .local-vravatar .local-vravatar-tablist,
+.behat-site .local-vravatar .local-vravatar-grouphead {
     position: static;
 }
 
