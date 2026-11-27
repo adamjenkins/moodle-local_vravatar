@@ -26,13 +26,14 @@ namespace local_vravatar\local;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(costumes::class)]
 final class costumes_test extends \advanced_testcase {
-    /** @var string[] The costumes the owner chose (2026-10-10), in manifest order. */
+    /**
+     * @var string[] The costumes the owner chose (2026-10-10), in manifest order, without the pirates,
+     *     the pirate hat and the Blocky characters retired on 2026-11-27 (design::RETIRED_OUTFITS).
+     */
     private const IDS = [
-        'pirate-captain', 'pirate-woman', 'hat-pirate', 'business-dude', 'suit-tie', 'sunflower', 'cactus',
+        'business-dude', 'suit-tie', 'sunflower', 'cactus',
         'alien-green', 'alien-pink', 'robot-screen', 'lalobot', 'device-laptop', 'device-monitor', 'device-tv',
         'device-computer',
-        'blocky-a', 'blocky-b', 'blocky-c', 'blocky-d', 'blocky-e', 'blocky-f', 'blocky-g', 'blocky-h', 'blocky-i',
-        'blocky-j', 'blocky-k', 'blocky-l', 'blocky-m', 'blocky-n', 'blocky-o', 'blocky-p', 'blocky-q', 'blocky-r',
         'mini-male-a', 'mini-male-b', 'mini-male-c', 'mini-male-d', 'mini-male-e', 'mini-male-f',
         'mini-female-a', 'mini-female-b', 'mini-female-c', 'mini-female-d', 'mini-female-e', 'mini-female-f',
     ];
@@ -81,14 +82,14 @@ final class costumes_test extends \advanced_testcase {
     }
 
     /**
-     * Every category of the page has a name, and the CC BY models are the three that need a credit.
+     * Every category of the page has a name, and the CC BY models are the two that need a credit.
      */
     public function test_categories_and_attribution(): void {
         foreach (costumes::CATEGORIES as $category) {
             $this->assertTrue(get_string_manager()->string_exists('costumecat_' . $category, 'local_vravatar'), $category);
         }
         $credited = array_keys(array_filter(costumes::all(), [costumes::class, 'needs_attribution']));
-        $this->assertSame(['hat-pirate', 'suit-tie', 'device-computer'], $credited);
+        $this->assertSame(['suit-tie', 'device-computer'], $credited);
         $this->assertSame('CC BY 3.0', costumes::licence_label('CC-BY-3.0'));
     }
 
@@ -113,36 +114,43 @@ final class costumes_test extends \advanced_testcase {
     }
 
     /**
-     * The outfits are the costumes of kind body or device; the pirate hat is an accessory, not an outfit.
+     * The outfits are the costumes of kind body or device; the retired models are gone, files too.
      */
     public function test_outfit_ids_from_manifest(): void {
         $ids = costumes::outfit_ids();
-        $this->assertCount(44, $ids);
-        $this->assertNotContains('hat-pirate', $ids);
-        $this->assertSame('accessory', costumes::get('hat-pirate')['kind']);
+        $this->assertCount(24, $ids);
         foreach (['device-laptop', 'device-monitor', 'device-tv', 'device-computer', 'robot-screen'] as $id) {
             $this->assertSame('device', costumes::get($id)['kind'], $id);
             $this->assertContains($id, $ids);
         }
-        $this->assertSame(array_merge(['none'], $ids), design::choices()['outfit']);
-        $this->assertSame('hat-pirate', costumes::HATS['pirate']);
-        $this->assertContains('pirate', design::choices()['hat']);
+        $this->assertSame(array_merge(['none'], design::wardrobe_ids(), $ids), design::choices()['outfit']);
+        $this->assertNotContains('pirate', design::choices()['hat']);
         $this->assertNull(costumes::get('no-such-costume'));
+        $dir = \core_component::get_component_directory('local_vravatar');
+        $blocky = array_map(fn($c) => 'blocky-' . $c, range('a', 'r'));
+        $retired = array_merge(['hat-pirate', 'pirate-captain', 'pirate-woman'], $blocky);
+        foreach ($retired as $id) {
+            $this->assertNull(costumes::get($id), $id);
+            $this->assertFileDoesNotExist($dir . '/costumes/' . $id . '.glb', $id);
+            $this->assertFileDoesNotExist($dir . '/pix/costumes/' . $id . '.png', $id);
+        }
     }
 
     /**
-     * A design gives the addresses of the models it names, and nothing for the drawn parts.
+     * A design gives the address of the costume model it wears, and nothing for the drawn parts,
+     * the costumes made in code or any hat.
      */
     public function test_assets_for(): void {
         $this->assertSame([], costumes::assets_for(design::defaults()));
         $this->assertSame([], costumes::assets_for(design::clean(['hat' => 'cap'])));
+        $this->assertSame([], costumes::assets_for(design::clean(['outfit' => 'captain', 'hat' => 'tricorne'])));
 
         $assets = costumes::assets_for(design::clean(['outfit' => 'device-laptop', 'hat' => 'pirate']));
-        $this->assertSame(['outfit', 'hat'], array_keys($assets));
+        $this->assertSame(['outfit'], array_keys($assets));
         $this->assertSame((new \moodle_url('/local/vravatar/costumes/device-laptop.glb'))->out(false), $assets['outfit']);
-        $this->assertSame((new \moodle_url('/local/vravatar/costumes/hat-pirate.glb'))->out(false), $assets['hat']);
 
         // A raw, uncleaned value never becomes a path.
         $this->assertSame([], costumes::assets_for(['outfit' => '../../config', 'hat' => 'hat-pirate']));
+        $this->assertSame([], costumes::assets_for(['outfit' => 'pirate-captain', 'hat' => 'pirate']));
     }
 }

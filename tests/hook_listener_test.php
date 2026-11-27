@@ -118,23 +118,24 @@ final class hook_listener_test extends \advanced_testcase {
     }
 
     /**
-     * A costume and the pirate hat reach the room as the addresses of their models; a design without
-     * them gives no assets.
+     * A costume model reaches the room as the address of its model; a design saved with a retired
+     * pirate model and the pirate hat (stored before the retirements) arrives as the pirate captain
+     * and the tricorne made in code, with no assets; a design without models gives no assets.
      */
     public function test_costume_assets(): void {
-        design::save((int)$this->withpicture->id, ['color' => 'red', 'picture' => true, 'outfit' => 'pirate-captain',
-            'hat' => 'pirate']);
+        // Stored as 0.2.0 wrote it, not through save() (which would clean it now).
+        set_user_preference(design::PREFERENCE,
+            '{"schema":"vrroom-avatar/1","color":"red","picture":true,"outfit":"pirate-captain","hat":"pirate"}',
+            (int)$this->withpicture->id);
         design::save((int)$this->haspictureless->id, ['outfit' => 'device-monitor']);
         $hook = $this->hook();
         hook_listener::avatar_appearance($hook);
         $appearances = $hook->get_appearances();
 
-        $this->assertSame('pirate-captain', $appearances['peera']['appearance']['outfit']);
-        $this->assertSame('pirate', $appearances['peera']['appearance']['hat']);
-        $this->assertSame([
-            'outfit' => (new \moodle_url('/local/vravatar/costumes/pirate-captain.glb'))->out(false),
-            'hat' => (new \moodle_url('/local/vravatar/costumes/hat-pirate.glb'))->out(false),
-        ], $appearances['peera']['assets']);
+        $this->assertSame('captain', $appearances['peera']['appearance']['outfit']);
+        $this->assertSame('tricorne', $appearances['peera']['appearance']['hat']);
+        $this->assertSame('red', $appearances['peera']['appearance']['color']);
+        $this->assertSame([], $appearances['peera']['assets']);
 
         $this->assertSame(
             ['outfit' => (new \moodle_url('/local/vravatar/costumes/device-monitor.glb'))->out(false)],
@@ -142,6 +143,26 @@ final class hook_listener_test extends \advanced_testcase {
         );
         // A drawn hat (cap) and no costume: no assets.
         $this->assertSame([], $appearances['peerb']['assets']);
+    }
+
+    /**
+     * Designs saved with the other retired costumes reach the room with their replacements and no
+     * assets: the pirate model "pirate-woman" as the deckhand, a Blocky character as the plain clothes.
+     */
+    public function test_retired_costumes_reach_the_room(): void {
+        set_user_preference(design::PREFERENCE, '{"schema":"vrroom-avatar/1","outfit":"pirate-woman"}',
+            (int)$this->withpicture->id);
+        set_user_preference(design::PREFERENCE, '{"schema":"vrroom-avatar/1","outfit":"blocky-k","color":"green"}',
+            (int)$this->haspictureless->id);
+        $hook = $this->hook();
+        hook_listener::avatar_appearance($hook);
+        $appearances = $hook->get_appearances();
+
+        $this->assertSame('deckhand', $appearances['peera']['appearance']['outfit']);
+        $this->assertSame([], $appearances['peera']['assets']);
+        $this->assertSame('none', $appearances['peerd']['appearance']['outfit']);
+        $this->assertSame('green', $appearances['peerd']['appearance']['color']);
+        $this->assertSame([], $appearances['peerd']['assets']);
     }
 
     /**

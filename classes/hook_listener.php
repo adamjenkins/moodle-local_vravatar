@@ -35,8 +35,8 @@ final class hook_listener {
      * a saved design get the standard look (design::standard(): a friendly figure with a drawn face,
      * in a colour that is always theirs). The profile picture is given only when
      * the site allows it, the user chose it and the user has a picture worth showing. A design that
-     * wears a costume, or a hat that is a costume model, also gives the addresses of those models
-     * (assets "outfit" and "hat", static files of this plugin).
+     * wears a costume model also gives the address of that model (asset "outfit", a static file of
+     * this plugin); a costume made in code and every hat need none.
      *
      * @param \mod_vrroom\hook\avatar_appearance $hook The hook.
      * @return void

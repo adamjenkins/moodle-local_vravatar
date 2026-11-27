@@ -3,6 +3,44 @@
 All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- The face, hair and headwear keys of VR room's avatar modules (`avatarface`, `avatarhair`,
+  `avatarheadwear`, `avatarhead`): `eyecolor`, `eyespace`, `browcolor`, `mouth`, `lips`,
+  `earshape`, `freckles`, `cheeks`, `marks`, `lines`, `makeup`, `hairgrey`, `beardcolor`, `eyewear`,
+  `eyewearcolor`, and many new values of `head`, `eyes`, `brows`, `nose`, `hair`, `beard` and
+  `hat` (`design::MODULE_KEYS`, `MODULE_DEFAULTS`). New keys default to the look before them;
+  `glasses` now follows `eyewear` (an old document with glasses wears `classic`).
+- 50 costumes made in code by `avatarwardrobe` (`design::WARDROBE`): outfit values with no model
+  and no asset, drawn live on the user's avatar in the designer, under 11 new costume categories.
+- The designer's Face, Hair and Extras tabs are split into sections shown one at a time
+  (`amd/src/tabs.js` `setupParts()`); costumes show one category at a time from the first; tile
+  pictures are drawn only for what is in view.
+- The full-length preview with moving arms, walk and wave buttons.
+- `local_vravatar_save_design` and `local_vravatar_get_design` return the new keys.
+
+### Changed
+
+- The six looks and `design::standard()` use the new choices, with cartoon hands in the skin tone.
+- Names: `hair_long` "Long straight", `hat_cap` "Baseball cap", `beard` "Facial hair".
+- The glasses checkbox is replaced by the eyewear tiles.
+
+### Removed
+
+- The costume models `blocky-a` to `blocky-r`, `pirate-captain`, `pirate-woman` and `hat-pirate`
+  (models, thumbnails, manifest entries, strings, `thirdpartylibs.xml` entries, credits), the
+  `pirate` costume category and `costumes::HATS`. `design::clean()` reads old designs as
+  `pirate-captain` → `captain`, `pirate-woman` → `deckhand`, `blocky-*` → `none` and hat `pirate` →
+  `tricorne` (`RETIRED_OUTFITS`, `RETIRED_HATS`, mirroring avatarmodel's `cleanAppearance()`), so
+  the designer and live rooms show them alike; the hook sends no asset for them.
+
+### Dependencies
+
+- Needs the matching mod_vrroom (after 0.2.0) with those modules and `RETIRED_OUTFITS`;
+  `version.php` and `composer.json` still name 0.2.0 and are raised with the release.
+
 ## [0.2.0] - 2026-11-27
 
 ### Added

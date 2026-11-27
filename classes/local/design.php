@@ -405,16 +405,39 @@ final class design {
         'brows' => ['none', 'thin', 'thick', 'arched'],
         'nose' => ['none', 'small', 'round', 'pointed'],
         'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
-        'hat' => ['none', 'cap', 'beanie', 'sunhat', 'pirate'],
+        // "pirate" was a hat model, now retired (RETIRED_HATS).
+        'hat' => ['none', 'cap', 'beanie', 'sunhat'],
     ];
+
+    /**
+     * Costume models no longer shipped, and what a design that wears one wears now: the pirates
+     * become the pirate costumes made in code; the Blocky characters (blocky-a to blocky-r,
+     * RETIRED_OUTFIT_PATTERN) the plain clothes in the user's own colours ("none"). Mirrors
+     * RETIRED_OUTFITS and cleanAppearance() of vrroomruntime_builtin/live/avatarmodel (VR room), so
+     * the designer and the live rooms read old designs alike.
+     *
+     * @var string[]
+     */
+    public const RETIRED_OUTFITS = ['pirate-captain' => 'captain', 'pirate-woman' => 'deckhand'];
+
+    /** @var string The retired Blocky characters, read as "none". */
+    public const RETIRED_OUTFIT_PATTERN = '/^blocky-[a-r]$/';
+
+    /**
+     * Hats no longer offered, and the hat a design that wears one wears now (the pirate hat model
+     * becomes the tricorne made in code, as avatarmodel's cleanAppearance() does).
+     *
+     * @var string[]
+     */
+    public const RETIRED_HATS = ['pirate' => 'tricorne'];
 
     /**
      * The allowed values of every key that takes a name.
      *
      * "outfit" is "none", one of the costumes the avatar builder makes in code (WARDROBE), or the id
      * of one of the costume models this plugin ships whose kind is body or device
-     * (costumes/costumes.json, see costumes::outfit_ids()). The hat "pirate" is a costume
-     * model too (costumes::HATS). The face, hair and headwear keys and the head shapes are the
+     * (costumes/costumes.json, see costumes::outfit_ids()). Retired costumes and hats are not in
+     * the lists: clean() reads them as their replacements. The face, hair and headwear keys and the head shapes are the
      * avatar builder's lists (MODULE_KEYS), with every value of the first versions.
      *
      * @return array key => list of names
@@ -436,6 +459,8 @@ final class design {
             $values = array_merge(...array_values($groups));
             $choices[$key] = array_values(array_unique(array_merge($values, self::FIRST_CHOICES[$key] ?? [])));
         }
+        // A retired hat is read as its replacement (clean()), never offered.
+        $choices['hat'] = array_values(array_diff($choices['hat'], array_keys(self::RETIRED_HATS)));
         return $choices;
     }
 
@@ -567,6 +592,18 @@ final class design {
         }
         if (array_key_exists('schema', $input) && $input['schema'] !== self::SCHEMA) {
             return $clean;
+        }
+
+        // A design saved before a costume or hat was retired wears its replacement.
+        if (isset($input['outfit']) && is_string($input['outfit'])) {
+            if (isset(self::RETIRED_OUTFITS[$input['outfit']])) {
+                $input['outfit'] = self::RETIRED_OUTFITS[$input['outfit']];
+            } else if (preg_match(self::RETIRED_OUTFIT_PATTERN, $input['outfit'])) {
+                $input['outfit'] = 'none';
+            }
+        }
+        if (isset($input['hat']) && is_string($input['hat']) && isset(self::RETIRED_HATS[$input['hat']])) {
+            $input['hat'] = self::RETIRED_HATS[$input['hat']];
         }
 
         $choices = self::choices();

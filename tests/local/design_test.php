@@ -177,7 +177,8 @@ final class design_test extends \advanced_testcase {
             'brows' => ['none', 'thin', 'thick', 'arched'],
             'nose' => ['none', 'small', 'round', 'pointed'],
             'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
-            'hat' => ['none', 'cap', 'beanie', 'sunhat', 'pirate'],
+            // The fifth first hat, "pirate", is retired (RETIRED_HATS).
+            'hat' => ['none', 'cap', 'beanie', 'sunhat'],
         ];
         foreach ($first as $key => $values) {
             $this->assertSame([], array_values(array_diff($values, $choices[$key])), $key);
@@ -203,7 +204,8 @@ final class design_test extends \advanced_testcase {
         foreach (design::MODULE_KEYS as $key => $groups) {
             $grouped = array_merge(...array_values($groups));
             $this->assertSame(array_unique($grouped), $grouped, $key);
-            $this->assertSame([], array_values(array_diff($grouped, $choices[$key])), $key);
+            $offered = $key === 'hat' ? array_diff($grouped, array_keys(design::RETIRED_HATS)) : $grouped;
+            $this->assertSame([], array_values(array_diff($offered, $choices[$key])), $key);
             foreach ($grouped as $value) {
                 // The services return every name as PARAM_ALPHA.
                 $this->assertMatchesRegularExpression('/^[a-z]+$/', $value, "{$key}={$value}");
@@ -325,7 +327,7 @@ final class design_test extends \advanced_testcase {
         $this->assertLessThan(design::MAXBYTES / 2, strlen($json), $json);
         // A real document of the longest values (a costume id that exists) is kept whole.
         $real = $longest;
-        $real['outfit'] = 'pirate-captain';
+        $real['outfit'] = 'business-dude';
         $this->assertSame(array_keys(design::defaults()), array_keys(design::clean($real)));
         foreach ($real as $key => $value) {
             $this->assertSame($value, design::clean(json_encode($real))[$key], $key);
@@ -355,7 +357,7 @@ final class design_test extends \advanced_testcase {
      */
     public function test_outfit_costumes(): void {
         $this->assertSame('none', design::clean(['outfit' => 'none'])['outfit']);
-        foreach (['pirate-captain', 'suit-tie', 'device-laptop', 'robot-screen', 'blocky-r', 'mini-female-f'] as $id) {
+        foreach (['business-dude', 'suit-tie', 'device-laptop', 'robot-screen', 'mini-male-a', 'mini-female-f'] as $id) {
             $this->assertSame($id, design::clean(['outfit' => $id])['outfit'], $id);
             $this->assertSame($id, design::clean(json_encode(['outfit' => $id]))['outfit'], $id);
         }
@@ -365,7 +367,71 @@ final class design_test extends \advanced_testcase {
         ) {
             $this->assertSame('none', design::clean(['outfit' => $value])['outfit'], var_export($value, true));
         }
-        $this->assertSame('pirate', design::clean(['hat' => 'pirate'])['hat']);
+        $this->assertSame('tricorne', design::clean(['hat' => 'pirate'])['hat']);
+    }
+
+    /**
+     * The retired pirate models become the pirates made in code, as in avatarmodel's
+     * cleanAppearance(), from an array or from JSON.
+     */
+    public function test_retired_pirates(): void {
+        $this->assertSame(['pirate-captain' => 'captain', 'pirate-woman' => 'deckhand'], design::RETIRED_OUTFITS);
+        foreach (design::RETIRED_OUTFITS as $old => $new) {
+            $this->assertContains($new, design::wardrobe_ids(), $new);
+            $this->assertSame($new, design::clean(['outfit' => $old])['outfit'], $old);
+            $this->assertSame($new, design::clean(json_encode(['outfit' => $old]))['outfit'], $old);
+            $this->assertNotContains($old, design::choices()['outfit'], $old);
+        }
+    }
+
+    /**
+     * Every retired Blocky character becomes "none": the plain clothes in the user's own colours.
+     */
+    public function test_retired_blocky(): void {
+        foreach (range('a', 'r') as $letter) {
+            $id = 'blocky-' . $letter;
+            $this->assertSame('none', design::clean(['outfit' => $id, 'color' => 'teal'])['outfit'], $id);
+            $this->assertSame('teal', design::clean(['outfit' => $id, 'color' => 'teal'])['color'], $id);
+            $this->assertNotContains($id, design::choices()['outfit'], $id);
+        }
+    }
+
+    /**
+     * The retired pirate hat model becomes the tricorne made in code, and is not offered.
+     */
+    public function test_retired_pirate_hat(): void {
+        $this->assertSame('tricorne', design::clean(['hat' => 'pirate'])['hat']);
+        $this->assertSame('tricorne', design::clean('{"hat":"pirate"}')['hat']);
+        $this->assertNotContains('pirate', design::choices()['hat']);
+        $this->assertContains('tricorne', design::choices()['hat']);
+    }
+
+    /**
+     * A design saved before the retirements (stored JSON as 0.2.0 wrote it: a pirate model, the
+     * pirate hat, no face, hair or eyewear keys) still loads, with the replacements and its own look.
+     */
+    public function test_design_saved_before_retirements(): void {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $stored = '{"schema":"vrroom-avatar/1","body":"slim","head":"oval","skin":"tan","color":"purple",' .
+            '"accent":"yellow","hair":"long","haircolor":"auburn","eyes":"almond","brows":"arched","nose":"round",' .
+            '"ears":true,"beard":"none","glasses":true,"hat":"pirate","outfit":"pirate-woman","hands":"glove",' .
+            '"handcolor":"teal","face":"drawn","picture":false}';
+        set_user_preference(design::PREFERENCE, $stored, (int)$user->id);
+        $loaded = design::load((int)$user->id);
+        $this->assertSame('deckhand', $loaded['outfit']);
+        $this->assertSame('tricorne', $loaded['hat']);
+        foreach (json_decode($stored, true) as $key => $value) {
+            if (!in_array($key, ['outfit', 'hat'], true)) {
+                $this->assertSame($value, $loaded[$key], $key);
+            }
+        }
+        $this->assertSame('classic', $loaded['eyewear']);
+        $this->assertSame(array_keys(design::defaults()), array_keys($loaded));
+        // A Blocky character saved then wears the plain clothes.
+        set_user_preference(design::PREFERENCE, '{"schema":"vrroom-avatar/1","outfit":"blocky-c","hat":"cap"}', (int)$user->id);
+        $this->assertSame('none', design::load((int)$user->id)['outfit']);
+        $this->assertSame('cap', design::load((int)$user->id)['hat']);
     }
 
     /**

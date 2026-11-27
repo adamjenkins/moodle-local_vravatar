@@ -431,7 +431,7 @@ class designer implements renderable, templatable {
      * anything else.
      *
      * A tile's picture is drawn by the page from the avatar builder (render), or is a fixed picture:
-     * a hat that is a costume model shows its thumbnail, a hand style its silhouette (mask, painted
+     * a hand style shows its silhouette (mask, painted
      * in the hand colour by the page). A long list of tiles comes in the avatar builder's groups,
      * each with a heading (none for the group of the "none" value alone).
      *
@@ -457,13 +457,9 @@ class designer implements renderable, templatable {
         $follows = self::FOLLOWS[$key] ?? [];
         $options = [];
         foreach ($values as $value) {
-            // A hat that is a costume model: the preview loads it, and its credit is shown.
-            $hatcostume = $key === 'hat' && isset(costumes::HATS[$value]) ? costumes::get(costumes::HATS[$value]) : null;
             $pic = '';
             $mask = '';
-            if ($hatcostume) {
-                $pic = $output->image_url('costumes/' . $hatcostume['id'], 'local_vravatar')->out(false);
-            } else if ($key === 'hands') {
+            if ($key === 'hands') {
                 $mask = $output->image_url('hands/' . $value, 'local_vravatar')->out(false);
             }
             $options[$value] = [
@@ -476,8 +472,8 @@ class designer implements renderable, templatable {
                 'follows' => $isswatch && isset($follows[$value]),
                 'followed' => $isswatch ? ($follows[$value] ?? '') : '',
                 'palette' => $palette,
-                'model' => $hatcostume ? costumes::model_url($hatcostume['id'])->out(false) : '',
-                'credit' => $hatcostume ? self::credit_line($hatcostume) : '',
+                'model' => '',
+                'credit' => '',
                 'pic' => $pic,
                 'mask' => $mask,
                 'render' => ($pic === '' && $mask === '') ? (self::RENDERS[$key] ?? '') : '',

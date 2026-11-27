@@ -36,15 +36,7 @@ final class costumes {
     public const OUTFIT_KINDS = ['body', 'device'];
 
     /** @var string[] The categories of the designer page, in page order. */
-    public const CATEGORIES = ['pirate', 'suit', 'plant', 'alien', 'robot', 'pc', 'characters'];
-
-    /**
-     * The hats that are costume models: value of the design key "hat" => costume id (kind accessory).
-     * The other hats are drawn by the avatar builder itself.
-     *
-     * @var string[]
-     */
-    public const HATS = ['pirate' => 'hat-pirate'];
+    public const CATEGORIES = ['suit', 'plant', 'alien', 'robot', 'pc', 'characters'];
 
     /** @var string[] Licences that need the author's credit shown. */
     public const ATTRIBUTION_LICENCES = ['CC-BY-3.0', 'CC-BY-4.0'];
@@ -167,8 +159,9 @@ final class costumes {
     }
 
     /**
-     * The costume models a design names, for the avatar builder: 'outfit' => URL when an outfit is
-     * worn, 'hat' => URL when the hat is a costume model.
+     * The costume models a design names, for the avatar builder: 'outfit' => URL when the outfit is
+     * one of the models shipped here. Costumes made in code and every hat need no model (the pirate
+     * hat model is retired: design::clean() reads it as the tricorne).
      *
      * @param array $design A clean design.
      * @return array<string, string> asset name => URL
@@ -178,10 +171,6 @@ final class costumes {
         $outfit = (string)($design['outfit'] ?? 'none');
         if ($outfit !== 'none' && in_array($outfit, self::outfit_ids(), true)) {
             $assets['outfit'] = self::model_url($outfit)->out(false);
-        }
-        $hat = (string)($design['hat'] ?? 'none');
-        if (isset(self::HATS[$hat]) && self::get(self::HATS[$hat]) !== null) {
-            $assets['hat'] = self::model_url(self::HATS[$hat])->out(false);
         }
         return $assets;
     }

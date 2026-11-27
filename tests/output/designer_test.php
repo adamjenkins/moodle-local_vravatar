@@ -158,17 +158,14 @@ final class designer_test extends \advanced_testcase {
         $this->assertSame(get_string('skin_match', 'local_vravatar'), $radios['skin']['options'][0]['label']);
         $this->assertSame('skin', $radios['skin']['options'][1]['palette']);
 
-        // The pirate hat is a model, with its CC BY credit; the drawn hats are not.
+        // Every hat is drawn by the page, with no model or credit; the retired pirate hat is not offered.
         $hats = array_column($radios['hat']['options'], null, 'value');
-        $this->assertStringEndsWith('/local/vravatar/costumes/hat-pirate.glb', $hats['pirate']['model']);
-        $this->assertStringContainsString('Poly by Google', $hats['pirate']['credit']);
-        $this->assertStringContainsString('CC BY 3.0', $hats['pirate']['credit']);
-        $this->assertSame('', $hats['cap']['model']);
-        $this->assertSame('', $hats['cap']['credit']);
-        // A drawn hat's tile is drawn by the page; the pirate hat shows its thumbnail.
-        $this->assertSame('face', $hats['cap']['render']);
-        $this->assertSame('', $hats['pirate']['render']);
-        $this->assertStringContainsString('costumes/hat-pirate', $hats['pirate']['pic']);
+        $this->assertArrayNotHasKey('pirate', $hats);
+        foreach (['cap', 'tricorne', 'hijab'] as $hat) {
+            $this->assertSame('', $hats[$hat]['model'], $hat);
+            $this->assertSame('', $hats[$hat]['credit'], $hat);
+            $this->assertSame('face', $hats[$hat]['render'], $hat);
+        }
         $this->assertSame('whole', $radios['body']['options'][0]['render']);
 
         // Hand styles are silhouettes; the hand colours are swatches, "skin" following the skin tone.
@@ -303,7 +300,7 @@ final class designer_test extends \advanced_testcase {
         $PAGE->set_url(new \core\url('/local/vravatar/index.php'));
         $output = $PAGE->get_renderer('core');
         $designer = new designer(
-            design::clean(['outfit' => 'device-laptop', 'hat' => 'pirate']),
+            design::clean(['outfit' => 'device-laptop', 'hat' => 'tricorne']),
             true,
             true,
             false,
@@ -331,15 +328,12 @@ final class designer_test extends \advanced_testcase {
         }
         $this->assertMatchesRegularExpression('~id="local-vravatar-outfit-device-laptop"[^>]*\schecked>~', $html);
         $this->assertMatchesRegularExpression('~<img class="local-vravatar-costume-thumb" src="[^"]+" alt=""~', $html);
-        $this->assertMatchesRegularExpression(
-            '~id="local-vravatar-hat-pirate"\s+data-model="[^"]*hat-pirate\.glb"\s+checked>~',
-            $html
-        );
+        $this->assertMatchesRegularExpression('~id="local-vravatar-hat-tricorne"\s+checked>~', $html);
+        $this->assertStringNotContainsString('hat-pirate', $html);
         $this->assertStringContainsString('by Ian MacGillivray, CC BY 3.0', $html);
         $this->assertStringContainsString('by Robert Schlyter, CC BY 3.0', $html);
-        $this->assertStringContainsString('by Poly by Google, CC BY 3.0', $html);
         $this->assertStringContainsString(get_string('costumecredits', 'local_vravatar'), $html);
-        $this->assertStringContainsString('href="https://kenney.nl/assets/blocky-characters"', $html);
+        $this->assertStringContainsString('href="https://kenney.nl/assets/mini-characters"', $html);
         $this->assertStringContainsString('aria-describedby="local-vravatar-outfit-help"', $html);
     }
 }

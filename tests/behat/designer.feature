@@ -129,7 +129,7 @@ Feature: Users design their own VR avatar
     When I click on "Costume" "button" in the "[role='tablist']" "css_element"
     Then the "aria-pressed" attribute of "Show the whole avatar" "button" should contain "true"
     # The costume tab opens on its first category (the costumes made in code).
-    And I press "Pirates"
+    And I press "Fun and fantasy"
     And I set the field "Pirate captain" to "1"
     And "[data-region='canvas']" "css_element" should be visible
     And "[data-render='face'] img" "css_element" should exist
@@ -211,25 +211,24 @@ Feature: Users design their own VR avatar
     And the field "Teal" in the "Hand colour" "fieldset" matches value "1"
 
   @javascript
-  Scenario: Choose a costume and the pirate hat, save and see them kept after a reload
+  Scenario: Choose a costume and the tricorne, save and see them kept after a reload
     Given I log in as "student1"
     And I visit "/local/vravatar/index.php"
     When I click on "Costume" "button" in the "[role='tablist']" "css_element"
-    Then I should see "Pirates"
+    Then I should see "Fun and fantasy"
     And I should see "Computers"
     And I should see "Travel"
     And I press "Suits"
     And I should see "by Ian MacGillivray, CC BY 3.0"
     And the field "No costume" matches value "1"
-    When I press "Pirates"
+    When I press "Fun and fantasy"
     And I set the field "Pirate captain" to "1"
     And I click on "Extras" "button" in the "[role='tablist']" "css_element"
-    # The pirate hat's label also holds its credit line, so it is found by its id.
-    And I set the field "local-vravatar-hat-pirate" to "1"
+    And I set the field "Tricorne" to "1"
     And I press "Save"
     And I should see "Your avatar was saved." in the "[data-region='status']" "css_element"
     And I reload the page
-    And the field "local-vravatar-hat-pirate" matches value "1"
+    And the field "Tricorne" matches value "1"
     And I click on "Costume" "button" in the "[role='tablist']" "css_element"
     Then the field "Pirate captain" matches value "1"
     And the field "No costume" matches value ""
@@ -250,4 +249,6 @@ Feature: Users design their own VR avatar
     Then I should see "Your avatar was saved."
     And the field "Mini woman C" matches value "1"
     And I should see "Credits for the costume models"
-    And I should see "Blocky Characters (character-a)"
+    And I should see "Mini Characters (character-male-a)"
+    And I should not see "Blocky"
+    And I should not see "Pirate hat"

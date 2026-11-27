@@ -22,7 +22,7 @@ there is nothing to moderate:
 | Facial hair | 19 styles (stubble, moustaches, chin, sideburns, beards), in the hair colour, greying, or any hair colour |
 | Body | capsule · slim · broad |
 | Colours | body colour and accent colour from 14 named colours (black and white among them, for a black suit with a white or black tie) |
-| Costume | none, one of 50 outfits drawn on the avatar itself (travel, work, service, health, science, school, everyday, formal, traditional dress, sport, fun and fantasy), or one of 44 ready-made costume models (pirates, suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
+| Costume | none, one of 50 outfits drawn on the avatar itself (travel, work, service, health, science, school, everyday, formal, traditional dress, sport, fun and fantasy), or one of 24 ready-made costume models (suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
 | Hands | round · mittens · cartoon · gloves · robot · paws, in the skin colour or any of the named colours |
 | Extras | 33 hats (everyday, smart, faith and tradition, work and uniform, celebration, dress-up), 17 eyewear (glasses, sunglasses, sport and safety, monocle, eye patch) in 13 frame colours |
 | Picture | the user's Moodle profile picture as a round badge on the face (shown by default; each user can untick it) |
@@ -30,8 +30,11 @@ there is nothing to moderate:
 The heads are stylised to match the bodies, not photographs. Every new part defaults to the look
 avatars had before it existed, so a design saved earlier looks the same. A costume (key `outfit`)
 takes the place of the body; a computer, a television or the screen-face robot takes the place of
-the head too and shows the face (picture or camera) on its screen. Some costumes (the pirate
-captain's coat, the suits and ties) take the accent colour.
+the head too and shows the face (picture or camera) on its screen. Some costumes (the suits and
+ties, and many of those made in code) take the accent colour. Designs saved with a costume or hat
+that is no longer shipped wear its replacement: the two pirate models become the pirate captain
+and deckhand made in code, the Blocky characters the plain clothes in the user's own colours, and
+the pirate hat model the tricorne.
 
 The page shows a 3D preview beside the choices, and the choices on tabs: **Looks** (six
 ready-made looks and *Surprise me* to start from), Face, Hair, Body, Costume, Hands and Extras.
@@ -93,8 +96,8 @@ When VR room builds the list of the people in one live room it dispatches the
 person in the list, and the address of their normal Moodle profile picture when the site allows it,
 the user chose it and the user has a picture (an uploaded one, or a Gravatar where the site uses
 them). So a person's design reaches only the people in the same live room, next to the name VR room
-already shows them. A design with a costume, or the pirate hat, also gives the addresses of those
-models (`/local/vravatar/costumes/<id>.glb`), which the avatar builder loads.
+already shows them. A design with a costume model also gives the address of that
+model (`/local/vravatar/costumes/<id>.glb`), which the avatar builder loads.
 
 The costume models are static files of this plugin: `costumes/<id>.glb`, listed in
 `costumes/costumes.json` (id, kind, category, credit, licence, source, whether it takes the accent
@@ -127,7 +130,7 @@ avatar around the video looks.
 
 The costume models are other authors' work, adapted for avatars (the head removed, or the screen
 marked as the face screen; turned to face forward, scaled to the avatar, textures made smaller).
-They are CC0 (public domain) except three that are CC BY 3.0, whose authors must be credited: the
+They are CC0 (public domain) except two that are CC BY 3.0, whose authors must be credited: the
 designer shows the credit under each of them and lists the credits of every model in *Credits for
 the costume models*. Each model is also listed in `thirdpartylibs.xml`. The thumbnails are rendered
 from the models and carry the same licence.
@@ -138,9 +141,6 @@ The CC BY 3.0 legal code is not copied into this plugin; it is at
 
 | Costume | Id | Kind | Model | Author | Licence |
 |---|---|---|---|---|---|
-| Pirate captain (Pirates) | `pirate-captain` | body | [Pretty generic Pirate Captain](https://poly.pizza/m/CwWl7iqnxN) | AliceCassie | CC0-1.0 |
-| Pirate (Pirates) | `pirate-woman` | body | [Pirate Woman](https://poly.pizza/m/qRDrzfs8j9) | Polygonal Mind | CC0-1.0 |
-| Pirate hat (Pirates) | `hat-pirate` | accessory | [Pirate hat](https://poly.pizza/m/9QEds6cYAy6) | Poly by Google | CC-BY-3.0 |
 | Business suit (Suits) | `business-dude` | body | [Business Dude](https://poly.pizza/m/odKDM2t8Cr) | Polygonal Mind | CC0-1.0 |
 | Suit and tie (Suits) | `suit-tie` | body | [Suit & Tie Guy](https://poly.pizza/m/cgdjE3cst7f) | Ian MacGillivray | CC-BY-3.0 |
 | Sunflower (Plants) | `sunflower` | body | [Sun Flower Person](https://poly.pizza/m/5MGoojA1LB) | Polygonal Mind | CC0-1.0 |
@@ -153,24 +153,6 @@ The CC BY 3.0 legal code is not copied into this plugin; it is at
 | Computer screen (Computers) | `device-monitor` | device | [Computer Screen](https://poly.pizza/m/V5Qo141OcB) | Kenney | CC0-1.0 |
 | Old television (Computers) | `device-tv` | device | [Television Vintage](https://poly.pizza/m/aSmz6H8aeu) | Kenney | CC0-1.0 |
 | Desktop computer (Computers) | `device-computer` | device | [Simple computer](https://poly.pizza/m/doMMnviJrGi) | Robert Schlyter | CC-BY-3.0 |
-| Blocky A (Characters) | `blocky-a` | body | [Blocky Characters (character-a)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky B (Characters) | `blocky-b` | body | [Blocky Characters (character-b)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky C (Characters) | `blocky-c` | body | [Blocky Characters (character-c)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky D (Characters) | `blocky-d` | body | [Blocky Characters (character-d)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky E (Characters) | `blocky-e` | body | [Blocky Characters (character-e)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky F (Characters) | `blocky-f` | body | [Blocky Characters (character-f)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky G (Characters) | `blocky-g` | body | [Blocky Characters (character-g)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky H (Characters) | `blocky-h` | body | [Blocky Characters (character-h)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky I (Characters) | `blocky-i` | body | [Blocky Characters (character-i)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky J (Characters) | `blocky-j` | body | [Blocky Characters (character-j)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky K (Characters) | `blocky-k` | body | [Blocky Characters (character-k)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky L (Characters) | `blocky-l` | body | [Blocky Characters (character-l)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky M (Characters) | `blocky-m` | body | [Blocky Characters (character-m)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky N (Characters) | `blocky-n` | body | [Blocky Characters (character-n)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky O (Characters) | `blocky-o` | body | [Blocky Characters (character-o)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky P (Characters) | `blocky-p` | body | [Blocky Characters (character-p)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky Q (Characters) | `blocky-q` | body | [Blocky Characters (character-q)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
-| Blocky R (Characters) | `blocky-r` | body | [Blocky Characters (character-r)](https://kenney.nl/assets/blocky-characters) | Kenney | CC0-1.0 |
 | Mini man A (Characters) | `mini-male-a` | body | [Mini Characters (character-male-a)](https://kenney.nl/assets/mini-characters) | Kenney | CC0-1.0 |
 | Mini man B (Characters) | `mini-male-b` | body | [Mini Characters (character-male-b)](https://kenney.nl/assets/mini-characters) | Kenney | CC0-1.0 |
 | Mini man C (Characters) | `mini-male-c` | body | [Mini Characters (character-male-c)](https://kenney.nl/assets/mini-characters) | Kenney | CC0-1.0 |
@@ -184,8 +166,7 @@ The CC BY 3.0 legal code is not copied into this plugin; it is at
 | Mini woman E (Characters) | `mini-female-e` | body | [Mini Characters (character-female-e)](https://kenney.nl/assets/mini-characters) | Kenney | CC0-1.0 |
 | Mini woman F (Characters) | `mini-female-f` | body | [Mini Characters (character-female-f)](https://kenney.nl/assets/mini-characters) | Kenney | CC0-1.0 |
 
-The Blocky and Mini characters are from Kenney's packs [Blocky Characters](https://kenney.nl/assets/blocky-characters)
-and [Mini Characters](https://kenney.nl/assets/mini-characters) (CC0).
+The Mini characters are from Kenney's pack [Mini Characters](https://kenney.nl/assets/mini-characters) (CC0).
 
 ## Licence
 
