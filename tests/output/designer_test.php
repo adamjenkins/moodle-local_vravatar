@@ -128,8 +128,10 @@ final class designer_test extends \advanced_testcase {
             $this->assertTrue($radios[$key]['isswatch'], $key);
             $this->assertCount(1, $radios[$key]['groups'], $key);
         }
-        foreach (['eyes', 'eyespace', 'brows', 'nose', 'mouth', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup',
-            'hairgrey', 'eyewear'] as $key) {
+        foreach (
+            ['eyes', 'eyespace', 'brows', 'nose', 'mouth', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup',
+            'hairgrey', 'eyewear'] as $key
+        ) {
             $this->assertFalse($radios[$key]['isswatch'], $key);
             $this->assertSame('face', $radios[$key]['options'][1]['render'], $key);
         }
@@ -138,8 +140,10 @@ final class designer_test extends \advanced_testcase {
         $this->assertSame(['Cartoon', 'Classic', 'Open', 'Lids and folds', 'Tilted'], $legends('eyes'));
         $this->assertSame('', $legends('hair')[0]);
         $this->assertCount(9, $legends('hair'));
-        $this->assertSame(['', 'Everyday', 'Smart', 'Faith and tradition', 'Work and uniform', 'Celebration', 'Dress-up'],
-            $legends('hat'));
+        $this->assertSame(
+            ['', 'Everyday', 'Smart', 'Faith and tradition', 'Work and uniform', 'Celebration', 'Dress-up'],
+            $legends('hat')
+        );
         $this->assertSame([''], $legends('freckles'));
         $this->assertSame([''], $legends('eyespace'));
         // What a swatch without its own colour follows, for the page to paint.

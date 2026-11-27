@@ -142,13 +142,13 @@ final class design {
      * @var array
      */
     public const MODULE_KEYS = [
-        // vrroomruntime_builtin/live/avatarhead.
+        // Mirrors vrroomruntime_builtin/live/avatarhead.
         'head' => [
             'classic' => ['round', 'square', 'oval', 'heart'],
             'proportion' => ['long', 'wide', 'soft'],
             'jaw' => ['angular', 'rectangle', 'diamond', 'pear', 'chiselled'],
         ],
-        // vrroomruntime_builtin/live/avatarface.
+        // Mirrors vrroomruntime_builtin/live/avatarface.
         'eyes' => [
             'cartoon' => ['dots', 'beads'],
             'classic' => ['round', 'almond', 'sleepy'],
@@ -222,7 +222,7 @@ final class design {
             'liner' => ['liner', 'wing', 'kohl', 'lashes', 'graphic'],
             'shadow' => ['smoky', 'bronze', 'gold', 'peach', 'pink', 'plum', 'blue', 'green', 'glitter'],
         ],
-        // vrroomruntime_builtin/live/avatarhair.
+        // Mirrors vrroomruntime_builtin/live/avatarhair.
         'hair' => [
             'none' => ['none'],
             'cropped' => ['buzz', 'crew', 'fade', 'curltop', 'mohawk'],
@@ -249,7 +249,7 @@ final class design {
         'hairgrey' => [
             'grey' => ['none', 'temples', 'salt'],
         ],
-        // vrroomruntime_builtin/live/avatarheadwear.
+        // Mirrors vrroomruntime_builtin/live/avatarheadwear.
         'hat' => [
             'none' => ['none'],
             'everyday' => ['cap', 'beanie', 'sunhat', 'bucket', 'flatcap', 'beret', 'bandana', 'headphones'],
@@ -405,7 +405,7 @@ final class design {
         'brows' => ['none', 'thin', 'thick', 'arched'],
         'nose' => ['none', 'small', 'round', 'pointed'],
         'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
-        // "pirate" was a hat model, now retired (RETIRED_HATS).
+        // The hat "pirate" was a model, now retired (RETIRED_HATS).
         'hat' => ['none', 'cap', 'beanie', 'sunhat'],
     ];
 

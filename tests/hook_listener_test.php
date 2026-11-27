@@ -124,9 +124,11 @@ final class hook_listener_test extends \advanced_testcase {
      */
     public function test_costume_assets(): void {
         // Stored as 0.2.0 wrote it, not through save() (which would clean it now).
-        set_user_preference(design::PREFERENCE,
+        set_user_preference(
+            design::PREFERENCE,
             '{"schema":"vrroom-avatar/1","color":"red","picture":true,"outfit":"pirate-captain","hat":"pirate"}',
-            (int)$this->withpicture->id);
+            (int)$this->withpicture->id
+        );
         design::save((int)$this->haspictureless->id, ['outfit' => 'device-monitor']);
         $hook = $this->hook();
         hook_listener::avatar_appearance($hook);
@@ -150,10 +152,16 @@ final class hook_listener_test extends \advanced_testcase {
      * assets: the pirate model "pirate-woman" as the deckhand, a Blocky character as the plain clothes.
      */
     public function test_retired_costumes_reach_the_room(): void {
-        set_user_preference(design::PREFERENCE, '{"schema":"vrroom-avatar/1","outfit":"pirate-woman"}',
-            (int)$this->withpicture->id);
-        set_user_preference(design::PREFERENCE, '{"schema":"vrroom-avatar/1","outfit":"blocky-k","color":"green"}',
-            (int)$this->haspictureless->id);
+        set_user_preference(
+            design::PREFERENCE,
+            '{"schema":"vrroom-avatar/1","outfit":"pirate-woman"}',
+            (int)$this->withpicture->id
+        );
+        set_user_preference(
+            design::PREFERENCE,
+            '{"schema":"vrroom-avatar/1","outfit":"blocky-k","color":"green"}',
+            (int)$this->haspictureless->id
+        );
         $hook = $this->hook();
         hook_listener::avatar_appearance($hook);
         $appearances = $hook->get_appearances();
