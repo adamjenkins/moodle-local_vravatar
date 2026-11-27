@@ -81,6 +81,14 @@ const SETTLE_MS = 4000;
 /** Camera video size for the preview, as in live rooms. */
 const VIDEO = {width: {ideal: 320}, height: {ideal: 240}, frameRate: {ideal: 15}};
 
+/** The walk shown in place: speed (m/s) and how long (ms); how long a wave lasts (ms). */
+const WALK_SPEED = 1.1;
+const WALK_MS = 3200;
+const WAVE_MS = 2400;
+
+/** How far the preview turns to show the walk (radians). */
+const WALK_TURN = 0.9;
+
 /** Keys of the document that take a name (radio groups; "outfit" is the costume picker). */
 const CHOICES = [
     'body', 'head', 'skin', 'color', 'accent', 'hair', 'haircolor', 'eyes', 'brows', 'nose', 'beard', 'hat', 'outfit',
@@ -303,6 +311,9 @@ const createPreview = (canvas, design, assets, config) => {
     let framing = 'face';
     const HEAD = AvatarModel.STANDING_HEAD_HEIGHT || 1.6;
     let wavefrom = -Infinity;
+    let waveuntil = -Infinity;
+    // The walk shown in place (Walk button, or a body or costume change), until this time.
+    let walkuntil = -Infinity;
     let bouncefrom = -Infinity;
 
     // Hand styles: drawn here until the avatar builder knows them.
@@ -359,7 +370,10 @@ const createPreview = (canvas, design, assets, config) => {
             return;
         }
         const head = [0, HEAD, 0, 0, 0, 0, 1];
-        if (framing === 'face') {
+        const waving = now < waveuntil;
+        if (framing === 'face' || (framing === 'whole' && !waving && !ownhands)) {
+            // As a desktop person: the arms hang from the shoulders and move a little (the builder's
+            // resting hands, breathing and, during the walk, the arm swing).
             avatar.setPose({h: head, l: null, r: null}, '3d');
             return;
         }
@@ -370,7 +384,6 @@ const createPreview = (canvas, design, assets, config) => {
         const y = up ? HEAD - 0.12 : HEAD - 0.7;
         const z = up ? -0.1 : -0.08;
         const x = up ? 0.36 : 0.3;
-        const waving = now - wavefrom < 1400;
         const wave = waving ? Math.sin((now - wavefrom) / 1000 * Math.PI * 4) * 0.05 : 0;
         const lift = waving && !up ? 0.45 : 0;
         // Hand rotations in the hand's grip frame (-Z along the index finger, +Y the back of the
@@ -713,8 +726,17 @@ const createPreview = (canvas, design, assets, config) => {
             const bounce = since < 450 ? Math.sin(since / 450 * Math.PI) : 0;
             bouncer.position.y = Math.sin(now / 900) * 0.006 + bounce * 0.035;
             bouncer.scale.setScalar(1 + bounce * 0.04);
-            if (now - wavefrom < 1500) {
-                poseHands(now);
+            // The arms, the breathing and the walk move every frame.
+            if (walkuntil > 0 && now >= walkuntil && typeof avatar.setWalkDemo === 'function') {
+                avatar.setWalkDemo(0);
+                walkuntil = -Infinity;
+                returning = true;
+            }
+            poseHands(now);
+            if (typeof avatar.update === 'function') {
+                avatar.update(now);
+            }
+            if (now < waveuntil + 100) {
                 groundShadow();
             }
             moved = true;
@@ -836,9 +858,35 @@ const createPreview = (canvas, design, assets, config) => {
     };
     whenLoaded(avatar.ready);
 
+    /**
+     * Show the avatar walking in place, or waving, for a moment (as others see it move).
+     *
+     * @param {string} what "walk" or "wave".
+     */
+    const demo = (what) => {
+        const now = performance.now();
+        if (still()) {
+            return;
+        }
+        if (what === 'walk' && typeof avatar.setWalkDemo === 'function') {
+            avatar.setWalkDemo(WALK_SPEED);
+            walkuntil = now + WALK_MS;
+            // Seen from three-quarters, where a stride reads; back to the front afterwards.
+            turntable.rotation.y = WALK_TURN;
+            returning = false;
+            holduntil = walkuntil;
+            dirty = true;
+        } else if (what === 'wave') {
+            wavefrom = now;
+            waveuntil = now + WAVE_MS;
+        }
+    };
+
     return {
+        demo: demo,
         update: (next, nextassets) => {
             const handschanged = next.hands !== look.hands || next.handcolor !== look.handcolor;
+            const bodychanged = next.body !== look.body || next.outfit !== look.outfit;
             look = next;
             whenLoaded(avatar.setAppearance(next, next.picture ? config.pictureurl : '', nextassets));
             dressHands();
@@ -848,8 +896,12 @@ const createPreview = (canvas, design, assets, config) => {
             faceFront();
             if (handschanged) {
                 wavefrom = performance.now();
+                waveuntil = wavefrom + WAVE_MS / 2;
             } else {
                 bouncefrom = performance.now();
+            }
+            if (bodychanged && framing === 'whole') {
+                demo('walk');
             }
         },
         setVideo: (video) => {
@@ -1017,6 +1069,18 @@ export const init = async(config) => {
             previewhelp.hidden = false;
             setZoom = setupZoom(zoombutton, preview);
             setupCamera(camerabutton, preview, status, str);
+            ['walk', 'wave'].forEach((what) => {
+                const button = root.querySelector('[data-action="demo' + what + '"]');
+                if (button) {
+                    button.hidden = false;
+                    button.addEventListener('click', () => {
+                        if (setZoom && what === 'walk') {
+                            setZoom.whole();
+                        }
+                        preview.demo(what);
+                    });
+                }
+            });
         } else {
             canvas.hidden = true;
         }
