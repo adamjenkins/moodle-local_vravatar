@@ -69,7 +69,7 @@ Feature: Users design their own VR avatar
     Then I should see "The default choices are back." in the "[data-region='status']" "css_element"
     And I should see "Unsaved changes" in the "[data-region='savebar']" "css_element"
     And the field "Capsule" matches value "1"
-    And the field "Blue" in the "Body colour" "fieldset" matches value "1"
+    And the field "Broad" matches value ""
     And I click on "Extras" "button" in the "[role='tablist']" "css_element"
     And the field "Wear glasses" matches value ""
     And I reload the page
@@ -90,7 +90,8 @@ Feature: Users design their own VR avatar
     And I press "Stop using my avatar (standard look)"
     And I should see "Your avatar was removed. You have the standard look again."
     And I should see "You have not saved an avatar yet"
-    And the field "No hair" matches value "1"
+    # The standard look again: short hair and no hat.
+    And the field "Short" matches value "1"
     And the field "No hat" matches value "1"
 
   Scenario: The site can turn off profile pictures on avatars
@@ -139,8 +140,9 @@ Feature: Users design their own VR avatar
     And I should see "Hands" in the "[role='tablist']" "css_element"
     And I should see "Extras" in the "[role='tablist']" "css_element"
     And I click on "Face" "button" in the "[role='tablist']" "css_element"
-    And the field "Same as body colour" matches value "1"
-    And the field "Dots" matches value "1"
+    # The standard look has a real skin tone and round eyes drawn on the skin.
+    And the field "Same as body colour" matches value ""
+    And the field "Round" in the "Eyes" "fieldset" matches value "1"
     And the field "No beard" matches value "1"
     And the field "Show ears" matches value ""
     When I set the field "Medium" to "1"

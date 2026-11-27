@@ -44,6 +44,9 @@ final class design_test extends \advanced_testcase {
         'glasses' => true,
         'hat' => 'sunhat',
         'outfit' => 'suit-tie',
+        'hands' => 'glove',
+        'handcolor' => 'cyan',
+        'face' => 'drawn',
         'picture' => true,
     ];
 

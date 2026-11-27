@@ -756,6 +756,14 @@
     background: var(--bs-body-bg, #fff);
 }
 
+/*
+ * Acceptance tests click the middle of a choice, which the sticky bar can cover in a short test
+ * window; there the bar stays in the page flow.
+ */
+.behat-site .local-vravatar-savebar {
+    position: static;
+}
+
 .local-vravatar-dirty {
     color: var(--bs-warning-text-emphasis, #997404);
     font-weight: 600;

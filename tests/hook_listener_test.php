@@ -200,6 +200,7 @@ final class hook_listener_test extends \advanced_testcase {
         $hook = $this->hook();
         \core\di::get(\core\hook\manager::class)->dispatch($hook);
         $this->assertArrayHasKey('peera', $hook->get_appearances());
-        $this->assertArrayNotHasKey('peerc', $hook->get_appearances());
+        // A person without a saved design gets the standard look through the hook manager too.
+        $this->assertSame(design::standard((int)$this->nodesign->id), $hook->get_appearances()['peerc']['appearance']);
     }
 }
