@@ -42,8 +42,9 @@
     * sections - list of sections (tabs), each with id, tabid, heading, tablabel (the short name on
       the tab), icon (the tab's icon), frame (how the preview frames the avatar on this tab: face,
       whole or hands), first, isextras, ishands and items; an item is
-      either a radio group (radio: name, id, legend, isswatch and options, each option with value,
-      id, label, checked, swatch, follows, palette, model, credit, pic, mask and render), a checkbox
+      either a radio group (radio: name, id, legend, isswatch, options and groups; each group with
+      id, legend (empty for no heading) and options, each option with value, id, label, checked,
+      swatch, follows, followed, palette, model, credit, pic, mask and render), a checkbox
       (check: name, id, groupid, legend, label, checked and render) or the costume picker (costume:
       name, id, legend, none with value, id, label and checked, and categories, each with id, legend
       and options, each option with value, id, label, checked, thumb, model, credit and kind); the
@@ -84,30 +85,37 @@
                             "id": "local-vravatar-group-skin",
                             "legend": "Skin tone",
                             "isswatch": true,
-                            "options": [
+                            "groups": [
                                 {
-                                    "value": "match",
-                                    "id": "local-vravatar-skin-match",
-                                    "label": "Same as body colour",
-                                    "checked": true,
-                                    "swatch": "",
-                                    "follows": true,
-                                    "palette": "skin",
-                                    "pic": "",
-                                    "mask": "",
-                                    "render": ""
-                                },
-                                {
-                                    "value": "medium",
-                                    "id": "local-vravatar-skin-medium",
-                                    "label": "Medium",
-                                    "checked": false,
-                                    "swatch": "#c98e64",
-                                    "follows": false,
-                                    "palette": "skin",
-                                    "pic": "",
-                                    "mask": "",
-                                    "render": ""
+                                    "id": "local-vravatar-group-skin-all",
+                                    "legend": "",
+                                    "options": [
+                                        {
+                                            "value": "match",
+                                            "id": "local-vravatar-skin-match",
+                                            "label": "Same as body colour",
+                                            "checked": true,
+                                            "swatch": "",
+                                            "follows": true,
+                                            "followed": "body",
+                                            "palette": "skin",
+                                            "pic": "",
+                                            "mask": "",
+                                            "render": ""
+                                        },
+                                        {
+                                            "value": "medium",
+                                            "id": "local-vravatar-skin-medium",
+                                            "label": "Medium",
+                                            "checked": false,
+                                            "swatch": "#c98e64",
+                                            "follows": false,
+                                            "palette": "skin",
+                                            "pic": "",
+                                            "mask": "",
+                                            "render": ""
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -142,34 +150,40 @@
                             "id": "local-vravatar-group-hat",
                             "legend": "Hat",
                             "isswatch": false,
-                            "options": [
+                            "groups": [
                                 {
-                                    "value": "none",
-                                    "id": "local-vravatar-hat-none",
-                                    "label": "No hat",
-                                    "checked": true,
-                                    "swatch": "",
-                                    "follows": false,
-                                    "palette": "",
-                                    "model": "",
-                                    "credit": "",
-                                    "pic": "",
-                                    "mask": "",
-                                    "render": "face"
-                                },
-                                {
-                                    "value": "pirate",
-                                    "id": "local-vravatar-hat-pirate",
-                                    "label": "Pirate hat",
-                                    "checked": false,
-                                    "swatch": "",
-                                    "palette": "",
-                                    "model": "https://example.org/local/vravatar/costumes/hat-pirate.glb",
-                                    "credit": "by Poly by Google, CC BY 3.0",
-                                    "follows": false,
-                                    "pic": "https://example.org/theme/image.php/boost/local_vravatar/1/costumes/hat-pirate",
-                                    "mask": "",
-                                    "render": ""
+                                    "id": "local-vravatar-group-hat-all",
+                                    "legend": "",
+                                    "options": [
+                                        {
+                                            "value": "none",
+                                            "id": "local-vravatar-hat-none",
+                                            "label": "No hat",
+                                            "checked": true,
+                                            "swatch": "",
+                                            "follows": false,
+                                            "palette": "",
+                                            "model": "",
+                                            "credit": "",
+                                            "pic": "",
+                                            "mask": "",
+                                            "render": "face"
+                                        },
+                                        {
+                                            "value": "pirate",
+                                            "id": "local-vravatar-hat-pirate",
+                                            "label": "Pirate hat",
+                                            "checked": false,
+                                            "swatch": "",
+                                            "palette": "",
+                                            "model": "https://example.org/local/vravatar/costumes/hat-pirate.glb",
+                                            "credit": "by Poly by Google, CC BY 3.0",
+                                            "follows": false,
+                                            "pic": "https://example.org/theme/image.php/boost/local_vravatar/1/costumes/hat-pirate",
+                                            "mask": "",
+                                            "render": ""
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -372,31 +386,36 @@
                                     <div class="local-vravatar-grouphead" aria-hidden="true">
                                         {{legend}}{{#isswatch}}<span class="local-vravatar-chosen" data-region="chosen"></span>{{/isswatch}}
                                     </div>
-                                    <div class="local-vravatar-tiles{{#isswatch}} local-vravatar-swatchgrid{{/isswatch}}">
-                                        {{#options}}
-                                            <div class="local-vravatar-tile{{#isswatch}} local-vravatar-tile-swatch{{/isswatch}}">
-                                                <input class="local-vravatar-tile-input" type="radio" name="{{name}}" value="{{value}}" id="{{id}}"
-                                                    {{#model}}data-model="{{model}}"{{/model}} {{#checked}}checked{{/checked}}>
-                                                <label class="local-vravatar-tile-label" for="{{id}}"{{#isswatch}} title="{{label}}"{{/isswatch}}>
-                                                    {{#isswatch}}
-                                                        <span class="local-vravatar-swatch{{#follows}} local-vravatar-swatch-follows{{/follows}}"
-                                                            data-swatch="{{value}}" data-palette="{{palette}}"
-                                                            {{#swatch}}style="background-color: {{swatch}};"{{/swatch}} aria-hidden="true"></span>
-                                                    {{/isswatch}}
-                                                    {{^isswatch}}
-                                                        <span class="local-vravatar-pic" aria-hidden="true"
-                                                            {{#render}}data-render="{{render}}" data-key="{{name}}" data-value="{{value}}"{{/render}}>
-                                                            {{#pic}}<img src="{{pic}}" alt="" width="96" height="96" loading="lazy">{{/pic}}
-                                                            {{#mask}}<span class="local-vravatar-handpic" data-region="handpic"
-                                                                style="mask-image: url({{mask}}); -webkit-mask-image: url({{mask}});"></span>{{/mask}}
-                                                        </span>
-                                                    {{/isswatch}}
-                                                    <span class="local-vravatar-tile-name">{{label}}</span>
-                                                    {{^isswatch}}{{#credit}}<span class="local-vravatar-credit">{{credit}}</span>{{/credit}}{{/isswatch}}
-                                                </label>
+                                    {{#groups}}
+                                        <div class="local-vravatar-subgroup"{{#legend}} role="group" aria-labelledby="{{id}}-label"{{/legend}}>
+                                            {{#legend}}<div class="local-vravatar-sublegend" id="{{id}}-label">{{legend}}</div>{{/legend}}
+                                            <div class="local-vravatar-tiles{{#isswatch}} local-vravatar-swatchgrid{{/isswatch}}">
+                                                {{#options}}
+                                                    <div class="local-vravatar-tile{{#isswatch}} local-vravatar-tile-swatch{{/isswatch}}">
+                                                        <input class="local-vravatar-tile-input" type="radio" name="{{name}}" value="{{value}}" id="{{id}}"
+                                                            {{#model}}data-model="{{model}}"{{/model}} {{#checked}}checked{{/checked}}>
+                                                        <label class="local-vravatar-tile-label" for="{{id}}"{{#isswatch}} title="{{label}}"{{/isswatch}}>
+                                                            {{#isswatch}}
+                                                                <span class="local-vravatar-swatch{{#follows}} local-vravatar-swatch-follows{{/follows}}"
+                                                                    data-swatch="{{value}}" data-palette="{{palette}}"{{#followed}} data-follows="{{followed}}"{{/followed}}
+                                                                    {{#swatch}}style="background: {{swatch}};"{{/swatch}} aria-hidden="true"></span>
+                                                            {{/isswatch}}
+                                                            {{^isswatch}}
+                                                                <span class="local-vravatar-pic" aria-hidden="true"
+                                                                    {{#render}}data-render="{{render}}" data-key="{{name}}" data-value="{{value}}"{{/render}}>
+                                                                    {{#pic}}<img src="{{pic}}" alt="" width="96" height="96" loading="lazy">{{/pic}}
+                                                                    {{#mask}}<span class="local-vravatar-handpic" data-region="handpic"
+                                                                        style="mask-image: url({{mask}}); -webkit-mask-image: url({{mask}});"></span>{{/mask}}
+                                                                </span>
+                                                            {{/isswatch}}
+                                                            <span class="local-vravatar-tile-name">{{label}}</span>
+                                                            {{^isswatch}}{{#credit}}<span class="local-vravatar-credit">{{credit}}</span>{{/credit}}{{/isswatch}}
+                                                        </label>
+                                                    </div>
+                                                {{/options}}
                                             </div>
-                                        {{/options}}
-                                    </div>
+                                        </div>
+                                    {{/groups}}
                                 </fieldset>
                             {{/radio}}
                             {{#costume}}

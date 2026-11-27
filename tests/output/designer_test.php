@@ -75,13 +75,19 @@ final class designer_test extends \advanced_testcase {
         }
         $expected = array_diff(array_keys(design::choices()), ['outfit']);
         $this->assertEqualsCanonicalizing($expected, array_keys($radios));
-        $this->assertSame(['ears', 'glasses'], array_keys($checks));
+        // The glasses flag has no box: it follows the eyewear.
+        $this->assertSame(['ears'], array_keys($checks));
         $this->assertTrue($checks['ears']['checked']);
-        $this->assertFalse($checks['glasses']['checked']);
-        $this->assertSame('face', $checks['glasses']['render']);
+        $this->assertSame('face', $checks['ears']['render']);
 
         foreach ($radios as $key => $group) {
             $this->assertSame(design::choices()[$key], array_column($group['options'], 'value'), $key);
+            // The groups hold every option once, in the same order.
+            $ingroups = array_merge(...array_map(fn($g) => array_column($g['options'], 'value'), $group['groups']));
+            $this->assertSame(design::choices()[$key], $ingroups, $key);
+            foreach ($group['groups'] as $sub) {
+                $this->assertStringNotContainsString('[[', $sub['legend'], $key);
+            }
             $checked = array_column(array_filter($group['options'], fn($o) => $o['checked']), 'value');
             $this->assertSame([$current[$key]], $checked, $key);
             foreach ($group['options'] as $option) {
@@ -89,6 +95,47 @@ final class designer_test extends \advanced_testcase {
                 $this->assertStringNotContainsString('[[', $option['label'], "{$key}={$option['value']}");
             }
         }
+        // The tabs hold the face, hair and headwear keys of the avatar builder's modules.
+        $keysof = function (int $index) use ($data): array {
+            $keys = [];
+            foreach ($data['sections'][$index]['items'] as $item) {
+                $keys[] = ($item['radio'] ?? $item['check'] ?? $item['costume'])['name'];
+            }
+            return $keys;
+        };
+        $this->assertSame(['face', 'head', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose', 'mouth',
+            'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'], $keysof(0));
+        $this->assertSame(['hair', 'haircolor', 'hairgrey', 'beard', 'beardcolor'], $keysof(1));
+        $this->assertSame(['hat', 'eyewear', 'eyewearcolor'], $keysof(5));
+        // Colours are swatches, the rest tiles drawn on the user's avatar.
+        foreach (['eyecolor', 'browcolor', 'lips', 'beardcolor', 'eyewearcolor'] as $key) {
+            $this->assertTrue($radios[$key]['isswatch'], $key);
+            $this->assertCount(1, $radios[$key]['groups'], $key);
+        }
+        foreach (['eyes', 'eyespace', 'brows', 'nose', 'mouth', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup',
+            'hairgrey', 'eyewear'] as $key) {
+            $this->assertFalse($radios[$key]['isswatch'], $key);
+            $this->assertSame('face', $radios[$key]['options'][1]['render'], $key);
+        }
+        // Long lists come under the builder's group headings; the group of "none" alone has none.
+        $legends = fn($key) => array_column($radios[$key]['groups'], 'legend');
+        $this->assertSame(['Cartoon', 'Classic', 'Open', 'Lids and folds', 'Tilted'], $legends('eyes'));
+        $this->assertSame('', $legends('hair')[0]);
+        $this->assertCount(9, $legends('hair'));
+        $this->assertSame(['', 'Everyday', 'Smart', 'Faith and tradition', 'Work and uniform', 'Celebration', 'Dress-up'],
+            $legends('hat'));
+        $this->assertSame([''], $legends('freckles'));
+        $this->assertSame([''], $legends('eyespace'));
+        // What a swatch without its own colour follows, for the page to paint.
+        $byvalue = fn($key) => array_column($radios[$key]['options'], null, 'value');
+        $this->assertSame('body', $byvalue('skin')['match']['followed']);
+        $this->assertSame('hair', $byvalue('browcolor')['hair']['followed']);
+        $this->assertSame('greying', $byvalue('beardcolor')['greying']['followed']);
+        $this->assertSame('skin', $byvalue('lips')['none']['followed']);
+        $this->assertSame(design::EYESWATCHES['hazel'], $byvalue('eyecolor')['hazel']['swatch']);
+        $this->assertStringContainsString('gradient', $byvalue('eyecolor')['odd']['swatch']);
+        $this->assertSame(design::FRAMESWATCHES['gold'], $byvalue('eyewearcolor')['gold']['swatch']);
+
         // Skin tones are named swatches; "match" has no swatch of its own.
         $this->assertTrue($radios['skin']['isswatch']);
         $this->assertSame('', $radios['skin']['options'][0]['swatch']);

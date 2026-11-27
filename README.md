@@ -10,18 +10,21 @@ there is nothing to moderate:
 
 | Part | Choices |
 |---|---|
-| Head | round · rounded square · oval · heart-shaped |
+| Head | 12 shapes: round · rounded square · oval · heart-shaped, long · wide · soft, and five jaw lines (angular, rectangle, diamond, pear, chiselled) |
 | Skin tone | same as body colour (the standard look) · porcelain · fair · light · medium · tan · brown · dark · deep |
 | Face style | a face screen on the head, or the face drawn on the skin |
-| Face | eyes (dots · round · almond · sleepy), eyebrows (none · thin · thick · arched), nose (none · small · round · pointed), ears (on/off) |
-| Beard | none · stubble · moustache · goatee · full beard, in the hair colour |
-| Hair | none · short · long · bun · curly · afro · ponytail · braids · buzz cut · bob · mohawk · side parting · pigtails · top knot |
+| Eyes | 21 shapes (cartoon, classic, open, lids and folds, tilted), 17 eye colours (two different ones too), 5 spacings |
+| Eyebrows | 20 shapes, in the hair colour or any of the hair colours |
+| Nose, mouth, ears | 15 noses, 16 mouths (smiles, calm, lips, braces, fun), ears on or off in 9 shapes |
+| Face details | 15 lip colours, 12 cheeks (blush, dimples, shapes), 9 freckles, 15 marks (moles, birthmark, vitiligo, scar, bindi, face paint), 12 age and expression lines, 15 make-ups |
+| Hair | 41 styles (cropped, short, thinning, medium, long, tied up, coils and afros, braids, twists and locs), grey at the temples or salt and pepper |
 | Hair colour | black · brown · blonde · auburn · grey · white · red · pink · blue · purple |
+| Facial hair | 19 styles (stubble, moustaches, chin, sideburns, beards), in the hair colour, greying, or any hair colour |
 | Body | capsule · slim · broad |
 | Colours | body colour and accent colour from 14 named colours (black and white among them, for a black suit with a white or black tie) |
 | Costume | none, or one of 44 ready-made costumes (pirates, suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
 | Hands | round · mittens · cartoon · gloves · robot · paws, in the skin colour or any of the named colours |
-| Extras | glasses, hat (none · cap · beanie · sun hat · pirate hat) |
+| Extras | 33 hats (everyday, smart, faith and tradition, work and uniform, celebration, dress-up), 17 eyewear (glasses, sunglasses, sport and safety, monocle, eye patch) in 13 frame colours |
 | Picture | the user's Moodle profile picture as a round badge on the face (shown by default; each user can untick it) |
 
 The heads are stylised to match the bodies, not photographs. Every new part defaults to the look
@@ -32,8 +35,9 @@ captain's coat, the suits and ties) take the accent colour.
 
 The page shows a 3D preview beside the choices, and the choices on tabs: **Looks** (six
 ready-made looks and *Surprise me* to start from), Face, Hair, Body, Costume, Hands and Extras.
-Every part is a picture tile of the user's own avatar with that part, and every colour and skin
-tone is a named swatch (the names are read out by screen readers). **Undo** and **Redo** step
+Every part is a picture tile of the user's own avatar with that part (long lists under group
+headings), and every colour and skin tone is a named swatch (the names are read out by screen
+readers). No choice is named, grouped or ordered by gender. **Undo** and **Redo** step
 through the changes, the **Save** bar stays at the bottom of the window and says when there are
 unsaved changes, and **Reset to default** and **Stop using my avatar** (back to the standard look)
 are below. On a first visit short tips over the preview name the next step (pick a look, change a

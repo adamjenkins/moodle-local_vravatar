@@ -58,12 +58,6 @@ final class design {
      */
     public const SKINS = ['match', 'porcelain', 'fair', 'light', 'medium', 'tan', 'brown', 'dark', 'deep'];
 
-    /** @var string[] The hair styles, in the order the designer shows them. */
-    public const HAIRSTYLES = [
-        'none', 'short', 'long', 'bun', 'curly', 'afro', 'ponytail', 'braids', 'buzz', 'bob', 'mohawk', 'sidepart',
-        'pigtails', 'topknot',
-    ];
-
     /**
      * Swatch colours for the designer form, by name. Only a visual cue next to the colour's name:
      * the 3D colours are chosen by vrroomruntime_builtin/live/avatarmodel, and the designer page
@@ -138,48 +132,309 @@ final class design {
         return array_merge(['skin'], self::COLOURS);
     }
 
+    /**
+     * The keys drawn by the avatar builder's face, hair and headwear modules, and the head shapes: key => group =>
+     * values, in the designer's order (the groups head the designer's tiles). Mirrors APPEARANCE of
+     * vrroomruntime_builtin/live/avatarface, avatarhair and avatarheadwear and HEAD_GROUPS of avatarhead (VR room),
+     * whose lists keep every value of the first versions. Printed by the wardrobe tools' print-choices.mjs (dev-docs);
+     * print it again when a module's lists change.
+     *
+     * @var array
+     */
+    public const MODULE_KEYS = [
+        // vrroomruntime_builtin/live/avatarhead.
+        'head' => [
+            'classic' => ['round', 'square', 'oval', 'heart'],
+            'proportion' => ['long', 'wide', 'soft'],
+            'jaw' => ['angular', 'rectangle', 'diamond', 'pear', 'chiselled'],
+        ],
+        // vrroomruntime_builtin/live/avatarface.
+        'eyes' => [
+            'cartoon' => ['dots', 'beads'],
+            'classic' => ['round', 'almond', 'sleepy'],
+            'open' => ['soft', 'wide', 'large', 'small', 'bright', 'doe', 'lashes'],
+            'lids' => ['hooded', 'heavy', 'deepset', 'monolid', 'innerfold'],
+            'tilt' => ['upturned', 'downturned', 'narrow', 'smiling'],
+        ],
+        'eyecolor' => [
+            'classic' => ['classic'],
+            'natural' => ['black', 'darkbrown', 'brown', 'lightbrown', 'amber', 'hazel', 'green', 'grey', 'bluegrey',
+                'blue', 'lightblue'],
+            'fun' => ['violet', 'teal', 'gold', 'red', 'odd'],
+        ],
+        'eyespace' => [
+            'spacing' => ['closer', 'close', 'normal', 'wide', 'wider'],
+        ],
+        'brows' => [
+            'classic' => ['none', 'thin', 'thick', 'arched'],
+            'shape' => ['straight', 'soft', 'rounded', 'higharch', 'angular', 'tapered', 'slantup', 'slantdown'],
+            'size' => ['short', 'long', 'bushy', 'bold', 'feathered', 'sparse'],
+            'style' => ['slit', 'joined'],
+        ],
+        'browcolor' => [
+            'hair' => ['hair'],
+            'colour' => ['black', 'brown', 'blonde', 'auburn', 'grey', 'white', 'red', 'pink', 'blue', 'purple'],
+        ],
+        'nose' => [
+            'classic' => ['none', 'small', 'round', 'pointed', 'button'],
+            'profile' => ['snub', 'upturned', 'straight', 'aquiline', 'roman'],
+            'size' => ['long', 'narrow', 'wide', 'broad', 'bulb'],
+        ],
+        'mouth' => [
+            'smiles' => ['smile', 'soft', 'wide', 'grin', 'teeth', 'gap', 'braces'],
+            'calm' => ['neutral', 'serious', 'smirk'],
+            'lips' => ['full', 'thin', 'pout'],
+            'fun' => ['cat', 'tongue', 'oh'],
+        ],
+        'lips' => [
+            'none' => ['none'],
+            'natural' => ['gloss', 'nude', 'peach', 'coral', 'pink', 'rose'],
+            'bold' => ['red', 'berry', 'plum', 'brown', 'black'],
+            'fun' => ['purple', 'blue', 'gold'],
+        ],
+        'earshape' => [
+            'classic' => ['classic'],
+            'size' => ['round', 'small', 'large', 'tall'],
+            'shape' => ['flat', 'out', 'lobe', 'pointed'],
+        ],
+        'freckles' => [
+            'none' => ['none'],
+            'freckles' => ['few', 'light', 'nose', 'cheeks', 'tiny', 'many', 'dense', 'big'],
+        ],
+        'cheeks' => [
+            'none' => ['none'],
+            'blush' => ['pink', 'peach', 'coral', 'rose', 'berry', 'sunkissed', 'glow'],
+            'shape' => ['dimples', 'hatch', 'hearts', 'stars'],
+        ],
+        'marks' => [
+            'none' => ['none'],
+            'moles' => ['mole', 'molecheek', 'beauty', 'chin', 'nosemole', 'cluster'],
+            'skin' => ['birthmark', 'patches', 'scar', 'bindi'],
+            'paint' => ['star', 'heart', 'whiskers', 'stripes'],
+        ],
+        'lines' => [
+            'none' => ['none'],
+            'single' => ['smile', 'crow', 'bags', 'forehead', 'frown', 'mouth'],
+            'together' => ['laugh', 'crinkle', 'gentle', 'mature', 'deep'],
+        ],
+        'makeup' => [
+            'none' => ['none'],
+            'liner' => ['liner', 'wing', 'kohl', 'lashes', 'graphic'],
+            'shadow' => ['smoky', 'bronze', 'gold', 'peach', 'pink', 'plum', 'blue', 'green', 'glitter'],
+        ],
+        // vrroomruntime_builtin/live/avatarhair.
+        'hair' => [
+            'none' => ['none'],
+            'cropped' => ['buzz', 'crew', 'fade', 'curltop', 'mohawk'],
+            'short' => ['short', 'sidepart', 'quiff', 'slicked', 'undercut', 'pixie'],
+            'age' => ['receding', 'thinning', 'balding'],
+            'medium' => ['bob', 'curlybob', 'bangs', 'shoulder', 'mullet', 'curly'],
+            'long' => ['long', 'longwavy', 'longcurly', 'halfup'],
+            'tied' => ['ponytail', 'pigtails', 'bun', 'lowbun', 'topknot', 'spacebuns'],
+            'coils' => ['coily', 'afro', 'afropuff', 'highpuff', 'bantu'],
+            'braids' => ['cornrows', 'braids', 'boxbraids', 'twists', 'locs'],
+        ],
+        'beard' => [
+            'none' => ['none'],
+            'stubble' => ['stubble', 'heavystubble'],
+            'moustache' => ['moustache', 'pencil', 'chevron', 'handlebar', 'walrus', 'horseshoe'],
+            'chin' => ['soulpatch', 'goatee', 'vandyke', 'circle'],
+            'sides' => ['sideburns', 'chinstrap', 'muttonchops'],
+            'beard' => ['boxed', 'full', 'long'],
+        ],
+        'beardcolor' => [
+            'hair' => ['hair', 'greying'],
+            'colour' => ['black', 'brown', 'blonde', 'auburn', 'grey', 'white', 'red', 'pink', 'blue', 'purple'],
+        ],
+        'hairgrey' => [
+            'grey' => ['none', 'temples', 'salt'],
+        ],
+        // vrroomruntime_builtin/live/avatarheadwear.
+        'hat' => [
+            'none' => ['none'],
+            'everyday' => ['cap', 'beanie', 'sunhat', 'bucket', 'flatcap', 'beret', 'bandana', 'headphones'],
+            'smart' => ['fedora', 'bowler', 'tophat', 'cowboy'],
+            'tradition' => ['hijab', 'turban', 'kufi', 'kippah', 'headwrap'],
+            'work' => ['hardhat', 'firehelmet', 'pilotcap', 'policecap', 'security', 'chef', 'scrubcap', 'porter'],
+            'celebration' => ['graduation', 'party', 'crown', 'flowercrown'],
+            'costume' => ['wizard', 'tricorne', 'pirate'],
+        ],
+        'eyewear' => [
+            'none' => ['none'],
+            'glasses' => ['classic', 'round', 'rectangle', 'cateye', 'halfrim', 'thick', 'halfmoon'],
+            'sun' => ['aviator', 'sunsquare', 'sunround', 'sunwrap', 'heart'],
+            'sport' => ['safety', 'ski'],
+            'costume' => ['monocle', 'eyepatch'],
+        ],
+        'eyewearcolor' => [
+            'plain' => ['dark', 'black', 'white', 'clear'],
+            'pattern' => ['tortoise'],
+            'metal' => ['gold', 'silver', 'gunmetal'],
+            'colour' => ['red', 'blue', 'green', 'pink', 'purple'],
+        ],
+    ];
+
+    /**
+     * The defaults of the keys the modules added: today's look (mirrors the modules' APPEARANCE defaults, as
+     * avatarmodel's DEFAULT_APPEARANCE).
+     *
+     * @var string[]
+     */
+    public const MODULE_DEFAULTS = [
+        'eyecolor' => 'classic',
+        'eyespace' => 'normal',
+        'browcolor' => 'hair',
+        'mouth' => 'smile',
+        'lips' => 'none',
+        'earshape' => 'classic',
+        'freckles' => 'none',
+        'cheeks' => 'none',
+        'marks' => 'none',
+        'lines' => 'none',
+        'makeup' => 'none',
+        'beardcolor' => 'hair',
+        'hairgrey' => 'none',
+        'eyewear' => 'none',
+        'eyewearcolor' => 'dark',
+    ];
+
+    /**
+     * Swatch colours of the eye colours (mirrors EYE_COLOURS of vrroomruntime_builtin/live/avatarface). "classic" (a
+     * plain dark pupil) and "odd" (two colours) are painted by the designer.
+     *
+     * @var string[]
+     */
+    public const EYESWATCHES = [
+        'black' => '#2a1d17',
+        'darkbrown' => '#432716',
+        'brown' => '#6b4226',
+        'lightbrown' => '#94663a',
+        'amber' => '#b8862e',
+        'hazel' => '#8a7f3e',
+        'green' => '#4f8549',
+        'grey' => '#8d989f',
+        'bluegrey' => '#6a8aa3',
+        'blue' => '#3d7bc4',
+        'lightblue' => '#7db3e6',
+        'violet' => '#8d5fcc',
+        'teal' => '#27a59b',
+        'gold' => '#dcaa22',
+        'red' => '#c43b3d',
+    ];
+
+    /**
+     * Swatch colours of the lip colours (mirrors LIP_COLOURS of vrroomruntime_builtin/live/avatarface). "none" and
+     * "gloss" follow the skin.
+     *
+     * @var string[]
+     */
+    public const LIPSWATCHES = [
+        'nude' => '#c48a78',
+        'peach' => '#e5946f',
+        'coral' => '#e8665a',
+        'pink' => '#e2779d',
+        'rose' => '#c2566e',
+        'red' => '#c4232f',
+        'berry' => '#8e2346',
+        'plum' => '#6b2a4c',
+        'brown' => '#7a4030',
+        'black' => '#24191c',
+        'purple' => '#7a3fb0',
+        'blue' => '#3a68c8',
+        'gold' => '#d2a43a',
+    ];
+
+    /**
+     * Swatch colours of the eyewear frames (mirrors FRAME_COLOURS of vrroomruntime_builtin/live/avatarheadwear).
+     *
+     * @var string[]
+     */
+    public const FRAMESWATCHES = [
+        'dark' => '#202326',
+        'black' => '#0b0b0d',
+        'white' => '#f1f1ee',
+        'clear' => '#d6e2ea',
+        'tortoise' => '#5a3418',
+        'gold' => '#d6ad48',
+        'silver' => '#c3c8cf',
+        'gunmetal' => '#4a4f57',
+        'red' => '#c62828',
+        'blue' => '#1f5fbf',
+        'green' => '#2e7d4f',
+        'pink' => '#e77fa8',
+        'purple' => '#7b52c0',
+    ];
+
+
     /** @var string[] Keys of the document that are true or false. */
     public const FLAGS = ['ears', 'glasses', 'picture'];
+
+    /**
+     * The values of the first versions of the keys the modules now list (MODULE_KEYS): each stays allowed
+     * even if a module's list leaves it out, as in avatarmodel's CHOICES.
+     *
+     * @var array
+     */
+    private const FIRST_CHOICES = [
+        'head' => ['round', 'square', 'oval', 'heart'],
+        'hair' => ['none', 'short', 'long', 'bun', 'curly', 'afro', 'ponytail', 'braids', 'buzz', 'bob', 'mohawk',
+            'sidepart', 'pigtails', 'topknot'],
+        'eyes' => ['dots', 'round', 'almond', 'sleepy'],
+        'brows' => ['none', 'thin', 'thick', 'arched'],
+        'nose' => ['none', 'small', 'round', 'pointed'],
+        'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
+        'hat' => ['none', 'cap', 'beanie', 'sunhat', 'pirate'],
+    ];
 
     /**
      * The allowed values of every key that takes a name.
      *
      * "outfit" is "none" or the id of one of the costumes this plugin ships whose kind is body or
      * device (costumes/costumes.json, see costumes::outfit_ids()). The hat "pirate" is a costume
-     * model too (costumes::HATS).
+     * model too (costumes::HATS). The face, hair and headwear keys and the head shapes are the
+     * avatar builder's lists (MODULE_KEYS), with every value of the first versions.
      *
      * @return array key => list of names
      */
     public static function choices(): array {
-        return [
+        $choices = [
             'body' => ['capsule', 'slim', 'broad'],
-            'head' => ['round', 'square', 'oval', 'heart'],
             'skin' => self::SKINS,
             'color' => self::COLOURS,
             'accent' => self::COLOURS,
-            'hair' => self::HAIRSTYLES,
             'haircolor' => self::HAIRCOLOURS,
-            'eyes' => ['dots', 'round', 'almond', 'sleepy'],
-            'brows' => ['none', 'thin', 'thick', 'arched'],
-            'nose' => ['none', 'small', 'round', 'pointed'],
-            'beard' => ['none', 'stubble', 'moustache', 'goatee', 'full'],
-            'hat' => ['none', 'cap', 'beanie', 'sunhat', 'pirate'],
             'outfit' => array_merge(['none'], costumes::outfit_ids()),
             'hands' => self::HANDSTYLES,
             'handcolor' => self::handcolours(),
             // The value "plate" is the first version's face screen; "drawn" paints the face on the skin.
             'face' => ['plate', 'drawn'],
         ];
+        foreach (self::MODULE_KEYS as $key => $groups) {
+            $values = array_merge(...array_values($groups));
+            $choices[$key] = array_values(array_unique(array_merge($values, self::FIRST_CHOICES[$key] ?? [])));
+        }
+        return $choices;
+    }
+
+    /**
+     * The group of each value of a key the modules list, for the designer's headings.
+     *
+     * @param string $key Document key.
+     * @return array group => list of values, in the designer's order ([] for a key without groups)
+     */
+    public static function groups(string $key): array {
+        return self::MODULE_KEYS[$key] ?? [];
     }
 
     /**
      * The default document. Every key added after the first version defaults to the look the avatar
-     * had before it, so designs saved earlier look the same.
+     * had before it, so designs saved earlier look the same. The keys the modules added come after
+     * the first versions' keys, before "picture".
      *
      * @return array
      */
     public static function defaults(): array {
-        return [
+        return array_merge([
             'schema' => self::SCHEMA,
             'body' => 'capsule',
             'head' => 'round',
@@ -199,41 +454,55 @@ final class design {
             'hands' => 'sphere',
             'handcolor' => 'skin',
             'face' => 'plate',
+        ], self::MODULE_DEFAULTS, [
             // On by default (owner, 2026-10-10); the site setting allowpicture can turn it off.
             'picture' => true,
-        ];
+        ]);
     }
 
     /** @var string[] The body colours a standard look is picked from (the bright ones). */
     public const STANDARD_COLOURS = ['red', 'orange', 'yellow', 'green', 'teal', 'cyan', 'blue', 'indigo', 'purple', 'pink'];
 
+    /** @var string[] The natural hair colours a standard look is picked from. */
+    public const STANDARD_HAIRCOLOURS = ['brown', 'black', 'auburn', 'blonde'];
+
+    /** @var string[] The natural eye colours a standard look is picked from. */
+    public const STANDARD_EYECOLOURS = ['brown', 'darkbrown', 'hazel', 'green', 'blue', 'grey'];
+
     /**
      * The standard look of a person who has not saved an avatar: a friendly figure with the face
-     * drawn on the head (round eyes, thin brows, a small nose) and short brown hair, in a body
+     * drawn on the head (round eyes, soft brows, a small nose, a smile) and short hair, in a body
      * colour that is always the same for that person (picked from their user id), with a white
-     * accent and round hands. The skin is a real skin tone, also always the same for that person but
-     * picked by a different step through the user ids than the colour, so a class shows the whole
-     * range of tones, and the bright colour is on the clothes only. No profile picture: they did not choose
-     * one. Saved designs never use this: a stored document is cleaned against defaults(), so it
-     * keeps the look it had.
+     * accent and cartoon hands in their skin tone. The skin is a real skin tone, the hair and eyes
+     * natural colours, each always the same for that person but picked by a different step through
+     * the user ids than the colour, so a class shows the whole range, and the bright colour is on the
+     * clothes only. No profile picture: they did not choose one. Saved designs never use this: a
+     * stored document is cleaned against defaults(), so it keeps the look it had.
      *
      * @param int $userid User id.
      * @return array A clean document.
      */
     public static function standard(int $userid): array {
+        $id = abs($userid);
         $colours = self::STANDARD_COLOURS;
         // Every tone but "match" (the body colour).
         $tones = array_values(array_diff(self::SKINS, ['match']));
+        $hair = self::STANDARD_HAIRCOLOURS;
+        $eyes = self::STANDARD_EYECOLOURS;
         return self::clean(array_merge(self::defaults(), [
-            'color' => $colours[abs($userid) % count($colours)],
-            'skin' => $tones[(abs($userid) * 5 + 3) % count($tones)],
+            'color' => $colours[$id % count($colours)],
+            'skin' => $tones[($id * 5 + 3) % count($tones)],
             'accent' => 'white',
             'face' => 'drawn',
             'eyes' => 'round',
-            'brows' => 'thin',
+            'eyecolor' => $eyes[($id * 7 + 2) % count($eyes)],
+            'brows' => 'soft',
             'nose' => 'small',
+            'mouth' => 'smile',
             'hair' => 'short',
-            'haircolor' => 'brown',
+            'haircolor' => $hair[($id * 3 + 1) % count($hair)],
+            'hands' => 'cartoon',
+            'handcolor' => 'skin',
             'picture' => false,
         ]));
     }
@@ -268,7 +537,8 @@ final class design {
             return $clean;
         }
 
-        foreach (self::choices() as $key => $allowed) {
+        $choices = self::choices();
+        foreach ($choices as $key => $allowed) {
             if (isset($input[$key]) && is_string($input[$key]) && in_array($input[$key], $allowed, true)) {
                 $clean[$key] = $input[$key];
             }
@@ -281,6 +551,14 @@ final class design {
                 }
             }
         }
+        // A document from before eyewear styles: its glasses are the first version's ("classic"), as
+        // avatarmodel reads it. Then "glasses" follows the eyewear, so viewers that know only the flag
+        // still show glasses.
+        $eyewear = $input['eyewear'] ?? null;
+        if (!is_string($eyewear) || !in_array($eyewear, $choices['eyewear'], true)) {
+            $clean['eyewear'] = $clean['glasses'] ? 'classic' : self::MODULE_DEFAULTS['eyewear'];
+        }
+        $clean['glasses'] = $clean['eyewear'] !== 'none';
         return $clean;
     }
 

@@ -89,11 +89,39 @@ const WAVE_MS = 2400;
 /** How far the preview turns to show the walk (radians). */
 const WALK_TURN = 0.9;
 
-/** Keys of the document that take a name (radio groups; "outfit" is the costume picker). */
+/**
+ * Keys of the document that take a name (radio groups; "outfit" is the costume picker). The face,
+ * hair and headwear keys are those of VR room's avatarface, avatarhair and avatarheadwear modules
+ * (design::MODULE_KEYS on the server).
+ */
 const CHOICES = [
     'body', 'head', 'skin', 'color', 'accent', 'hair', 'haircolor', 'eyes', 'brows', 'nose', 'beard', 'hat', 'outfit',
     'hands', 'handcolor', 'face',
+    'eyecolor', 'eyespace', 'browcolor', 'mouth', 'lips', 'earshape', 'freckles', 'cheeks', 'marks', 'lines', 'makeup',
+    'hairgrey', 'beardcolor', 'eyewear', 'eyewearcolor',
 ];
+
+/**
+ * Surprise me: how often a key keeps its plain value (key => [value, chance]), so a random look has
+ * a few extras, not all of them at once.
+ */
+const SURPRISE_PLAIN = {
+    hat: ['none', 0.6],
+    beard: ['none', 0.6],
+    eyewear: ['none', 0.7],
+    handcolor: ['skin', 0.5],
+    eyecolor: ['classic', 0.2],
+    eyespace: ['normal', 0.6],
+    browcolor: ['hair', 0.75],
+    beardcolor: ['hair', 0.7],
+    hairgrey: ['none', 0.75],
+    lips: ['none', 0.6],
+    freckles: ['none', 0.6],
+    cheeks: ['none', 0.6],
+    marks: ['none', 0.75],
+    lines: ['none', 0.65],
+    makeup: ['none', 0.65],
+};
 
 /** Keys Surprise me leaves alone: the skin tone is the user's own. */
 const KEEP_ON_SURPRISE = ['skin', 'picture'];
@@ -134,6 +162,10 @@ const readForm = (form, defaults) => {
             design[key] = box.checked;
         }
     });
+    // "glasses" has no box: it follows the eyewear, for viewers that know only the flag.
+    if (typeof design.eyewear === 'string') {
+        design.glasses = design.eyewear !== 'none';
+    }
     return design;
 };
 
@@ -1108,8 +1140,10 @@ export const init = async(config) => {
     };
 
     /**
-     * Paint what follows other choices: the hand silhouettes (in the hand colour), "Same as body
-     * colour" (the body colour) and "Same as skin" (the skin colour).
+     * Paint what follows other choices: the hand silhouettes (in the hand colour), and the swatches
+     * without a colour of their own (data-follows): "Same as body colour" (the body colour), "Same
+     * as skin" and no lip colour (the skin colour), "Same as hair" (the hair colour) and "Greying"
+     * (the hair colour, with grey strands drawn by the style sheet).
      *
      * @param {Object} design The design in the form.
      */
@@ -1117,11 +1151,14 @@ export const init = async(config) => {
         const body = colourOf('colour', design.color);
         const skin = design.skin === 'match' ? body : colourOf('skin', design.skin);
         const hand = design.handcolor === 'skin' ? skin : colourOf('colour', design.handcolor);
+        const hair = colourOf('hair', design.haircolor);
+        const followed = {body, skin, hair, greying: hair};
         root.querySelectorAll('[data-region="handpic"]').forEach((pic) => {
             pic.style.backgroundColor = hand;
         });
         root.querySelectorAll('.local-vravatar-swatch-follows').forEach((swatch) => {
-            swatch.style.backgroundColor = swatch.dataset.palette === 'skin' ? body : skin;
+            const colour = followed[swatch.dataset.follows];
+            swatch.style.backgroundColor = colour === undefined ? skin : colour;
         });
     };
 
@@ -1176,14 +1213,17 @@ export const init = async(config) => {
     setupCostumeFilter(root.querySelector('.local-vravatar-costumes'), str.costumefilter, str.costumeall);
 
     /**
-     * Draw the tile pictures that are out of date: the tab in view first.
+     * Draw the tile pictures that are out of date: those of the tab in view (after a change the
+     * other tabs draw theirs when they are opened: with the long lists of faces, hair and hats a
+     * change would otherwise redraw some 300 pictures). Without tabs, every section's.
      */
     const repaint = () => {
         const active = tabs ? tabs.active() : null;
         if (active) {
             paintPanel(active, true);
+            return;
         }
-        panels.filter((panel) => panel !== active).forEach((panel) => paintPanel(panel, false));
+        panels.forEach((panel) => paintPanel(panel, false));
     };
 
     // Ready-made looks, drawn on the user's own avatar.
@@ -1266,8 +1306,8 @@ export const init = async(config) => {
         }
     });
 
-    // Surprise me: a random choice for every part but the skin tone, with fewer hats, beards and
-    // costumes than plain chance would give.
+    // Surprise me: a random choice for every part but the skin tone, with fewer hats, beards,
+    // glasses, marks and make-up (SURPRISE_PLAIN) and costumes than plain chance would give.
     const valuesOf = (name) => Array.from(form.querySelectorAll(`input[type="radio"][name="${name}"]`)).map((r) => r.value);
     const pick = (list) => list[Math.floor(Math.random() * list.length)];
     const surprise = () => {
@@ -1280,16 +1320,15 @@ export const init = async(config) => {
             if (key === 'outfit') {
                 // A costume hides most of the other choices: it is chosen on purpose, not by chance.
                 design[key] = 'none';
-            } else if (key === 'hat' || key === 'beard') {
-                design[key] = Math.random() < 0.6 ? 'none' : pick(list);
-            } else if (key === 'handcolor') {
-                design[key] = Math.random() < 0.5 ? 'skin' : pick(list);
+            } else if (SURPRISE_PLAIN[key] && list.indexOf(SURPRISE_PLAIN[key][0]) >= 0) {
+                const [plain, chance] = SURPRISE_PLAIN[key];
+                design[key] = Math.random() < chance ? plain : pick(list.filter((value) => value !== plain));
             } else {
                 design[key] = pick(list);
             }
         });
         design.ears = Math.random() < 0.5;
-        design.glasses = Math.random() < 0.25;
+        design.glasses = design.eyewear ? design.eyewear !== 'none' : Math.random() < 0.25;
         writeForm(form, design);
         changed(true);
         // A new look is seen whole.
@@ -1375,6 +1414,11 @@ export const init = async(config) => {
     if (tilepainter) {
         tilepainter.presets(readForm(form, config.defaults),
             presetbuttons.map((button) => [button.querySelector('[data-region="presetpic"]'), presetOf(button)]));
+        // On the first load the other tabs get their pictures too, after the looks, one at a time.
+        const active = tabs ? tabs.active() : null;
+        if (active) {
+            panels.filter((panel) => panel !== active).forEach((panel) => paintPanel(panel, false));
+        }
     }
 
     pending.resolve();

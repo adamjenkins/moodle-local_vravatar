@@ -68,7 +68,7 @@ final class services_test extends \advanced_testcase {
         $this->assertSame(design::standard((int)$user->id), $before['design']);
         $this->assertTrue($before['pictureallowed']);
 
-        $result = $this->save(['body' => 'slim', 'color' => 'purple', 'hat' => 'crown', 'glasses' => true, 'picture' => true,
+        $result = $this->save(['body' => 'slim', 'color' => 'purple', 'hat' => 'helicopter', 'glasses' => true, 'picture' => true,
             'userid' => (int)$other->id]);
         $this->assertSame('slim', $result['design']['body']);
         $this->assertSame('purple', $result['design']['color']);
@@ -99,6 +99,26 @@ final class services_test extends \advanced_testcase {
             $this->assertSame($value, $result['design'][$key], $key);
         }
         $this->assertSame('none', $result['design']['outfit']);
+        $this->assertSame($result['design'], $this->get()['design']);
+    }
+
+    /**
+     * The face, hair and headwear keys of the avatar builder's modules go through both services, and
+     * "glasses" follows the eyewear.
+     */
+    public function test_save_face_hair_and_headwear(): void {
+        $this->resetAfterTest();
+        $this->setUser($this->getDataGenerator()->create_user());
+        $chosen = ['head' => 'chiselled', 'eyes' => 'monolid', 'eyecolor' => 'hazel', 'eyespace' => 'wider',
+            'brows' => 'feathered', 'browcolor' => 'auburn', 'nose' => 'aquiline', 'mouth' => 'braces', 'lips' => 'berry',
+            'earshape' => 'pointed', 'freckles' => 'many', 'cheeks' => 'dimples', 'marks' => 'bindi', 'lines' => 'laugh',
+            'makeup' => 'wing', 'hair' => 'boxbraids', 'hairgrey' => 'salt', 'beard' => 'handlebar',
+            'beardcolor' => 'greying', 'hat' => 'hijab', 'eyewear' => 'cateye', 'eyewearcolor' => 'tortoise'];
+        $result = $this->save($chosen + ['glasses' => false]);
+        foreach ($chosen as $key => $value) {
+            $this->assertSame($value, $result['design'][$key], $key);
+        }
+        $this->assertTrue($result['design']['glasses']);
         $this->assertSame($result['design'], $this->get()['design']);
     }
 

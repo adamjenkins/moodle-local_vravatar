@@ -61,7 +61,7 @@ if ($action === 'remove') {
         $input[$key] = optional_param($key, '', PARAM_ALPHANUMEXT);
     }
     $input['ears'] = optional_param('ears', 0, PARAM_BOOL);
-    $input['glasses'] = optional_param('glasses', 0, PARAM_BOOL);
+    // No glasses box: clean() sets "glasses" from the eyewear chosen.
     $input['picture'] = $pictureallowed
         ? optional_param('picture', 0, PARAM_BOOL)
         : (bool)(design::load($userid)['picture'] ?? false);

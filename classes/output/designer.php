@@ -26,7 +26,7 @@ use local_vravatar\local\presets;
 /**
  * The "My VR avatar" designer: the preview with its tools (presets, surprise me, undo), and the
  * choices as picture tiles and swatches (labelled radio groups) on six tabs: head and face, hair,
- * body, costume, hands, extras.
+ * body, costume, hands, extras. Long lists of tiles come under the avatar builder's group headings.
  *
  * @package    local_vravatar
  * @copyright  2026 Adam Jenkins <adam@wisecat.net>
@@ -35,21 +35,26 @@ use local_vravatar\local\presets;
 class designer implements renderable, templatable {
     /**
      * The tabs of the designer, in page (and keyboard) order: lang string of the heading => keys.
-     * A key in FLAGS is a checkbox (ears and glasses as picture tiles, picture as a plain box drawn
-     * by the template in the Extras tab), "outfit" the costume picker (thumbnails by category), a
-     * colour key a row of large swatches and any other key a row of picture tiles. Without
+     * A key in FLAGS is a checkbox (ears as a picture tile, picture as a plain box drawn by the
+     * template in the Extras tab; glasses is not shown, it follows the eyewear), "outfit" the costume
+     * picker (thumbnails by category), a colour key a row of large swatches and any other key a row
+     * of picture tiles, under the avatar builder's group headings when the list is long. Without
      * JavaScript every tab is shown, one under the other, as headed sections.
      *
      * @var array
      */
     private const SECTIONS = [
-        'section_head' => ['face', 'head', 'skin', 'eyes', 'brows', 'nose', 'ears', 'beard'],
-        'section_hair' => ['hair', 'haircolor'],
+        'section_head' => ['face', 'head', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose', 'mouth',
+            'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'],
+        'section_hair' => ['hair', 'haircolor', 'hairgrey', 'beard', 'beardcolor'],
         'section_body' => ['body', 'color', 'accent'],
         'section_costume' => ['outfit'],
         'section_hands' => ['hands', 'handcolor'],
-        'section_extras' => ['hat', 'glasses'],
+        'section_extras' => ['hat', 'eyewear', 'eyewearcolor'],
     ];
+
+    /** @var int A list of tiles this long or longer is shown under its group headings. */
+    private const GROUPED_FROM = 9;
 
     /**
      * How the preview frames each tab (data-frame): "face" a close-up of the head, "whole" the whole
@@ -91,13 +96,22 @@ class designer implements renderable, templatable {
         'face' => 'face',
         'head' => 'face',
         'eyes' => 'face',
+        'eyespace' => 'face',
         'brows' => 'face',
         'nose' => 'face',
+        'mouth' => 'face',
+        'earshape' => 'face',
+        'cheeks' => 'face',
+        'freckles' => 'face',
+        'marks' => 'face',
+        'lines' => 'face',
+        'makeup' => 'face',
         'beard' => 'face',
         'ears' => 'face',
         'hair' => 'face',
+        'hairgrey' => 'face',
         'hat' => 'face',
-        'glasses' => 'face',
+        'eyewear' => 'face',
         'body' => 'whole',
     ];
 
@@ -110,11 +124,26 @@ class designer implements renderable, templatable {
         'accent' => 'accent',
         'hair' => 'hair',
         'haircolor' => 'haircolor',
+        'hairgrey' => 'hairgrey',
         'eyes' => 'eyes',
+        'eyecolor' => 'eyecolor',
+        'eyespace' => 'eyespace',
         'brows' => 'brows',
+        'browcolor' => 'browcolor',
         'nose' => 'nose',
+        'mouth' => 'mouth',
+        'lips' => 'lips',
+        'earshape' => 'earshape',
+        'cheeks' => 'cheeks',
+        'freckles' => 'freckles',
+        'marks' => 'marks',
+        'lines' => 'lines',
+        'makeup' => 'makeup',
         'beard' => 'beard',
+        'beardcolor' => 'beardcolor',
         'hat' => 'hat',
+        'eyewear' => 'eyewear',
+        'eyewearcolor' => 'eyewearcolor',
         'hands' => 'hands',
         'handcolor' => 'handcolor',
         'face' => 'face',
@@ -307,28 +336,62 @@ class designer implements renderable, templatable {
     }
 
     /**
+     * Swatches the page paints itself, for values with no colour in the builder's tables: the plain
+     * dark pupil and the two-coloured eyes (ODD_EYES of the face module).
+     *
+     * @var array
+     */
+    private const PAGE_SWATCHES = [
+        'eyecolor' => [
+            'classic' => '#1b1b1d',
+            'odd' => 'linear-gradient(90deg, #3d7bc4 50%, #6b4226 50%)',
+        ],
+    ];
+
+    /**
+     * What the values without a colour of their own follow (data-follows, painted by the page):
+     * "body" the body colour, "skin" the skin colour, "hair" the hair colour and "greying" the hair
+     * colour with grey in it.
+     *
+     * @var array
+     */
+    private const FOLLOWS = [
+        'skin' => ['match' => 'body'],
+        'handcolor' => ['skin' => 'skin'],
+        'browcolor' => ['hair' => 'hair'],
+        'beardcolor' => ['hair' => 'hair', 'greying' => 'greying'],
+        'lips' => ['none' => 'skin', 'gloss' => 'skin'],
+    ];
+
+    /**
      * One group of radio buttons for the template: large swatches for a colour, picture tiles for
      * anything else.
      *
      * A tile's picture is drawn by the page from the avatar builder (render), or is a fixed picture:
      * a hat that is a costume model shows its thumbnail, a hand style its silhouette (mask, painted
-     * in the hand colour by the page).
+     * in the hand colour by the page). A long list of tiles comes in the avatar builder's groups,
+     * each with a heading (none for the group of the "none" value alone).
      *
      * @param renderer_base $output Renderer.
      * @param string $key Document key.
      * @param string[] $values Allowed values, in order.
-     * @return array {name, id, legend, isswatch, render, options: [{value, id, label, checked, swatch,
-     *     palette, model, credit, pic, mask}]}
+     * @return array {name, id, legend, isswatch, options: [{value, id, label, checked, swatch, follows,
+     *     followed, palette, model, credit, pic, mask, render}], groups: [{id, legend, options}]}
      */
     protected function radio_group(renderer_base $output, string $key, array $values): array {
         [$swatches, $palette] = match ($key) {
             'color', 'accent' => [design::SWATCHES, 'colour'],
-            'haircolor' => [design::HAIRSWATCHES, 'hair'],
+            'haircolor', 'browcolor', 'beardcolor' => [design::HAIRSWATCHES, 'hair'],
             'skin' => [design::SKINSWATCHES, 'skin'],
             'handcolor' => [design::SWATCHES, 'colour'],
+            'eyecolor' => [design::EYESWATCHES, 'eye'],
+            'lips' => [design::LIPSWATCHES, 'lips'],
+            'eyewearcolor' => [design::FRAMESWATCHES, 'frame'],
             default => [[], ''],
         };
         $isswatch = (bool)$swatches;
+        $swatches += self::PAGE_SWATCHES[$key] ?? [];
+        $follows = self::FOLLOWS[$key] ?? [];
         $options = [];
         foreach ($values as $value) {
             // A hat that is a costume model: the preview loads it, and its credit is shown.
@@ -340,14 +403,15 @@ class designer implements renderable, templatable {
             } else if ($key === 'hands') {
                 $mask = $output->image_url('hands/' . $value, 'local_vravatar')->out(false);
             }
-            $options[] = [
+            $options[$value] = [
                 'value' => $value,
                 'id' => 'local-vravatar-' . $key . '-' . $value,
                 'label' => get_string(self::option_string($key, $value), 'local_vravatar'),
                 'checked' => $this->current[$key] === $value,
                 'swatch' => $swatches[$value] ?? '',
-                // The values "match" and "skin" have no colour of their own: the page paints the one they follow.
-                'follows' => $isswatch && !isset($swatches[$value]),
+                // The values "match", "skin", "hair" ... have no colour of their own: the page paints the one they follow.
+                'follows' => $isswatch && isset($follows[$value]),
+                'followed' => $isswatch ? ($follows[$value] ?? '') : '',
                 'palette' => $palette,
                 'model' => $hatcostume ? costumes::model_url($hatcostume['id'])->out(false) : '',
                 'credit' => $hatcostume ? self::credit_line($hatcostume) : '',
@@ -361,8 +425,45 @@ class designer implements renderable, templatable {
             'id' => 'local-vravatar-group-' . $key,
             'legend' => get_string(self::LEGENDS[$key], 'local_vravatar'),
             'isswatch' => $isswatch,
-            'options' => $options,
+            'options' => array_values($options),
+            'groups' => $this->option_groups($key, $options, !$isswatch),
         ];
+    }
+
+    /**
+     * The options of a radio group in their headed groups: the avatar builder's groups for a long
+     * list of tiles, else one group without a heading.
+     *
+     * @param string $key Document key.
+     * @param array $options value => option, in order.
+     * @param bool $grouped Whether the list may be grouped (tiles, not swatches).
+     * @return array list of {id, legend, options}
+     */
+    protected function option_groups(string $key, array $options, bool $grouped): array {
+        $groups = design::groups($key);
+        // Headings only where there are two to tell apart (the "none" group has none).
+        $headed = array_diff(array_keys($groups), ['none']);
+        if (!$grouped || count($headed) < 2 || count($options) < self::GROUPED_FROM) {
+            return [['id' => 'local-vravatar-group-' . $key . '-all', 'legend' => '', 'options' => array_values($options)]];
+        }
+        $list = [];
+        foreach ($groups as $group => $values) {
+            $members = array_values(array_intersect_key($options, array_flip($values)));
+            if ($members) {
+                $list[] = [
+                    'id' => 'local-vravatar-group-' . $key . '-' . $group,
+                    // The group of "none" alone needs no heading.
+                    'legend' => $group === 'none' ? '' : get_string($key . 'group_' . $group, 'local_vravatar'),
+                    'options' => $members,
+                ];
+            }
+            $options = array_diff_key($options, array_flip($values));
+        }
+        if ($options) {
+            // Values of the first versions a module no longer lists: at the end, as in the allowlist.
+            $list[] = ['id' => 'local-vravatar-group-' . $key . '-more', 'legend' => '', 'options' => array_values($options)];
+        }
+        return $list;
     }
 
     /**
@@ -376,6 +477,10 @@ class designer implements renderable, templatable {
         return match ($key) {
             'color', 'accent' => 'colour_' . $value,
             'haircolor' => 'haircolour_' . $value,
+            'browcolor' => $value === 'hair' ? 'browcolour_hair' : 'haircolour_' . $value,
+            'beardcolor' => in_array($value, ['hair', 'greying'], true) ? 'beardcolour_' . $value : 'haircolour_' . $value,
+            'eyecolor' => 'eyecolour_' . $value,
+            'eyewearcolor' => 'framecolour_' . $value,
             'handcolor' => $value === 'skin' ? 'handcolour_skin' : 'colour_' . $value,
             'skin' => 'skin_' . $value,
             default => $key . '_' . $value,

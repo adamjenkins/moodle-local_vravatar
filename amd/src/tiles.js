@@ -47,6 +47,9 @@ const FOV = 26;
 /** The keys a tile picture never shows: models need loading, the picture is the user's own. */
 const NEUTRAL = {outfit: 'none', picture: false};
 
+/** The keys whose tiles are drawn without eyewear: what they change is round the eyes. */
+const EYE_KEYS = ['eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'makeup', 'lines'];
+
 /**
  * The design a tile shows: the user's design with the tile's own choice, without what would hide
  * that choice (a hat hides the hair and the brows, so only the hat tiles wear one).
@@ -63,7 +66,21 @@ const tileDesign = (design, key, value) => {
     } else if (Array.isArray(AvatarModel.MODEL_HATS) && AvatarModel.MODEL_HATS.indexOf(value) >= 0) {
         shown.hat = 'none';
     }
+    // Glasses (sunglasses above all) would hide the choices round the eyes.
+    if (EYE_KEYS.indexOf(key) >= 0) {
+        shown.eyewear = 'none';
+    }
+    // Ear shapes show only with the ears on, and not under hair that covers them.
+    if (key === 'earshape') {
+        shown.ears = true;
+        if (typeof AvatarModel.hairCoversEars === 'function' && AvatarModel.hairCoversEars(shown.hair)) {
+            shown.hair = 'short';
+        }
+    }
     shown[key] = value === '1' ? true : value;
+    if (typeof shown.eyewear === 'string') {
+        shown.glasses = shown.eyewear !== 'none';
+    }
     return shown;
 };
 

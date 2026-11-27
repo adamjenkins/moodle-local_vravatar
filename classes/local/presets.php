@@ -30,45 +30,66 @@ namespace local_vravatar\local;
  */
 final class presets {
     /**
-     * @var array id => the keys the preset sets. Names are the lang strings preset_<id>. Most looks
-     *     have the face drawn on the skin; the scientist and the robot keep the face screen.
+     * @var array id => the keys the preset sets (every key but the skin tone and the picture). Names
+     *     are the lang strings preset_<id>. The looks span ages (a young teen with braces and freckles
+     *     to an older scientist with white hair and gentle lines) and hair types, and none is tied to
+     *     a gender. The people have the face drawn on the skin and cartoon hands in the user's own
+     *     skin tone; the robot keeps the face screen and robot hands.
      */
     private const PRESETS = [
         'explorer' => [
-            'body' => 'broad', 'head' => 'round', 'color' => 'green', 'accent' => 'brown', 'hair' => 'short',
-            'haircolor' => 'brown', 'eyes' => 'round', 'brows' => 'thick', 'nose' => 'small', 'beard' => 'stubble',
-            'hat' => 'sunhat', 'glasses' => false, 'outfit' => 'none', 'hands' => 'glove', 'handcolor' => 'brown',
-            'face' => 'drawn',
+            'body' => 'broad', 'head' => 'long', 'color' => 'green', 'accent' => 'brown',
+            'hair' => 'locs', 'haircolor' => 'black', 'hairgrey' => 'temples',
+            'eyes' => 'smiling', 'eyecolor' => 'darkbrown', 'eyespace' => 'normal', 'brows' => 'straight', 'browcolor' => 'hair',
+            'nose' => 'wide', 'mouth' => 'grin', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
+            'freckles' => 'none', 'cheeks' => 'sunkissed', 'marks' => 'none', 'lines' => 'crow', 'makeup' => 'none',
+            'beard' => 'stubble', 'beardcolor' => 'greying', 'hat' => 'sunhat', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'scientist' => [
-            'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal', 'hair' => 'bun',
-            'haircolor' => 'black', 'eyes' => 'almond', 'brows' => 'arched', 'nose' => 'small', 'beard' => 'none',
-            'hat' => 'none', 'glasses' => true, 'outfit' => 'none', 'hands' => 'glove', 'handcolor' => 'cyan',
-            'face' => 'plate',
+            'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal',
+            'hair' => 'lowbun', 'haircolor' => 'white', 'hairgrey' => 'none',
+            'eyes' => 'hooded', 'eyecolor' => 'bluegrey', 'eyespace' => 'close', 'brows' => 'sparse', 'browcolor' => 'grey',
+            'nose' => 'aquiline', 'mouth' => 'soft', 'lips' => 'none', 'ears' => true, 'earshape' => 'lobe',
+            'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'molecheek', 'lines' => 'gentle', 'makeup' => 'none',
+            'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'round', 'eyewearcolor' => 'gold',
+            'glasses' => true, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'artist' => [
-            'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow', 'hair' => 'curly',
-            'haircolor' => 'auburn', 'eyes' => 'round', 'brows' => 'thin', 'nose' => 'round', 'beard' => 'none',
-            'hat' => 'beanie', 'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin',
-            'face' => 'drawn',
+            'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow',
+            'hair' => 'undercut', 'haircolor' => 'pink', 'hairgrey' => 'none',
+            'eyes' => 'large', 'eyecolor' => 'green', 'eyespace' => 'normal', 'brows' => 'slit', 'browcolor' => 'black',
+            'nose' => 'button', 'mouth' => 'smirk', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
+            'freckles' => 'nose', 'cheeks' => 'none', 'marks' => 'star', 'lines' => 'none', 'makeup' => 'graphic',
+            'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'beret', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'athlete' => [
-            'body' => 'broad', 'head' => 'square', 'color' => 'red', 'accent' => 'white', 'hair' => 'buzz',
-            'haircolor' => 'black', 'eyes' => 'dots', 'brows' => 'thick', 'nose' => 'small', 'beard' => 'none',
-            'hat' => 'cap', 'glasses' => false, 'outfit' => 'none', 'hands' => 'mitten', 'handcolor' => 'red',
-            'face' => 'drawn',
+            'body' => 'broad', 'head' => 'angular', 'color' => 'red', 'accent' => 'white',
+            'hair' => 'cornrows', 'haircolor' => 'black', 'hairgrey' => 'none',
+            'eyes' => 'bright', 'eyecolor' => 'brown', 'eyespace' => 'normal', 'brows' => 'bold', 'browcolor' => 'hair',
+            'nose' => 'straight', 'mouth' => 'teeth', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
+            'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
+            'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'cap', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'dreamer' => [
-            'body' => 'slim', 'head' => 'round', 'color' => 'indigo', 'accent' => 'pink', 'hair' => 'long',
-            'haircolor' => 'pink', 'eyes' => 'sleepy', 'brows' => 'thin', 'nose' => 'none', 'beard' => 'none',
-            'hat' => 'none', 'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin',
-            'face' => 'drawn',
+            'body' => 'slim', 'head' => 'round', 'color' => 'indigo', 'accent' => 'pink',
+            'hair' => 'spacebuns', 'haircolor' => 'blue', 'hairgrey' => 'none',
+            'eyes' => 'doe', 'eyecolor' => 'violet', 'eyespace' => 'wide', 'brows' => 'rounded', 'browcolor' => 'hair',
+            'nose' => 'snub', 'mouth' => 'braces', 'lips' => 'none', 'ears' => false, 'earshape' => 'classic',
+            'freckles' => 'few', 'cheeks' => 'stars', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
+            'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
         ],
         'robot' => [
-            'body' => 'capsule', 'head' => 'square', 'color' => 'grey', 'accent' => 'cyan', 'hair' => 'none',
-            'haircolor' => 'grey', 'eyes' => 'dots', 'brows' => 'none', 'nose' => 'none', 'beard' => 'none',
-            'hat' => 'none', 'glasses' => false, 'outfit' => 'none', 'hands' => 'robot', 'handcolor' => 'grey',
-            'face' => 'plate',
+            'body' => 'capsule', 'head' => 'rectangle', 'color' => 'grey', 'accent' => 'cyan',
+            'hair' => 'none', 'haircolor' => 'grey', 'hairgrey' => 'none',
+            'eyes' => 'dots', 'eyecolor' => 'teal', 'eyespace' => 'normal', 'brows' => 'none', 'browcolor' => 'hair',
+            'nose' => 'none', 'mouth' => 'neutral', 'lips' => 'none', 'ears' => false, 'earshape' => 'classic',
+            'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
+            'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'robot', 'handcolor' => 'grey', 'face' => 'plate',
         ],
     ];
 
