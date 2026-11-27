@@ -753,6 +753,15 @@
     font-weight: 600;
 }
 
+/* The parts of a tab with many choices (Face, Hair, Extras): the same buttons, one part shown. */
+.local-vravatar-partchips {
+    margin: 0 0 0.75rem;
+}
+
+.local-vravatar-partlabel {
+    margin: 1rem 0 0.5rem;
+}
+
 .local-vravatar-chip:focus-visible {
     outline: 3px solid var(--bs-primary, #0f6cbf);
     outline-offset: 2px;

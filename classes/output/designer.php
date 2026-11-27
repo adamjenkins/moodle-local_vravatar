@@ -53,6 +53,33 @@ class designer implements renderable, templatable {
         'section_extras' => ['hat', 'eyewear', 'eyewearcolor'],
     ];
 
+    /**
+     * The parts of a tab with many choices: lang string of the part (part_<id>) => its keys, in the
+     * order of SECTIONS. The page shows one part at a time, picked with a row of buttons (as the
+     * costume categories); without JavaScript every part is shown under its heading. A tab not
+     * listed is one part with no heading.
+     *
+     * @var array
+     */
+    private const PARTS = [
+        'section_head' => [
+            'shape' => ['face', 'head', 'skin'],
+            'eyes' => ['eyes', 'eyecolor', 'eyespace'],
+            'brows' => ['brows', 'browcolor'],
+            'nosemouth' => ['nose', 'mouth', 'lips'],
+            'ears' => ['ears', 'earshape'],
+            'skindetails' => ['cheeks', 'freckles', 'marks', 'lines', 'makeup'],
+        ],
+        'section_hair' => [
+            'hair' => ['hair', 'haircolor', 'hairgrey'],
+            'facialhair' => ['beard', 'beardcolor'],
+        ],
+        'section_extras' => [
+            'hats' => ['hat'],
+            'glasses' => ['eyewear', 'eyewearcolor'],
+        ],
+    ];
+
     /** @var int A list of tiles this long or longer is shown under its group headings. */
     private const GROUPED_FROM = 9;
 
@@ -202,6 +229,15 @@ class designer implements renderable, templatable {
             }
             $id = 'local-vravatar-' . str_replace('_', '-', $heading);
             [$tabstring, $icon] = self::TABS[$heading];
+            $byname = array_combine($keys, $items);
+            $parts = [];
+            foreach (self::PARTS[$heading] ?? ['' => $keys] as $part => $partkeys) {
+                $parts[] = [
+                    'id' => $id . '-part-' . ($part === '' ? 'all' : $part),
+                    'label' => $part === '' ? '' : get_string('part_' . $part, 'local_vravatar'),
+                    'items' => array_values(array_intersect_key($byname, array_flip($partkeys))),
+                ];
+            }
             $sections[] = [
                 'id' => $id,
                 'tabid' => $id . '-tab',
@@ -211,6 +247,8 @@ class designer implements renderable, templatable {
                 'frame' => self::FRAMES[$heading],
                 'first' => !$sections,
                 'items' => $items,
+                'parts' => $parts,
+                'hasparts' => count($parts) > 1,
                 'isextras' => $heading === 'section_extras',
                 'ishands' => $heading === 'section_hands',
             ];

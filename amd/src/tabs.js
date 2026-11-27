@@ -138,3 +138,49 @@ export const setupCostumeFilter = (fieldset, label, all) => {
     });
     help.after(bar);
 };
+
+/**
+ * Part buttons at the top of a tab with many choices: one part shown at a time (the first at the
+ * start), as the costume categories. Each part's heading becomes its button's name and is hidden,
+ * the button says which part is shown (aria-pressed).
+ *
+ * @param {HTMLElement} panel The tab's panel.
+ * @param {string} label Accessible name of the group of buttons.
+ * @param {Function} onShow Called with the panel after a part is shown.
+ */
+export const setupParts = (panel, label, onShow) => {
+    const parts = Array.from(panel.querySelectorAll('[data-region="part"]'));
+    if (parts.length < 2) {
+        return;
+    }
+    const bar = document.createElement('div');
+    bar.className = 'local-vravatar-chips local-vravatar-partchips';
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', label);
+    const chips = [];
+    const show = (target) => {
+        parts.forEach((part, i) => {
+            part.hidden = part !== target;
+            chips[i].setAttribute('aria-pressed', part === target ? 'true' : 'false');
+        });
+    };
+    parts.forEach((part) => {
+        const heading = part.querySelector('.local-vravatar-partlabel');
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'local-vravatar-chip';
+        chip.textContent = heading ? heading.textContent.trim() : '';
+        chip.setAttribute('aria-controls', part.id);
+        chip.addEventListener('click', () => {
+            show(part);
+            onShow(panel);
+        });
+        if (heading) {
+            heading.classList.add('visually-hidden');
+        }
+        chips.push(chip);
+        bar.appendChild(chip);
+    });
+    parts[0].before(bar);
+    show(parts[0]);
+};

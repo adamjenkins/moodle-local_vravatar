@@ -107,6 +107,22 @@ final class designer_test extends \advanced_testcase {
             'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'], $keysof(0));
         $this->assertSame(['hair', 'haircolor', 'hairgrey', 'beard', 'beardcolor'], $keysof(1));
         $this->assertSame(['hat', 'eyewear', 'eyewearcolor'], $keysof(5));
+        // Face, Hair and Extras come in parts, one shown at a time; together they hold the tab's items in order.
+        $partsof = fn(int $index) => array_map(
+            fn($part) => array_map(fn($item) => ($item['radio'] ?? $item['check'] ?? $item['costume'])['name'], $part['items']),
+            $data['sections'][$index]['parts']
+        );
+        $this->assertSame([['face', 'head', 'skin'], ['eyes', 'eyecolor', 'eyespace'], ['brows', 'browcolor'],
+            ['nose', 'mouth', 'lips'], ['ears', 'earshape'], ['cheeks', 'freckles', 'marks', 'lines', 'makeup']], $partsof(0));
+        $this->assertSame([['hair', 'haircolor', 'hairgrey'], ['beard', 'beardcolor']], $partsof(1));
+        $this->assertSame([['hat'], ['eyewear', 'eyewearcolor']], $partsof(5));
+        $this->assertSame(get_string('part_shape', 'local_vravatar'), $data['sections'][0]['parts'][0]['label']);
+        $this->assertSame([true, true, false, false, false, true], array_column($data['sections'], 'hasparts'));
+        foreach ([2, 3, 4] as $index) {
+            $this->assertSame([$keysof($index)], $partsof($index));
+            $this->assertSame('', $data['sections'][$index]['parts'][0]['label']);
+        }
+
         // Colours are swatches, the rest tiles drawn on the user's avatar.
         foreach (['eyecolor', 'browcolor', 'lips', 'beardcolor', 'eyewearcolor'] as $key) {
             $this->assertTrue($radios[$key]['isswatch'], $key);

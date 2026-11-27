@@ -38,7 +38,7 @@ import Notification from 'core/notification';
 import Pending from 'core/pending';
 import {getString, getStrings} from 'core/str';
 import {createTiles} from 'local_vravatar/tiles';
-import {setupTabs, setupCostumeFilter} from 'local_vravatar/tabs';
+import {setupTabs, setupCostumeFilter, setupParts} from 'local_vravatar/tabs';
 import {buildHand} from 'local_vravatar/handmodels';
 import {setupCoach} from 'local_vravatar/coach';
 
@@ -138,7 +138,7 @@ const FLAGS = ['ears', 'glasses', 'picture'];
 /** The strings the page uses, in this order. */
 const STRINGS = [
     'saving', 'saved', 'camera_on', 'camera_off', 'camera_error', 'camerapreview', 'camerapreviewstop',
-    'showwhole', 'surprisedone', 'undone', 'redone', 'costumefilter', 'costumeall', 'resetundo',
+    'showwhole', 'surprisedone', 'undone', 'redone', 'costumefilter', 'costumeall', 'resetundo', 'partfilter',
 ];
 
 /**
@@ -1162,12 +1162,21 @@ export const init = async(config) => {
         });
     };
 
+    // Only the pictures of the part in view: a part hidden behind its button draws when it is shown.
     const paintPanel = (panel, first) => {
         if (tilepainter && panel) {
-            tilepainter.paint(readForm(form, config.defaults), Array.from(panel.querySelectorAll('[data-render]')), first);
+            const holders = Array.from(panel.querySelectorAll('[data-render]')).filter((holder) => {
+                const part = holder.closest('[data-region="part"]');
+                return !part || !part.hidden;
+            });
+            tilepainter.paint(readForm(form, config.defaults), holders, first);
         }
     };
     const panels = Array.from(form.querySelectorAll('[data-region="panel"]'));
+    // The tabs with many choices show one part at a time (set up before the first tab draws its pictures).
+    if (root.querySelector('[data-region="tablist"]')) {
+        panels.forEach((panel) => setupParts(panel, str.partfilter, (shown) => paintPanel(shown, true)));
+    }
     const tabs = setupTabs(root, (panel, tab) => {
         if (setZoom && tab.dataset.frame) {
             setZoom.tab(tab.dataset.frame);
