@@ -3,18 +3,27 @@
 All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.2.0] - 2026-11-27
 
 ### Added
 
-- Hand styles and hand colours (appearance keys `hands` and `handcolor`; defaults keep today's
-  look).
-- Ready-made looks, Surprise me, Undo and Redo on the designer.
+- Appearance keys `hands` (sphere, mitten, cartoon, glove, robot, paw) and `handcolor` (skin or a
+  named colour), and `face` (`plate`, the face screen, or `drawn`, on the skin). Defaults keep the
+  0.1.x look.
+- Six ready-made looks (`classes/local/presets.php`), Surprise me, Undo and Redo on the designer.
+- A coached start: tips over the preview on a first visit (`amd/src/coach.js`; a cookie records
+  that they were seen).
+- `db/uninstall.php`: uninstalling removes every user's `local_vravatar_design` preference.
 
 ### Changed
 
-- The designer shows its choices on tabs as picture tiles and large swatches, with a save bar that
-  stays in view and a preview that stays in view on phones.
+- The designer shows its choices on tabs as picture tiles and large swatches (`amd/src/tabs.js`,
+  `amd/src/tiles.js`), with a save bar that stays in view, an unsaved-changes warning, and a
+  preview that frames the part being chosen and stays in view on phones.
+- Users with no saved design get `design::standard()` in live rooms: a drawn face, short brown
+  hair, a white accent, and a body colour and skin tone picked from the user id.
+- Requires mod_vrroom 2026112700 (0.2.0), whose avatar builder draws the hand styles and faces;
+  `composer.json` requires `adamjenkins/moodle-mod_vrroom` `^0.2`.
 
 ## [0.1.3] - 2026-11-15
 

@@ -1,21 +1,24 @@
 # Changes
 
-## Unreleased (prototype, 2026-11-26)
+## 0.2.0 (2026-11-27) — ALPHA
 
-- A more visual "My VR avatar" designer. The choices are on tabs with icons (Looks, Face, Hair,
-  Body, Costume, Hands, Extras), every part is a picture of your own avatar with that part, colours
-  are rows of round swatches, and costumes can be shown one category at a time.
-- First visit: pick one of six ready-made looks, or press Surprise me, then change anything. Undo
-  and Redo step back and forward; Reset to default is one more step Undo takes back.
-- The preview shows what you are choosing (the head for a face or hair choice, the raised hands on
-  the Hands tab, the whole figure with your name tag for the body and costumes), moves gently,
-  bounces when a part changes and waves when the hands change (not with reduced motion).
-- The Save bar stays at the bottom of the window and says when there are unsaved changes; on a
-  phone the preview and the tabs stay at the top of the screen while you choose. The page uses the
-  full width of the window.
-- Hands: choose a hand style (round, mittens, cartoon, gloves, robot, paws) and a hand colour.
-  Saved avatars keep the round hands in the skin colour they had.
+Needs VR room 0.2.0 (version 2026112700), which draws the new hands and faces in live rooms.
 
-## 0.1.3 (2026-11-15) — ALPHA
-
-- The plugin can now be installed with Composer from Packagist: `composer require adamjenkins/moodle-local_vravatar`, which also brings in VR room. No change to the plugin itself.
+- **A more visual "My VR avatar" page.** The choices are on tabs with icons (Looks, Face, Hair,
+  Body, Costume, Hands, Extras). Every part is a picture of the user's own avatar wearing it, and
+  colours and skin tones are rows of named round swatches. Costumes can be shown one category at a
+  time.
+- **Easy start.** Six ready-made looks and a *Surprise me* button give a starting point to change
+  from. On a first visit short tips over the preview name the next step (pick a look, change a
+  part, save); the *?* button shows them again.
+- **Undo and Redo**, and a **Save bar** that stays at the bottom of the window and says when there
+  are unsaved changes. Leaving the page with unsaved changes asks first.
+- **Hands:** a hand style (round, mittens, cartoon, gloves, robot, paws) and a hand colour.
+- **Face style:** a face screen on the head, as before, or the face drawn on the skin.
+- **A friendlier standard look** for people who have not designed an avatar: a drawn face, short
+  hair, and a skin tone and body colour that always stay the same for that person.
+- **The preview** frames what is being chosen (the head, the raised hands, or the whole figure with
+  its name tag) and moves gently, unless the browser asks for reduced motion. On a phone the preview
+  and the tabs stay at the top of the screen while choosing.
+- Avatars saved with 0.1.x keep their look: the new choices default to what those avatars had.
+- Uninstalling the plugin now also removes the avatars users saved.

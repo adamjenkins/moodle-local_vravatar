@@ -12,6 +12,7 @@ there is nothing to moderate:
 |---|---|
 | Head | round · rounded square · oval · heart-shaped |
 | Skin tone | same as body colour (the standard look) · porcelain · fair · light · medium · tan · brown · dark · deep |
+| Face style | a face screen on the head, or the face drawn on the skin |
 | Face | eyes (dots · round · almond · sleepy), eyebrows (none · thin · thick · arched), nose (none · small · round · pointed), ears (on/off) |
 | Beard | none · stubble · moustache · goatee · full beard, in the hair colour |
 | Hair | none · short · long · bun · curly · afro · ponytail · braids · buzz cut · bob · mohawk · side parting · pigtails · top knot |
@@ -19,6 +20,7 @@ there is nothing to moderate:
 | Body | capsule · slim · broad |
 | Colours | body colour and accent colour from 14 named colours (black and white among them, for a black suit with a white or black tie) |
 | Costume | none, or one of 44 ready-made costumes (pirates, suits, plants, aliens, robots, computers and simple characters; see [Costumes and credits](#costumes-and-credits)) |
+| Hands | round · mittens · cartoon · gloves · robot · paws, in the skin colour or any of the named colours |
 | Extras | glasses, hat (none · cap · beanie · sun hat · pirate hat) |
 | Picture | the user's Moodle profile picture as a round badge on the face (shown by default; each user can untick it) |
 
@@ -28,13 +30,16 @@ takes the place of the body; a computer, a television or the screen-face robot t
 the head too and shows the face (picture or camera) on its screen. Some costumes (the pirate
 captain's coat, the suits and ties) take the accent colour.
 
-The page shows a 3D preview that turns slowly (drag it, or use the arrow keys, to turn it), the
-choices under five headings (Head and face, Hair, Body, Costume, Extras) as ordinary labelled radio
-buttons, checkboxes and colour swatches (every colour and skin tone is named,
-for screen readers), the costumes as a wrapping grid of named thumbnails by category, **Save**, **Reset to default** and **Stop using my avatar** (back to the standard look). The
-preview shows the head and shoulders (as wide as a costume's shoulders), or the whole laptop,
-monitor, TV or computer for a device costume; *Show the whole avatar* fits everything that is
-drawn, wide sleeves too. It frames again once a costume model has loaded.
+The page shows a 3D preview beside the choices, and the choices on tabs: **Looks** (six
+ready-made looks and *Surprise me* to start from), Face, Hair, Body, Costume, Hands and Extras.
+Every part is a picture tile of the user's own avatar with that part, and every colour and skin
+tone is a named swatch (the names are read out by screen readers). **Undo** and **Redo** step
+through the changes, the **Save** bar stays at the bottom of the window and says when there are
+unsaved changes, and **Reset to default** and **Stop using my avatar** (back to the standard look)
+are below. On a first visit short tips over the preview name the next step (pick a look, change a
+part, save); the *?* button shows them again. The preview frames what is being chosen (the head,
+the raised hands, or the whole figure with its name tag), can be turned by dragging or with the
+arrow keys, and moves gently unless the browser asks for reduced motion.
 The preview is drawn by VR room's own avatar builder, so what a user designs is exactly what the
 others see. Where a browser has a camera, *Try my camera on the preview* shows the user's camera on
 the face of the preview, as others see it in a live room when the camera is on; that video stays
@@ -99,7 +104,9 @@ A server that refuses unknown file types should serve `.glb` as `model/gltf-bina
 
 VR room's live rooms work exactly the same without it: everyone has the standard look, a simple
 figure in a colour worked out from their anonymous id in the room. A user who has not saved a
-design, or who chose *Stop using my avatar*, also has the standard look. Webcams in live rooms are
+design, or who chose *Stop using my avatar*, gets this plugin's standard look instead: a friendly
+figure with a drawn face, short hair and a skin tone and body colour that are always the same for
+that person. Webcams in live rooms are
 part of VR room itself and work with or without this plugin; this plugin only changes how the
 avatar around the video looks.
 
