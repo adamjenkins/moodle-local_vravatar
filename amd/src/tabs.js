@@ -96,8 +96,8 @@ export const setupTabs = (root, onSelect, first = 0) => {
 };
 
 /**
- * Category buttons over the costumes: All, or one category at a time. The first category is shown
- * at the start, so only its pictures are drawn.
+ * Category buttons over the costumes: All, or one category at a time. The category of the costume
+ * worn is shown at the start (the first category when none is), so only its pictures are drawn.
  *
  * @param {HTMLElement|null} fieldset The costume picker.
  * @param {string} label Accessible name of the group of buttons.
@@ -144,7 +144,10 @@ export const setupCostumeFilter = (fieldset, label, all, onShow = () => null) =>
         make(legend ? legend.textContent.trim() : '', category);
     });
     help.after(bar);
-    chips[1].localvravatarShow();
+    // Open on the category of the costume worn, so its tile shows as chosen; else the first category.
+    const worn = fieldset.querySelector('input[name="outfit"]:checked');
+    const home = worn ? categories.indexOf(worn.closest('.local-vravatar-costumecategory')) : -1;
+    chips[home >= 0 ? home + 1 : 1].localvravatarShow();
 };
 
 /**
