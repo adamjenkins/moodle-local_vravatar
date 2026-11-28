@@ -278,7 +278,7 @@ Feature: Users design their own VR avatar
     And the field "Pilot's cap" matches value "1"
 
   @javascript
-  Scenario: A design saved with the retired pirate model and pirate hat opens as the pirate captain and tricorne
+  Scenario: A design saved with the retired pirate model and pirate hat opens as the pirate captain and pirate tricorne
     Given the following "user preferences" exist:
       | user     | preference            | value                                                                    |
       | student1 | local_vravatar_design | {"schema":"vrroom-avatar/1","outfit":"pirate-captain","hat":"pirate"} |
@@ -289,7 +289,7 @@ Feature: Users design their own VR avatar
     Then the field "Pirate captain" matches value "1"
     And the field "No costume" matches value ""
     And I click on "Extras" "button" in the "[role='tablist']" "css_element"
-    And the field "Tricorne" matches value "1"
+    And the field "Pirate tricorne" matches value "1"
 
   Scenario: A design saved with a retired blocky character opens in plain clothes
     Given the following "user preferences" exist:
@@ -300,3 +300,15 @@ Feature: Users design their own VR avatar
     Then the field "No costume" matches value "1"
     And the field "Red" in the "Body colour" "fieldset" matches value "1"
     And I should not see "Blocky"
+
+  Scenario: Without JavaScript a face layout and the pirate tricorne are saved and kept
+    Given I log in as "student1"
+    And I visit "/local/vravatar/index.php"
+    Then the field "Balanced" matches value "1"
+    When I set the field "High eyes" to "1"
+    And I set the field "Pirate tricorne" to "1"
+    And I press "Save"
+    Then I should see "Your avatar was saved."
+    And the field "High eyes" matches value "1"
+    And the field "Balanced" matches value ""
+    And the field "Pirate tricorne" matches value "1"

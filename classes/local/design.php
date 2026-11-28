@@ -222,6 +222,9 @@ final class design {
             'liner' => ['liner', 'wing', 'kohl', 'lashes', 'graphic'],
             'shadow' => ['smoky', 'bronze', 'gold', 'peach', 'pink', 'plum', 'blue', 'green', 'glitter'],
         ],
+        'facelayout' => [
+            'layout' => ['balanced', 'higheyes', 'loweyes', 'longnose', 'compact'],
+        ],
         // Mirrors vrroomruntime_builtin/live/avatarhair.
         'hair' => [
             'none' => ['none'],
@@ -254,10 +257,10 @@ final class design {
             'none' => ['none'],
             'everyday' => ['cap', 'beanie', 'sunhat', 'bucket', 'flatcap', 'beret', 'bandana', 'headphones'],
             'smart' => ['fedora', 'bowler', 'tophat', 'cowboy'],
-            'tradition' => ['hijab', 'turban', 'kufi', 'kippah', 'headwrap'],
+            'tradition' => ['hijab', 'turban', 'pagri', 'kufi', 'fez', 'kippah', 'headwrap'],
             'work' => ['hardhat', 'firehelmet', 'pilotcap', 'policecap', 'security', 'chef', 'scrubcap', 'porter'],
             'celebration' => ['graduation', 'party', 'crown', 'flowercrown'],
-            'costume' => ['wizard', 'tricorne', 'pirate'],
+            'costume' => ['wizard', 'tricorne', 'piratehat', 'pirate'],
         ],
         'eyewear' => [
             'none' => ['none'],
@@ -292,6 +295,7 @@ final class design {
         'marks' => 'none',
         'lines' => 'none',
         'makeup' => 'none',
+        'facelayout' => 'balanced',
         'beardcolor' => 'hair',
         'hairgrey' => 'none',
         'eyewear' => 'none',
@@ -425,11 +429,11 @@ final class design {
 
     /**
      * Hats no longer offered, and the hat a design that wears one wears now (the pirate hat model
-     * becomes the tricorne made in code, as avatarmodel's cleanAppearance() does).
+     * becomes the pirate tricorne made in code, as avatarmodel's cleanAppearance() does).
      *
      * @var string[]
      */
-    public const RETIRED_HATS = ['pirate' => 'tricorne'];
+    public const RETIRED_HATS = ['pirate' => 'piratehat'];
 
     /**
      * The allowed values of every key that takes a name.

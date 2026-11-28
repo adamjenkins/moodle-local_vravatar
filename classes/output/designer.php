@@ -44,8 +44,8 @@ class designer implements renderable, templatable {
      * @var array
      */
     private const SECTIONS = [
-        'section_head' => ['face', 'head', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose', 'mouth',
-            'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'],
+        'section_head' => ['face', 'head', 'facelayout', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose',
+            'mouth', 'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'],
         'section_hair' => ['hair', 'haircolor', 'hairgrey', 'beard', 'beardcolor'],
         'section_body' => ['body', 'color', 'accent'],
         'section_costume' => ['outfit'],
@@ -63,7 +63,7 @@ class designer implements renderable, templatable {
      */
     private const PARTS = [
         'section_head' => [
-            'shape' => ['face', 'head', 'skin'],
+            'shape' => ['face', 'head', 'facelayout', 'skin'],
             'eyes' => ['eyes', 'eyecolor', 'eyespace'],
             'brows' => ['brows', 'browcolor'],
             'nosemouth' => ['nose', 'mouth', 'lips'],
@@ -122,6 +122,7 @@ class designer implements renderable, templatable {
     private const RENDERS = [
         'face' => 'face',
         'head' => 'face',
+        'facelayout' => 'face',
         'eyes' => 'face',
         'eyespace' => 'face',
         'brows' => 'face',
@@ -146,6 +147,7 @@ class designer implements renderable, templatable {
     private const LEGENDS = [
         'body' => 'body',
         'head' => 'head',
+        'facelayout' => 'facelayout',
         'skin' => 'skin',
         'color' => 'color',
         'accent' => 'accent',

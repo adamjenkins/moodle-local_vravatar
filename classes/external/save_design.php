@@ -130,6 +130,7 @@ class save_design extends external_api {
             'marks' => new external_value(PARAM_ALPHA, 'Marks on the face'),
             'lines' => new external_value(PARAM_ALPHA, 'Age and expression lines'),
             'makeup' => new external_value(PARAM_ALPHA, 'Make-up'),
+            'facelayout' => new external_value(PARAM_ALPHA, 'Face layout: how high the eyes, nose and mouth sit'),
             'beardcolor' => new external_value(PARAM_ALPHA, 'Facial hair colour, or hair (or greying) for the hair colour'),
             'hairgrey' => new external_value(PARAM_ALPHA, 'Grey in the hair'),
             'eyewear' => new external_value(PARAM_ALPHA, 'Eyewear, or none'),

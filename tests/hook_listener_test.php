@@ -120,7 +120,7 @@ final class hook_listener_test extends \advanced_testcase {
     /**
      * A costume model reaches the room as the address of its model; a design saved with a retired
      * pirate model and the pirate hat (stored before the retirements) arrives as the pirate captain
-     * and the tricorne made in code, with no assets; a design without models gives no assets.
+     * and the pirate tricorne made in code, with no assets; a design without models gives no assets.
      */
     public function test_costume_assets(): void {
         // Stored as 0.2.0 wrote it, not through save() (which would clean it now).
@@ -135,7 +135,7 @@ final class hook_listener_test extends \advanced_testcase {
         $appearances = $hook->get_appearances();
 
         $this->assertSame('captain', $appearances['peera']['appearance']['outfit']);
-        $this->assertSame('tricorne', $appearances['peera']['appearance']['hat']);
+        $this->assertSame('piratehat', $appearances['peera']['appearance']['hat']);
         $this->assertSame('red', $appearances['peera']['appearance']['color']);
         $this->assertSame([], $appearances['peera']['assets']);
 

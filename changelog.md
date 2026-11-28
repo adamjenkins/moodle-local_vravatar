@@ -20,7 +20,13 @@ All notable changes to this plugin are documented here. The format follows
 - The designer's Face, Hair and Extras tabs are split into sections shown one at a time
   (`amd/src/tabs.js` `setupParts()`); costumes show one category at a time, opening on the
   category of the costume worn; tile pictures are drawn only for what is in view.
-- The full-length preview with moving arms, walk and wave buttons.
+- The full-length preview with moving arms, walk and wave buttons; a "Bust a move" button
+  (`data-action="demomove"`) that plays the avatar builder's moves (`avatar.move()`, VR room's
+  `avatarmotion` `MOVES`), and moves played by themselves in the full-length view (not with
+  `prefers-reduced-motion`). The wave in that view is the builder's wave move.
+- `facelayout` (`balanced` by default; `higheyes`, `loweyes`, `longnose`, `compact`): the face's
+  vertical layout, in the face tab's first section.
+- Hats `piratehat` (skull and crossbones, feather) and `fez`.
 - `local_vravatar_save_design` and `local_vravatar_get_design` return the new keys.
 
 ### Changed
@@ -35,7 +41,7 @@ All notable changes to this plugin are documented here. The format follows
   (models, thumbnails, manifest entries, strings, `thirdpartylibs.xml` entries, credits), the
   `pirate` costume category and `costumes::HATS`. `design::clean()` reads old designs as
   `pirate-captain` → `captain`, `pirate-woman` → `deckhand`, `blocky-*` → `none` and hat `pirate` →
-  `tricorne` (`RETIRED_OUTFITS`, `RETIRED_HATS`, mirroring avatarmodel's `cleanAppearance()`), so
+  `piratehat` (`RETIRED_OUTFITS`, `RETIRED_HATS`, mirroring avatarmodel's `cleanAppearance()`), so
   the designer and live rooms show them alike; the hook sends no asset for them.
 
 ### Fixed

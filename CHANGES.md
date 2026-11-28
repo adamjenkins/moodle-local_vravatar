@@ -24,11 +24,20 @@ hair, hats, glasses, costumes and legs. The version numbers that state this (`ve
   Only the pictures in view are drawn.
 - **Legs and walking:** the preview shows the whole avatar, arms that move, and buttons to see it
   walk and wave.
+- **A real wave, and moves:** the wave raises the arm to the side and rocks the forearm, palm to
+  the front. "Bust a move" plays a short dance (a spin, a shuffle, a disco point, a jump, the
+  robot, and a hat tip when you wear a hat). In the full-length view the avatar now and then
+  plays one by itself, unless your device asks for reduced motion.
+- **A better-balanced face:** the eyes, nose and mouth sit lower and the chin is shorter on every
+  head shape. A new "Face layout" choice (balanced, high eyes, low eyes, long nose, compact) moves
+  them a little more. Avatars saved before get the new balanced layout.
+- **More hats:** a pirate tricorne with a skull and crossbones and a feather, and a fez; the
+  fedora and the cowboy hat were reshaped so they read at a glance.
 - **The ready-made looks** were redone with the new choices, across ages, with skin-toned hands;
   the standard look has cartoon hands in the skin tone and natural hair and eye colours.
 - **Removed:** the 18 Blocky characters, the two pirate models and the pirate hat model. Avatars
   saved with them keep working: the pirates become the new pirate captain and deckhand, a Blocky
-  character the plain clothes in your own colours, and the pirate hat the tricorne.
+  character the plain clothes in your own colours, and the pirate hat the pirate tricorne.
 
 ## 0.2.0 (2026-11-27) — ALPHA
 

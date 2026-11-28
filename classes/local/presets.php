@@ -46,6 +46,7 @@ final class presets {
             'freckles' => 'none', 'cheeks' => 'sunkissed', 'marks' => 'none', 'lines' => 'crow', 'makeup' => 'none',
             'beard' => 'stubble', 'beardcolor' => 'greying', 'hat' => 'sunhat', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
             'glasses' => false, 'outfit' => 'explorer', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'facelayout' => 'balanced',
         ],
         'scientist' => [
             'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal',
@@ -55,6 +56,7 @@ final class presets {
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'molecheek', 'lines' => 'gentle', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'round', 'eyewearcolor' => 'gold',
             'glasses' => true, 'outfit' => 'labcoat', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'facelayout' => 'balanced',
         ],
         'artist' => [
             'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow',
@@ -64,6 +66,7 @@ final class presets {
             'freckles' => 'nose', 'cheeks' => 'none', 'marks' => 'star', 'lines' => 'none', 'makeup' => 'graphic',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'beret', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
             'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'facelayout' => 'balanced',
         ],
         'athlete' => [
             'body' => 'broad', 'head' => 'angular', 'color' => 'red', 'accent' => 'white',
@@ -73,6 +76,7 @@ final class presets {
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'cap', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
             'glasses' => false, 'outfit' => 'athlete', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'facelayout' => 'balanced',
         ],
         'dreamer' => [
             'body' => 'slim', 'head' => 'round', 'color' => 'indigo', 'accent' => 'pink',
@@ -82,6 +86,7 @@ final class presets {
             'freckles' => 'few', 'cheeks' => 'stars', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
             'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'facelayout' => 'balanced',
         ],
         'robot' => [
             'body' => 'capsule', 'head' => 'rectangle', 'color' => 'grey', 'accent' => 'cyan',
@@ -91,6 +96,7 @@ final class presets {
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
             'glasses' => false, 'outfit' => 'none', 'hands' => 'robot', 'handcolor' => 'grey', 'face' => 'plate',
+            'facelayout' => 'balanced',
         ],
     ];
 

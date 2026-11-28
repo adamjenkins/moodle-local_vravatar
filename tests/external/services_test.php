@@ -131,7 +131,7 @@ final class services_test extends \advanced_testcase {
         $this->setUser($this->getDataGenerator()->create_user());
         $result = $this->save(['outfit' => 'mini-female-c', 'hat' => 'pirate']);
         $this->assertSame('mini-female-c', $result['design']['outfit']);
-        $this->assertSame('tricorne', $result['design']['hat']);
+        $this->assertSame('piratehat', $result['design']['hat']);
         $this->assertSame('captain', $this->save(['outfit' => 'pirate-captain'])['design']['outfit']);
         $result = $this->save(['outfit' => 'mini-female-c', 'hat' => 'pirate']);
         $this->assertSame($result['design'], $this->get()['design']);

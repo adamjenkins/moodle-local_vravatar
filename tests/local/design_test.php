@@ -58,6 +58,7 @@ final class design_test extends \advanced_testcase {
         'marks' => 'mole',
         'lines' => 'crow',
         'makeup' => 'kohl',
+        'facelayout' => 'compact',
         'beardcolor' => 'greying',
         'hairgrey' => 'temples',
         'eyewear' => 'aviator',
@@ -78,6 +79,7 @@ final class design_test extends \advanced_testcase {
         'marks' => 'none',
         'lines' => 'none',
         'makeup' => 'none',
+        'facelayout' => 'balanced',
         'beardcolor' => 'hair',
         'hairgrey' => 'none',
         'eyewear' => 'none',
@@ -310,6 +312,22 @@ final class design_test extends \advanced_testcase {
     }
 
     /**
+     * The face layout is one of the named layouts; a design saved before it, or with anything else
+     * there, has the balanced layout.
+     */
+    public function test_facelayout_cleaned(): void {
+        $this->assertSame(['balanced', 'higheyes', 'loweyes', 'longnose', 'compact'], design::choices()['facelayout']);
+        $this->assertSame('balanced', design::defaults()['facelayout']);
+        foreach (design::choices()['facelayout'] as $layout) {
+            $this->assertSame($layout, design::clean(['facelayout' => $layout])['facelayout'], $layout);
+        }
+        $this->assertSame('balanced', design::clean(['schema' => design::SCHEMA, 'head' => 'oval'])['facelayout']);
+        foreach (['Compact', 'sideways', '', ['higheyes'], 2, '<b>loweyes</b>'] as $wrong) {
+            $this->assertSame('balanced', design::clean(['facelayout' => $wrong])['facelayout'], json_encode($wrong));
+        }
+    }
+
+    /**
      * A document with every key at its longest value still fits the size cap, with room to spare.
      */
     public function test_longest_document_fits(): void {
@@ -367,7 +385,7 @@ final class design_test extends \advanced_testcase {
         ) {
             $this->assertSame('none', design::clean(['outfit' => $value])['outfit'], var_export($value, true));
         }
-        $this->assertSame('tricorne', design::clean(['hat' => 'pirate'])['hat']);
+        $this->assertSame('piratehat', design::clean(['hat' => 'pirate'])['hat']);
     }
 
     /**
@@ -397,11 +415,11 @@ final class design_test extends \advanced_testcase {
     }
 
     /**
-     * The retired pirate hat model becomes the tricorne made in code, and is not offered.
+     * The retired pirate hat model becomes the pirate tricorne made in code, and is not offered.
      */
     public function test_retired_pirate_hat(): void {
-        $this->assertSame('tricorne', design::clean(['hat' => 'pirate'])['hat']);
-        $this->assertSame('tricorne', design::clean('{"hat":"pirate"}')['hat']);
+        $this->assertSame('piratehat', design::clean(['hat' => 'pirate'])['hat']);
+        $this->assertSame('piratehat', design::clean('{"hat":"pirate"}')['hat']);
         $this->assertNotContains('pirate', design::choices()['hat']);
         $this->assertContains('tricorne', design::choices()['hat']);
     }
@@ -420,7 +438,7 @@ final class design_test extends \advanced_testcase {
         set_user_preference(design::PREFERENCE, $stored, (int)$user->id);
         $loaded = design::load((int)$user->id);
         $this->assertSame('deckhand', $loaded['outfit']);
-        $this->assertSame('tricorne', $loaded['hat']);
+        $this->assertSame('piratehat', $loaded['hat']);
         foreach (json_decode($stored, true) as $key => $value) {
             if (!in_array($key, ['outfit', 'hat'], true)) {
                 $this->assertSame($value, $loaded[$key], $key);

@@ -103,8 +103,8 @@ final class designer_test extends \advanced_testcase {
             }
             return $keys;
         };
-        $this->assertSame(['face', 'head', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose', 'mouth',
-            'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'], $keysof(0));
+        $this->assertSame(['face', 'head', 'facelayout', 'skin', 'eyes', 'eyecolor', 'eyespace', 'brows', 'browcolor', 'nose',
+            'mouth', 'lips', 'ears', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup'], $keysof(0));
         $this->assertSame(['hair', 'haircolor', 'hairgrey', 'beard', 'beardcolor'], $keysof(1));
         $this->assertSame(['hat', 'eyewear', 'eyewearcolor'], $keysof(5));
         // Face, Hair and Extras come in parts, one shown at a time; together they hold the tab's items in order.
@@ -112,7 +112,7 @@ final class designer_test extends \advanced_testcase {
             fn($part) => array_map(fn($item) => ($item['radio'] ?? $item['check'] ?? $item['costume'])['name'], $part['items']),
             $data['sections'][$index]['parts']
         );
-        $this->assertSame([['face', 'head', 'skin'], ['eyes', 'eyecolor', 'eyespace'], ['brows', 'browcolor'],
+        $this->assertSame([['face', 'head', 'facelayout', 'skin'], ['eyes', 'eyecolor', 'eyespace'], ['brows', 'browcolor'],
             ['nose', 'mouth', 'lips'], ['ears', 'earshape'], ['cheeks', 'freckles', 'marks', 'lines', 'makeup']], $partsof(0));
         $this->assertSame([['hair', 'haircolor', 'hairgrey'], ['beard', 'beardcolor']], $partsof(1));
         $this->assertSame([['hat'], ['eyewear', 'eyewearcolor']], $partsof(5));
@@ -130,7 +130,7 @@ final class designer_test extends \advanced_testcase {
         }
         foreach (
             ['eyes', 'eyespace', 'brows', 'nose', 'mouth', 'earshape', 'cheeks', 'freckles', 'marks', 'lines', 'makeup',
-            'hairgrey', 'eyewear'] as $key
+            'hairgrey', 'eyewear', 'facelayout'] as $key
         ) {
             $this->assertFalse($radios[$key]['isswatch'], $key);
             $this->assertSame('face', $radios[$key]['options'][1]['render'], $key);
@@ -146,6 +146,7 @@ final class designer_test extends \advanced_testcase {
         );
         $this->assertSame([''], $legends('freckles'));
         $this->assertSame([''], $legends('eyespace'));
+        $this->assertSame([''], $legends('facelayout'));
         // What a swatch without its own colour follows, for the page to paint.
         $byvalue = fn($key) => array_column($radios[$key]['options'], null, 'value');
         $this->assertSame('body', $byvalue('skin')['match']['followed']);
@@ -333,7 +334,8 @@ final class designer_test extends \advanced_testcase {
         $this->assertMatchesRegularExpression('~id="local-vravatar-outfit-device-laptop"[^>]*\schecked>~', $html);
         $this->assertMatchesRegularExpression('~<img class="local-vravatar-costume-thumb" src="[^"]+" alt=""~', $html);
         $this->assertMatchesRegularExpression('~id="local-vravatar-hat-tricorne"\s+checked>~', $html);
-        $this->assertStringNotContainsString('hat-pirate', $html);
+        // The retired pirate hat has no tile (the pirate tricorne, hat-piratehat, does).
+        $this->assertStringNotContainsString('id="local-vravatar-hat-pirate"', $html);
         $this->assertStringContainsString('by Ian MacGillivray, CC BY 3.0', $html);
         $this->assertStringContainsString('by Robert Schlyter, CC BY 3.0', $html);
         $this->assertStringContainsString(get_string('costumecredits', 'local_vravatar'), $html);

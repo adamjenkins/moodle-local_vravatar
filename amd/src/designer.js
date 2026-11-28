@@ -86,6 +86,13 @@ const WALK_SPEED = 1.1;
 const WALK_MS = 3200;
 const WAVE_MS = 2400;
 
+/**
+ * Moves the whole avatar plays now and then in the full-length view: the first after FIRST ms
+ * (and a random part of SPREAD), then every EVERY ms (and SPREAD); none within QUIET ms of a
+ * drag or a change.
+ */
+const MOVES_AUTO = Object.freeze({first: 8000, every: 12000, spread: 10000, quiet: 4000});
+
 /** How far the preview turns to show the walk (radians). */
 const WALK_TURN = 0.9;
 
@@ -98,7 +105,7 @@ const CHOICES = [
     'body', 'head', 'skin', 'color', 'accent', 'hair', 'haircolor', 'eyes', 'brows', 'nose', 'beard', 'hat', 'outfit',
     'hands', 'handcolor', 'face',
     'eyecolor', 'eyespace', 'browcolor', 'mouth', 'lips', 'earshape', 'freckles', 'cheeks', 'marks', 'lines', 'makeup',
-    'hairgrey', 'beardcolor', 'eyewear', 'eyewearcolor',
+    'hairgrey', 'beardcolor', 'eyewear', 'eyewearcolor', 'facelayout',
 ];
 
 /**
@@ -107,6 +114,7 @@ const CHOICES = [
  */
 const SURPRISE_PLAIN = {
     hat: ['none', 0.6],
+    facelayout: ['balanced', 0.7],
     beard: ['none', 0.6],
     eyewear: ['none', 0.7],
     handcolor: ['skin', 0.5],
@@ -685,6 +693,31 @@ const createPreview = (canvas, design, assets, config) => {
 
     const reducedmotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     const still = () => !!(reducedmotion && reducedmotion.matches);
+    // Moves (the builder's dances): the last played, when the next plays by itself, the last drag or change.
+    let lastmove = null;
+    let nextmove = performance.now() + MOVES_AUTO.first + Math.random() * MOVES_AUTO.spread * 0.4;
+    let interacted = -Infinity;
+    const moving = () => typeof avatar.isMoving === 'function' && avatar.isMoving();
+    /**
+     * Play a move (one not just played, when no name is given).
+     *
+     * @param {string|null} name Move name, or null for the next one.
+     * @returns {number} How long it lasts (ms), 0 if none plays.
+     */
+    const playMove = (name) => {
+        if (typeof avatar.move !== 'function') {
+            return 0;
+        }
+        const list = avatar.moves();
+        const others = list.filter((n) => n !== lastmove);
+        const from = others.length ? others : list;
+        const pick = name || from[Math.floor(Math.random() * from.length)];
+        const ms = pick ? avatar.move(pick) : 0;
+        if (ms) {
+            lastmove = pick;
+        }
+        return ms;
+    };
     let dragging = null;
     let hovering = false;
     let focused = false;
@@ -764,13 +797,25 @@ const createPreview = (canvas, design, assets, config) => {
                 walkuntil = -Infinity;
                 returning = true;
             }
+            // Now and then a move, in the full-length view, while nobody is turning or changing the avatar.
+            if (framing !== 'whole' || dragging || now - interacted < MOVES_AUTO.quiet || now < walkuntil || moving()) {
+                nextmove = Math.max(nextmove, now + 1000);
+            } else if (now >= nextmove) {
+                nextmove = now + playMove(null) + MOVES_AUTO.every + Math.random() * MOVES_AUTO.spread;
+            }
             poseHands(now);
             if (typeof avatar.update === 'function') {
                 avatar.update(now);
             }
-            if (now < waveuntil + 100) {
+            if (now < waveuntil + 100 || moving()) {
                 groundShadow();
             }
+            moved = true;
+        } else if (moving()) {
+            // Reduced motion: no move plays by itself, but one asked for (the button) is shown.
+            poseHands(now);
+            avatar.update(now);
+            groundShadow();
             moved = true;
         }
         const fading = now < videofade;
@@ -796,6 +841,7 @@ const createPreview = (canvas, design, assets, config) => {
      * @param {number} by Radians.
      */
     const turn = (by) => {
+        interacted = performance.now();
         turntable.rotation.y = wrapAngle(turntable.rotation.y + by);
         returning = false;
         // The sway starts again from where the user left the avatar.
@@ -893,10 +939,16 @@ const createPreview = (canvas, design, assets, config) => {
     /**
      * Show the avatar walking in place, or waving, for a moment (as others see it move).
      *
-     * @param {string} what "walk" or "wave".
+     * @param {string} what "walk", "wave" or "move" (the next dance).
      */
     const demo = (what) => {
         const now = performance.now();
+        interacted = now;
+        if (what === 'move' || (what === 'wave' && framing === 'whole' && typeof avatar.move === 'function')) {
+            // Asked for: plays with reduced motion too (short, and only when asked).
+            playMove(what === 'wave' ? 'wave' : null);
+            return;
+        }
         if (still()) {
             return;
         }
@@ -920,13 +972,16 @@ const createPreview = (canvas, design, assets, config) => {
             const handschanged = next.hands !== look.hands || next.handcolor !== look.handcolor;
             const bodychanged = next.body !== look.body || next.outfit !== look.outfit;
             look = next;
+            interacted = performance.now();
             whenLoaded(avatar.setAppearance(next, next.picture ? config.pictureurl : '', nextassets));
             dressHands();
             showLabel();
             poseHands(performance.now());
             frame();
             faceFront();
-            if (handschanged) {
+            if (handschanged && framing === 'whole' && typeof avatar.move === 'function') {
+                playMove('wave');
+            } else if (handschanged) {
                 wavefrom = performance.now();
                 waveuntil = wavefrom + WAVE_MS / 2;
             } else {
@@ -944,7 +999,11 @@ const createPreview = (canvas, design, assets, config) => {
             faceFront();
         },
         setFraming: (value) => {
+            const was = framing;
             framing = value === 'whole' || value === 'hands' ? value : 'face';
+            if (framing === 'whole' && was !== 'whole') {
+                nextmove = performance.now() + MOVES_AUTO.first + Math.random() * MOVES_AUTO.spread * 0.4;
+            }
             showLabel();
             poseHands(performance.now());
             frame();
@@ -1106,12 +1165,12 @@ export const init = async(config = null) => {
             previewhelp.hidden = false;
             setZoom = setupZoom(zoombutton, preview);
             setupCamera(camerabutton, preview, status, str);
-            ['walk', 'wave'].forEach((what) => {
+            ['walk', 'wave', 'move'].forEach((what) => {
                 const button = root.querySelector('[data-action="demo' + what + '"]');
                 if (button) {
                     button.hidden = false;
                     button.addEventListener('click', () => {
-                        if (setZoom && what === 'walk') {
+                        if (setZoom) {
                             setZoom.whole();
                         }
                         preview.demo(what);
