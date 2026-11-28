@@ -35,5 +35,18 @@ if ($hassiteconfig) {
             new lang_string('allowpicture_desc', 'local_vravatar'),
             1
         ));
+        $settings->add(new admin_setting_configcheckbox(
+            'local_vravatar/allowtattoos',
+            new lang_string('allowtattoos', 'local_vravatar'),
+            new lang_string('allowtattoos_desc', 'local_vravatar'),
+            1
+        ));
+        // Off until the site chooses to offer them (the designs are not yet reviewed by people from the cultures).
+        $settings->add(new admin_setting_configcheckbox(
+            'local_vravatar/allowculturaltattoos',
+            new lang_string('allowculturaltattoos', 'local_vravatar'),
+            new lang_string('allowculturaltattoos_desc', 'local_vravatar'),
+            0
+        ));
     }
 }

@@ -135,7 +135,34 @@ class save_design extends external_api {
             'hairgrey' => new external_value(PARAM_ALPHA, 'Grey in the hair'),
             'eyewear' => new external_value(PARAM_ALPHA, 'Eyewear, or none'),
             'eyewearcolor' => new external_value(PARAM_ALPHA, 'Eyewear frame colour'),
+            'neckwear' => new external_value(PARAM_ALPHA, 'Neckwear, or none'),
+            'chest' => new external_value(PARAM_ALPHA, 'Pin, badge or flower on the chest, or none'),
+            'earrings' => new external_value(PARAM_ALPHA, 'Earrings, or none'),
+            'hairflower' => new external_value(PARAM_ALPHA, 'Flower behind the ear, or none'),
+            'wristleft' => new external_value(PARAM_ALPHA, 'On the left wrist, or none'),
+            'wristright' => new external_value(PARAM_ALPHA, 'On the right wrist, or none'),
+            'ankleleft' => new external_value(PARAM_ALPHA, 'On the left ankle, or none'),
+            'ankleright' => new external_value(PARAM_ALPHA, 'On the right ankle, or none'),
+            'metal' => new external_value(PARAM_ALPHA, 'Metal of the jewellery'),
+            'fabric' => new external_value(PARAM_ALPHA, 'Colour of fabric accessories, or accent for the accent colour'),
+        ] + self::tattoo_structure() + [
             'picture' => new external_value(PARAM_BOOL, 'Show the profile picture on the avatar'),
         ]);
+    }
+
+    /**
+     * The four tattoo slots of the document.
+     *
+     * @return external_value[]
+     */
+    private static function tattoo_structure(): array {
+        $fields = [];
+        for ($n = 1; $n <= design::TATTOO_SLOTS; $n++) {
+            $fields['tattoo' . $n] = new external_value(PARAM_ALPHA, 'Tattoo ' . $n . ': design, or none');
+            $fields['tattoo' . $n . 'at'] = new external_value(PARAM_ALPHA, 'Tattoo ' . $n . ': where it is');
+            $fields['tattoo' . $n . 'size'] = new external_value(PARAM_ALPHA, 'Tattoo ' . $n . ': size');
+            $fields['tattoo' . $n . 'ink'] = new external_value(PARAM_ALPHA, 'Tattoo ' . $n . ': ink colour');
+        }
+        return $fields;
     }
 }

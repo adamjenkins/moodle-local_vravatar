@@ -120,7 +120,15 @@ final class design {
      *
      * @var string[]
      */
-    public const HANDSTYLES = ['sphere', 'mitten', 'cartoon', 'glove', 'robot', 'paw'];
+    public const HANDSTYLES = ['natural', 'cartoon', 'glove', 'robot', 'paw'];
+
+    /**
+     * Hand styles retired for better ones (2026-11-28): the round and the mitten hands are drawn as
+     * natural hands, as vrroomruntime_builtin/live/avatarhands HAND_FALLBACK.
+     *
+     * @var string[]
+     */
+    public const RETIRED_HANDS = ['sphere' => 'natural', 'mitten' => 'natural'];
 
     /**
      * The hand colours: "skin" follows the skin tone (or the body colour when the skin is "match"),
@@ -275,6 +283,159 @@ final class design {
             'metal' => ['gold', 'silver', 'gunmetal'],
             'colour' => ['red', 'blue', 'green', 'pink', 'purple'],
         ],
+        // Mirrors vrroomruntime_builtin/live/avataraccessory.
+        'neckwear' => [
+            'none' => ['none'],
+            'ties' => ['bowtie', 'necktie', 'bolo'],
+            'scarves' => ['scarf', 'bandana'],
+            'jewellery' => ['choker', 'chain', 'chunky', 'pendant', 'medallion', 'pearls'],
+            'badges' => ['medal', 'lanyard'],
+        ],
+        'chest' => [
+            'none' => ['none'],
+            'pins' => ['brooch', 'pin', 'star', 'badge'],
+            'flowers' => ['flower'],
+        ],
+        'earrings' => [
+            'none' => ['none'],
+            'pairs' => ['studs', 'pearls', 'hoops', 'bighoops', 'drops'],
+            'oneside' => ['onestud', 'onehoop'],
+        ],
+        'hairflower' => [
+            'none' => ['none'],
+            'flowers' => ['hibiscus', 'rose', 'daisy'],
+        ],
+        'wristleft' => [
+            'none' => ['none'],
+            'jewellery' => ['bangle', 'bangles', 'cuff', 'chain'],
+            'beads' => ['beads', 'friendship'],
+            'watches' => ['watch', 'smartwatch'],
+            'sport' => ['sweatband'],
+        ],
+        'wristright' => [
+            'none' => ['none'],
+            'jewellery' => ['bangle', 'bangles', 'cuff', 'chain'],
+            'beads' => ['beads', 'friendship'],
+            'watches' => ['watch', 'smartwatch'],
+            'sport' => ['sweatband'],
+        ],
+        'ankleleft' => [
+            'none' => ['none'],
+            'anklets' => ['chain', 'beads', 'bells', 'cord'],
+        ],
+        'ankleright' => [
+            'none' => ['none'],
+            'anklets' => ['chain', 'beads', 'bells', 'cord'],
+        ],
+        'metal' => [
+            'metals' => ['gold', 'silver', 'rosegold', 'black'],
+        ],
+        'fabric' => [
+            'accent' => ['accent'],
+            'colours' => ['red', 'orange', 'yellow', 'green', 'teal', 'cyan', 'blue', 'indigo', 'purple', 'pink',
+                'brown', 'grey', 'black', 'white'],
+        ],
+        // Mirrors vrroomruntime_builtin/live/avatartattoo.
+        'tattoo1' => [
+            'none' => ['none'],
+            'generic' => ['anchor', 'rose', 'star', 'bolt', 'swallow', 'waveband', 'compass', 'heart', 'dragon', 'paw',
+                'geoband', 'sun'],
+            'maori' => ['maoriface', 'maorichin', 'maoriband', 'maorikoru'],
+            'samoan' => ['samoanwide', 'samoanleg', 'samoanarm'],
+            'hawaiian' => ['hawaiiarm', 'hawaiileg'],
+            'batok' => ['batokband', 'batokarm'],
+            'amazigh' => ['amazighchin', 'amazighcheek', 'amazigharm'],
+            'mehndi' => ['mehndiarm', 'mehndileg'],
+            'irezumi' => ['irezumiwave', 'irezumikoi', 'irezumipeony'],
+            'celtic' => ['celticband', 'celticknot'],
+        ],
+        'tattoo1at' => [
+            'arms' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright'],
+            'legs' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+            'neck' => ['neck'],
+            'face' => ['cheekleft', 'cheekright', 'chin', 'fullface'],
+        ],
+        'tattoo1size' => [
+            'size' => ['small', 'medium', 'large'],
+        ],
+        'tattoo1ink' => [
+            'ink' => ['black', 'navy', 'green', 'red', 'purple', 'henna'],
+        ],
+        'tattoo2' => [
+            'none' => ['none'],
+            'generic' => ['anchor', 'rose', 'star', 'bolt', 'swallow', 'waveband', 'compass', 'heart', 'dragon', 'paw',
+                'geoband', 'sun'],
+            'maori' => ['maoriface', 'maorichin', 'maoriband', 'maorikoru'],
+            'samoan' => ['samoanwide', 'samoanleg', 'samoanarm'],
+            'hawaiian' => ['hawaiiarm', 'hawaiileg'],
+            'batok' => ['batokband', 'batokarm'],
+            'amazigh' => ['amazighchin', 'amazighcheek', 'amazigharm'],
+            'mehndi' => ['mehndiarm', 'mehndileg'],
+            'irezumi' => ['irezumiwave', 'irezumikoi', 'irezumipeony'],
+            'celtic' => ['celticband', 'celticknot'],
+        ],
+        'tattoo2at' => [
+            'arms' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright'],
+            'legs' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+            'neck' => ['neck'],
+            'face' => ['cheekleft', 'cheekright', 'chin', 'fullface'],
+        ],
+        'tattoo2size' => [
+            'size' => ['small', 'medium', 'large'],
+        ],
+        'tattoo2ink' => [
+            'ink' => ['black', 'navy', 'green', 'red', 'purple', 'henna'],
+        ],
+        'tattoo3' => [
+            'none' => ['none'],
+            'generic' => ['anchor', 'rose', 'star', 'bolt', 'swallow', 'waveband', 'compass', 'heart', 'dragon', 'paw',
+                'geoband', 'sun'],
+            'maori' => ['maoriface', 'maorichin', 'maoriband', 'maorikoru'],
+            'samoan' => ['samoanwide', 'samoanleg', 'samoanarm'],
+            'hawaiian' => ['hawaiiarm', 'hawaiileg'],
+            'batok' => ['batokband', 'batokarm'],
+            'amazigh' => ['amazighchin', 'amazighcheek', 'amazigharm'],
+            'mehndi' => ['mehndiarm', 'mehndileg'],
+            'irezumi' => ['irezumiwave', 'irezumikoi', 'irezumipeony'],
+            'celtic' => ['celticband', 'celticknot'],
+        ],
+        'tattoo3at' => [
+            'arms' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright'],
+            'legs' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+            'neck' => ['neck'],
+            'face' => ['cheekleft', 'cheekright', 'chin', 'fullface'],
+        ],
+        'tattoo3size' => [
+            'size' => ['small', 'medium', 'large'],
+        ],
+        'tattoo3ink' => [
+            'ink' => ['black', 'navy', 'green', 'red', 'purple', 'henna'],
+        ],
+        'tattoo4' => [
+            'none' => ['none'],
+            'generic' => ['anchor', 'rose', 'star', 'bolt', 'swallow', 'waveband', 'compass', 'heart', 'dragon', 'paw',
+                'geoband', 'sun'],
+            'maori' => ['maoriface', 'maorichin', 'maoriband', 'maorikoru'],
+            'samoan' => ['samoanwide', 'samoanleg', 'samoanarm'],
+            'hawaiian' => ['hawaiiarm', 'hawaiileg'],
+            'batok' => ['batokband', 'batokarm'],
+            'amazigh' => ['amazighchin', 'amazighcheek', 'amazigharm'],
+            'mehndi' => ['mehndiarm', 'mehndileg'],
+            'irezumi' => ['irezumiwave', 'irezumikoi', 'irezumipeony'],
+            'celtic' => ['celticband', 'celticknot'],
+        ],
+        'tattoo4at' => [
+            'arms' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright'],
+            'legs' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+            'neck' => ['neck'],
+            'face' => ['cheekleft', 'cheekright', 'chin', 'fullface'],
+        ],
+        'tattoo4size' => [
+            'size' => ['small', 'medium', 'large'],
+        ],
+        'tattoo4ink' => [
+            'ink' => ['black', 'navy', 'green', 'red', 'purple', 'henna'],
+        ],
     ];
 
     /**
@@ -300,6 +461,32 @@ final class design {
         'hairgrey' => 'none',
         'eyewear' => 'none',
         'eyewearcolor' => 'dark',
+        'neckwear' => 'none',
+        'chest' => 'none',
+        'earrings' => 'none',
+        'hairflower' => 'none',
+        'wristleft' => 'none',
+        'wristright' => 'none',
+        'ankleleft' => 'none',
+        'ankleright' => 'none',
+        'metal' => 'gold',
+        'fabric' => 'accent',
+        'tattoo1' => 'none',
+        'tattoo1at' => 'forearmright',
+        'tattoo1size' => 'medium',
+        'tattoo1ink' => 'black',
+        'tattoo2' => 'none',
+        'tattoo2at' => 'forearmright',
+        'tattoo2size' => 'medium',
+        'tattoo2ink' => 'black',
+        'tattoo3' => 'none',
+        'tattoo3at' => 'forearmright',
+        'tattoo3size' => 'medium',
+        'tattoo3ink' => 'black',
+        'tattoo4' => 'none',
+        'tattoo4at' => 'forearmright',
+        'tattoo4size' => 'medium',
+        'tattoo4ink' => 'black',
     ];
 
     /**
@@ -392,6 +579,87 @@ final class design {
         'fun' => ['astronaut', 'knight', 'wizard', 'detective', 'explorer', 'superhero', 'captain', 'deckhand'],
     ];
 
+    /** @var int How many tattoos a design can wear (tattoo1 to tattoo4). */
+    public const TATTOO_SLOTS = 4;
+
+    /** @var string[] Tattoo designs drawn in henna whatever the ink chosen (avatartattoo, design.henna). */
+    public const HENNA_TATTOOS = ['mehndiarm', 'mehndileg'];
+
+    /**
+     * The tattoo designs of each set (vrroomruntime_builtin/live/avatartattoo TATTOO_SETS): "generic"
+     * is allowed by the setting allowtattoos, "cultural" (traditional cultural designs) by
+     * allowculturaltattoos as well.
+     *
+     * @var array set => design ids
+     */
+    public const TATTOO_SETS = [
+        'generic' => ['anchor', 'rose', 'star', 'bolt', 'swallow', 'waveband', 'compass', 'heart', 'dragon', 'paw',
+            'geoband', 'sun'],
+        'cultural' => ['maoriface', 'maorichin', 'maoriband', 'maorikoru', 'samoanwide', 'samoanleg', 'samoanarm',
+            'hawaiiarm', 'hawaiileg', 'batokband', 'batokarm', 'amazighchin', 'amazighcheek', 'amazigharm', 'mehndiarm',
+            'mehndileg', 'irezumiwave', 'irezumikoi', 'irezumipeony', 'celticband', 'celticknot'],
+    ];
+
+    /**
+     * Where each tattoo design may go (avatartattoo allowedPlacements()): design id => placements.
+     *
+     * @var array
+     */
+    public const TATTOO_PLACES = [
+        'anchor' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'rose' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'star' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright', 'neck', 'cheekleft', 'cheekright'],
+        'bolt' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'swallow' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'waveband' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'thighleft', 'thighright',
+            'calfleft', 'calfright'],
+        'compass' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'heart' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright', 'neck', 'cheekleft', 'cheekright'],
+        'dragon' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'paw' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright', 'neck', 'cheekleft', 'cheekright'],
+        'geoband' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'thighleft', 'thighright',
+            'calfleft', 'calfright'],
+        'sun' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft', 'shoulderright',
+            'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'maoriface' => ['fullface'],
+        'maorichin' => ['chin'],
+        'maoriband' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'thighleft', 'thighright',
+            'calfleft', 'calfright'],
+        'maorikoru' => ['shoulderleft', 'shoulderright', 'upperarmleft', 'upperarmright', 'thighleft', 'thighright',
+            'calfleft', 'calfright'],
+        'samoanwide' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+        'samoanleg' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+        'samoanarm' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright'],
+        'hawaiiarm' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'calfleft', 'calfright'],
+        'hawaiileg' => ['thighleft', 'thighright', 'calfleft', 'calfright'],
+        'batokband' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright'],
+        'batokarm' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright'],
+        'amazighchin' => ['chin'],
+        'amazighcheek' => ['cheekleft', 'cheekright'],
+        'amazigharm' => ['forearmleft', 'forearmright'],
+        'mehndiarm' => ['forearmleft', 'forearmright'],
+        'mehndileg' => ['calfleft', 'calfright'],
+        'irezumiwave' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft',
+            'shoulderright', 'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'irezumikoi' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft',
+            'shoulderright', 'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'irezumipeony' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft',
+            'shoulderright', 'thighleft', 'thighright', 'calfleft', 'calfright'],
+        'celticband' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'thighleft', 'thighright',
+            'calfleft', 'calfright'],
+        'celticknot' => ['upperarmleft', 'upperarmright', 'forearmleft', 'forearmright', 'shoulderleft',
+            'shoulderright', 'thighleft', 'thighright', 'calfleft', 'calfright'],
+    ];
+
     /** @var string[] Keys of the document that are true or false. */
     public const FLAGS = ['ears', 'glasses', 'picture'];
 
@@ -465,7 +733,74 @@ final class design {
         }
         // A retired hat is read as its replacement (clean()), never offered.
         $choices['hat'] = array_values(array_diff($choices['hat'], array_keys(self::RETIRED_HATS)));
+        // Tattoo designs the site does not allow are not offered (and clean() drops them).
+        $refused = self::refused_tattoos();
+        for ($n = 1; $n <= self::TATTOO_SLOTS; $n++) {
+            $choices['tattoo' . $n] = array_values(array_diff($choices['tattoo' . $n], $refused));
+        }
         return $choices;
+    }
+
+    /**
+     * The tattoo designs the site settings do not allow: every one when tattoos are off; the
+     * traditional cultural set unless it is allowed too.
+     *
+     * @return string[] Design ids.
+     */
+    public static function refused_tattoos(): array {
+        $refused = [];
+        if (!self::setting_on('allowtattoos', true)) {
+            return array_merge(...array_values(self::TATTOO_SETS));
+        }
+        if (!self::setting_on('allowculturaltattoos', false)) {
+            $refused = self::TATTOO_SETS['cultural'];
+        }
+        return $refused;
+    }
+
+    /**
+     * A yes/no site setting of this plugin.
+     *
+     * @param string $name Setting name.
+     * @param bool $default Its value when not set yet (before an upgrade adds it).
+     * @return bool
+     */
+    private static function setting_on(string $name, bool $default): bool {
+        $value = get_config('local_vravatar', $name);
+        return $value === false ? $default : (bool)$value;
+    }
+
+    /**
+     * Empty the tattoo slots that do not hold together, as avatartattoo's cleanTattoos() does: an
+     * unknown or refused design, a placement the design does not allow, or one already covered by
+     * an earlier slot (a full-face design covers both cheeks and the chin). A henna design is always
+     * in henna; any other with no known ink is black.
+     *
+     * @param array $clean Clean document (changed).
+     * @return array
+     */
+    private static function clean_tattoos(array $clean): array {
+        $taken = [];
+        $allowed = array_diff(array_keys(self::TATTOO_PLACES), self::refused_tattoos());
+        for ($n = 1; $n <= self::TATTOO_SLOTS; $n++) {
+            $keys = ['tattoo' . $n, 'tattoo' . $n . 'at', 'tattoo' . $n . 'size', 'tattoo' . $n . 'ink'];
+            [$design, $at] = [$clean[$keys[0]], $clean[$keys[1]]];
+            $zones = $at === 'fullface' ? ['fullface', 'cheekleft', 'cheekright', 'chin'] : [$at];
+            if (
+                !in_array($design, $allowed, true) || !in_array($at, self::TATTOO_PLACES[$design], true) ||
+                    array_intersect($zones, $taken)
+            ) {
+                foreach ($keys as $key) {
+                    $clean[$key] = self::MODULE_DEFAULTS[$key];
+                }
+                continue;
+            }
+            $taken = array_merge($taken, $zones);
+            if (in_array($design, self::HENNA_TATTOOS, true)) {
+                $clean[$keys[3]] = 'henna';
+            }
+        }
+        return $clean;
     }
 
     /**
@@ -512,7 +847,7 @@ final class design {
             'glasses' => false,
             'hat' => 'none',
             'outfit' => 'none',
-            'hands' => 'sphere',
+            'hands' => 'natural',
             'handcolor' => 'skin',
             'face' => 'plate',
         ], self::MODULE_DEFAULTS, [
@@ -562,7 +897,7 @@ final class design {
             'mouth' => 'smile',
             'hair' => 'short',
             'haircolor' => $hair[($id * 3 + 1) % count($hair)],
-            'hands' => 'cartoon',
+            'hands' => 'natural',
             'handcolor' => 'skin',
             'picture' => false,
         ]));
@@ -609,6 +944,9 @@ final class design {
         if (isset($input['hat']) && is_string($input['hat']) && isset(self::RETIRED_HATS[$input['hat']])) {
             $input['hat'] = self::RETIRED_HATS[$input['hat']];
         }
+        if (isset($input['hands']) && is_string($input['hands']) && isset(self::RETIRED_HANDS[$input['hands']])) {
+            $input['hands'] = self::RETIRED_HANDS[$input['hands']];
+        }
 
         $choices = self::choices();
         foreach ($choices as $key => $allowed) {
@@ -632,7 +970,7 @@ final class design {
             $clean['eyewear'] = $clean['glasses'] ? 'classic' : self::MODULE_DEFAULTS['eyewear'];
         }
         $clean['glasses'] = $clean['eyewear'] !== 'none';
-        return $clean;
+        return self::clean_tattoos($clean);
     }
 
     /**

@@ -33,6 +33,19 @@ hair, hats, glasses, costumes and legs. The version numbers that state this (`ve
   them a little more. Avatars saved before get the new balanced layout.
 - **More hats:** a pirate tricorne with a skull and crossbones and a feather, and a fez; the
   fedora and the cowboy hat were reshaped so they read at a glance.
+- **Accessories:** a new Accessories tab with neckwear (ties, scarves, chains, pearls, a medal, a
+  lanyard), a pin or flower on the chest, earrings, a flower behind the ear, something on each
+  wrist and each ankle, in gold, silver, rose gold or black and any fabric colour. They move with
+  the avatar and hide under costumes that cover them.
+- **Tattoos:** up to four, each a design, a place, a size and an ink, on bare skin. The site
+  setting "Tattoos on avatars" (on by default) turns them off. A second set in the style of
+  traditional cultural tattoos (Māori-style kirituhi, Samoan, Hawaiian, Filipino batok, Amazigh,
+  mehndi, Japanese irezumi, Celtic knotwork) is offered only when "Traditional cultural tattoos"
+  is turned on (off by default); it is drawn from general knowledge and not yet checked by people
+  from those cultures.
+- **Hands:** a new natural hand, now the default; the cartoon, glove, robot and paw hands were
+  redrawn slimmer, and every style can point and make a fist. The round and mitten hands were
+  retired: avatars saved with them get natural hands.
 - **The ready-made looks** were redone with the new choices, across ages, with skin-toned hands;
   the standard look has cartoon hands in the skin tone and natural hair and eye colours.
 - **Removed:** the 18 Blocky characters, the two pirate models and the pirate hat model. Avatars

@@ -51,6 +51,12 @@ class designer implements renderable, templatable {
         'section_costume' => ['outfit'],
         'section_hands' => ['hands', 'handcolor'],
         'section_extras' => ['hat', 'eyewear', 'eyewearcolor'],
+        'section_accessories' => ['neckwear', 'chest', 'earrings', 'hairflower', 'wristleft', 'wristright', 'ankleleft',
+            'ankleright', 'metal', 'fabric',
+            'tattoo1', 'tattoo1at', 'tattoo1size', 'tattoo1ink',
+            'tattoo2', 'tattoo2at', 'tattoo2size', 'tattoo2ink',
+            'tattoo3', 'tattoo3at', 'tattoo3size', 'tattoo3ink',
+            'tattoo4', 'tattoo4at', 'tattoo4size', 'tattoo4ink'],
     ];
 
     /**
@@ -78,7 +84,21 @@ class designer implements renderable, templatable {
             'hats' => ['hat'],
             'glasses' => ['eyewear', 'eyewearcolor'],
         ],
+        'section_accessories' => [
+            'neck' => ['neckwear', 'chest'],
+            'ears' => ['earrings', 'hairflower'],
+            'wrists' => ['wristleft', 'wristright'],
+            'ankles' => ['ankleleft', 'ankleright'],
+            'metal' => ['metal', 'fabric'],
+            'tattoo1' => ['tattoo1', 'tattoo1at', 'tattoo1size', 'tattoo1ink'],
+            'tattoo2' => ['tattoo2', 'tattoo2at', 'tattoo2size', 'tattoo2ink'],
+            'tattoo3' => ['tattoo3', 'tattoo3at', 'tattoo3size', 'tattoo3ink'],
+            'tattoo4' => ['tattoo4', 'tattoo4at', 'tattoo4size', 'tattoo4ink'],
+        ],
     ];
+
+    /** @var string[] Parts with a line of help under their heading (lang string part_<id>_help). */
+    private const PART_HELP = ['ankles', 'tattoo1'];
 
     /** @var int A list of tiles this long or longer is shown under its group headings. */
     private const GROUPED_FROM = 9;
@@ -96,6 +116,7 @@ class designer implements renderable, templatable {
         'section_costume' => 'whole',
         'section_hands' => 'hands',
         'section_extras' => 'face',
+        'section_accessories' => 'whole',
     ];
 
     /**
@@ -110,6 +131,7 @@ class designer implements renderable, templatable {
         'section_costume' => ['tab_costume', 'costume'],
         'section_hands' => ['tab_hands', 'hands'],
         'section_extras' => ['tab_extras', 'extras'],
+        'section_accessories' => ['tab_accessories', 'accessories'],
     ];
 
     /**
@@ -141,6 +163,18 @@ class designer implements renderable, templatable {
         'hat' => 'face',
         'eyewear' => 'face',
         'body' => 'whole',
+        'neckwear' => 'bust',
+        'chest' => 'bust',
+        'earrings' => 'earring',
+        'hairflower' => 'flower',
+        'wristleft' => 'wristleft',
+        'wristright' => 'wristright',
+        'ankleleft' => 'ankleleft',
+        'ankleright' => 'ankleright',
+        'tattoo1' => 'tattoo',
+        'tattoo2' => 'tattoo',
+        'tattoo3' => 'tattoo',
+        'tattoo4' => 'tattoo',
     ];
 
     /** @var string[] Lang string of the legend of each group of choices. */
@@ -176,6 +210,32 @@ class designer implements renderable, templatable {
         'hands' => 'hands',
         'handcolor' => 'handcolor',
         'face' => 'face',
+        'neckwear' => 'neckwear',
+        'chest' => 'chest',
+        'earrings' => 'earrings',
+        'hairflower' => 'hairflower',
+        'wristleft' => 'wristleft',
+        'wristright' => 'wristright',
+        'ankleleft' => 'ankleleft',
+        'ankleright' => 'ankleright',
+        'metal' => 'metal',
+        'fabric' => 'fabric',
+        'tattoo1' => 'tattoodesign',
+        'tattoo1at' => 'tattooat',
+        'tattoo1size' => 'tattoosize',
+        'tattoo1ink' => 'tattooink',
+        'tattoo2' => 'tattoodesign',
+        'tattoo2at' => 'tattooat',
+        'tattoo2size' => 'tattoosize',
+        'tattoo2ink' => 'tattooink',
+        'tattoo3' => 'tattoodesign',
+        'tattoo3at' => 'tattooat',
+        'tattoo3size' => 'tattoosize',
+        'tattoo3ink' => 'tattooink',
+        'tattoo4' => 'tattoodesign',
+        'tattoo4at' => 'tattooat',
+        'tattoo4size' => 'tattoosize',
+        'tattoo4ink' => 'tattooink',
     ];
 
     /**
@@ -234,9 +294,14 @@ class designer implements renderable, templatable {
             $byname = array_combine($keys, $items);
             $parts = [];
             foreach (self::PARTS[$heading] ?? ['' => $keys] as $part => $partkeys) {
+                if (str_starts_with($part, 'tattoo') && count($choices[$partkeys[0]]) < 2) {
+                    // The site allows no tattoos: no tattoo parts.
+                    continue;
+                }
                 $parts[] = [
                     'id' => $id . '-part-' . ($part === '' ? 'all' : $part),
                     'label' => $part === '' ? '' : get_string('part_' . $part, 'local_vravatar'),
+                    'help' => in_array($part, self::PART_HELP, true) ? get_string('part_' . $part . '_help', 'local_vravatar') : '',
                     'items' => array_values(array_intersect_key($byname, array_flip($partkeys))),
                 ];
             }
@@ -426,7 +491,15 @@ class designer implements renderable, templatable {
         'browcolor' => ['hair' => 'hair'],
         'beardcolor' => ['hair' => 'hair', 'greying' => 'greying'],
         'lips' => ['none' => 'skin', 'gloss' => 'skin'],
+        'fabric' => ['accent' => 'accent'],
     ];
+
+    /** @var string[] Metal colours (vrroomruntime_builtin/live/avataraccessory METALS). */
+    private const METALSWATCHES = ['gold' => '#e8bd52', 'silver' => '#d9dde2', 'rosegold' => '#e8a88e', 'black' => '#3a3b40'];
+
+    /** @var string[] Tattoo ink colours (vrroomruntime_builtin/live/avatartattoo INKS). */
+    private const INKSWATCHES = ['black' => '#23252b', 'navy' => '#1f3466', 'green' => '#1f5a3c', 'red' => '#a3262e',
+        'purple' => '#56307c', 'henna' => '#6b2a0e'];
 
     /**
      * One group of radio buttons for the template: large swatches for a colour, picture tiles for
@@ -452,6 +525,9 @@ class designer implements renderable, templatable {
             'eyecolor' => [design::EYESWATCHES, 'eye'],
             'lips' => [design::LIPSWATCHES, 'lips'],
             'eyewearcolor' => [design::FRAMESWATCHES, 'frame'],
+            'fabric' => [design::SWATCHES, 'colour'],
+            'metal' => [self::METALSWATCHES, 'metal'],
+            'tattoo1ink', 'tattoo2ink', 'tattoo3ink', 'tattoo4ink' => [self::INKSWATCHES, 'ink'],
             default => [[], ''],
         };
         $isswatch = (bool)$swatches;
@@ -511,10 +587,15 @@ class designer implements renderable, templatable {
         foreach ($groups as $group => $values) {
             $members = array_values(array_intersect_key($options, array_flip($values)));
             if ($members) {
+                // Keys that share their values share the strings of their groups too.
+                $stem = preg_replace(['/^tattoo[1-4]/', '/^(wrist|ankle)(left|right)$/'], ['tattoo', '$1'], $key);
                 $list[] = [
                     'id' => 'local-vravatar-group-' . $key . '-' . $group,
                     // The group of "none" alone needs no heading.
-                    'legend' => $group === 'none' ? '' : get_string($key . 'group_' . $group, 'local_vravatar'),
+                    'legend' => $group === 'none' ? '' : get_string($stem . 'group_' . $group, 'local_vravatar'),
+                    // A tattoo tradition says what it is and where it is from.
+                    'help' => $stem === 'tattoo' && !in_array($group, ['none', 'generic'], true) ?
+                        get_string('tattoogroup_' . $group . '_help', 'local_vravatar') : '',
                     'options' => $members,
                 ];
             }
@@ -544,7 +625,11 @@ class designer implements renderable, templatable {
             'eyewearcolor' => 'framecolour_' . $value,
             'handcolor' => $value === 'skin' ? 'handcolour_skin' : 'colour_' . $value,
             'skin' => 'skin_' . $value,
-            default => $key . '_' . $value,
+            'wristleft', 'wristright' => 'wrist_' . $value,
+            'ankleleft', 'ankleright' => 'ankle_' . $value,
+            'fabric' => $value === 'accent' ? 'fabric_accent' : 'colour_' . $value,
+            default => preg_match('/^tattoo[1-4](at|size|ink)?$/', $key, $m) ? 'tattoo' . ($m[1] ?? '') . '_' . $value :
+                $key . '_' . $value,
         };
     }
 }

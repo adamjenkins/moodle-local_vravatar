@@ -49,6 +49,7 @@ final class designer_test extends \advanced_testcase {
                 get_string('section_costume', 'local_vravatar'),
                 get_string('section_hands', 'local_vravatar'),
                 get_string('section_extras', 'local_vravatar'),
+                get_string('section_accessories', 'local_vravatar'),
             ],
             array_column($data['sections'], 'heading')
         );
@@ -57,8 +58,11 @@ final class designer_test extends \advanced_testcase {
             $this->assertStringNotContainsString('[[', $section['tablabel']);
             $this->assertStringContainsString('tabs/', $section['icon']);
         }
-        $this->assertSame([true, false, false, false, false, false], array_column($data['sections'], 'first'));
-        $this->assertSame(['face', 'face', 'whole', 'whole', 'hands', 'face'], array_column($data['sections'], 'frame'));
+        $this->assertSame([true, false, false, false, false, false, false], array_column($data['sections'], 'first'));
+        $this->assertSame(
+            ['face', 'face', 'whole', 'whole', 'hands', 'face', 'whole'],
+            array_column($data['sections'], 'frame')
+        );
 
         $radios = [];
         $checks = [];
@@ -117,7 +121,7 @@ final class designer_test extends \advanced_testcase {
         $this->assertSame([['hair', 'haircolor', 'hairgrey'], ['beard', 'beardcolor']], $partsof(1));
         $this->assertSame([['hat'], ['eyewear', 'eyewearcolor']], $partsof(5));
         $this->assertSame(get_string('part_shape', 'local_vravatar'), $data['sections'][0]['parts'][0]['label']);
-        $this->assertSame([true, true, false, false, false, true], array_column($data['sections'], 'hasparts'));
+        $this->assertSame([true, true, false, false, false, true, true], array_column($data['sections'], 'hasparts'));
         foreach ([2, 3, 4] as $index) {
             $this->assertSame([$keysof($index)], $partsof($index));
             $this->assertSame('', $data['sections'][$index]['parts'][0]['label']);
@@ -190,6 +194,52 @@ final class designer_test extends \advanced_testcase {
             $this->assertStringNotContainsString('[[', $preset['name']);
             $this->assertIsArray(json_decode($preset['json'], true));
         }
+    }
+
+    /**
+     * The Accessories tab: its parts, the tattoo parts only while the site allows tattoos, the
+     * cultural designs only while those are allowed too, each tradition with its description.
+     */
+    public function test_accessories_tab(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $parts = function (): array {
+            global $PAGE;
+            $designer = new designer(design::clean([]), false, true, false, new \core\url('/local/vravatar/index.php'));
+            $data = $designer->export_for_template($PAGE->get_renderer('core'));
+            $section = $data['sections'][6];
+            $this->assertSame(get_string('tab_accessories', 'local_vravatar'), $section['tablabel']);
+            $designs = [];
+            $helps = [];
+            foreach ($section['parts'] as $part) {
+                foreach ($part['items'] as $item) {
+                    if (($item['radio']['name'] ?? '') === 'tattoo1') {
+                        $designs = array_column($item['radio']['options'], 'value');
+                        $helps = array_filter(array_column($item['radio']['groups'], 'help'));
+                    }
+                }
+            }
+            return [array_column($section['parts'], 'label'), $designs, $helps];
+        };
+        // By default: generic tattoos only.
+        [$labels, $designs, $helps] = $parts();
+        $this->assertContains(get_string('part_tattoo4', 'local_vravatar'), $labels);
+        $this->assertContains('anchor', $designs);
+        $this->assertNotContains('maoriface', $designs);
+        $this->assertSame([], $helps);
+        // Cultural designs allowed: offered under their traditions, each described.
+        set_config('allowculturaltattoos', 1, 'local_vravatar');
+        [$labels, $designs, $helps] = $parts();
+        $this->assertContains('maoriface', $designs);
+        $this->assertCount(8, $helps);
+        foreach ($helps as $help) {
+            $this->assertStringNotContainsString('[[', $help);
+        }
+        // No tattoos at all: no tattoo parts.
+        set_config('allowtattoos', 0, 'local_vravatar');
+        [$labels, $designs] = $parts();
+        $this->assertNotContains(get_string('part_tattoo1', 'local_vravatar'), $labels);
+        $this->assertContains(get_string('part_neck', 'local_vravatar'), $labels);
     }
 
     /**
@@ -277,10 +327,10 @@ final class designer_test extends \advanced_testcase {
         );
         // Tiles are real radio buttons with labels; the tools are hidden until the page starts them.
         $this->assertMatchesRegularExpression(
-            '~<input class="local-vravatar-tile-input" type="radio" name="hands" value="mitten" id="local-vravatar-hands-mitten"~',
+            '~<input class="local-vravatar-tile-input" type="radio" name="hands" value="natural" id="local-vravatar-hands-natural"~',
             $html
         );
-        $this->assertStringContainsString('<label class="local-vravatar-tile-label" for="local-vravatar-hands-mitten">', $html);
+        $this->assertStringContainsString('<label class="local-vravatar-tile-label" for="local-vravatar-hands-natural">', $html);
         $this->assertMatchesRegularExpression('~data-action="surprise"[^>]*\shidden>~', $html);
         $this->assertMatchesRegularExpression('~data-action="undo"[^>]*\sdisabled hidden>~', $html);
         $this->assertStringContainsString('data-region="savebar"', $html);

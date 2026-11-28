@@ -189,7 +189,7 @@ Feature: Users design their own VR avatar
     Given I log in as "student1"
     And I visit "/local/vravatar/index.php"
     When I click on "Hands" "button" in the "[role='tablist']" "css_element"
-    Then the field "Cartoon" in the "Hand style" "fieldset" matches value "1"
+    Then the field "Natural" in the "Hand style" "fieldset" matches value "1"
     And the field "Same as skin" matches value "1"
     And I set the field "Robot" in the "Hand style" "fieldset" to "1"
     And I set the field "Teal" in the "Hand colour" "fieldset" to "1"
@@ -198,7 +198,7 @@ Feature: Users design their own VR avatar
     When I press "Explorer"
     Then I should see "The look \"Explorer\" is in the preview" in the "[data-region='status']" "css_element"
     And I click on "Hands" "button" in the "[role='tablist']" "css_element"
-    And the field "Cartoon" in the "Hand style" "fieldset" matches value "1"
+    And the field "Natural" in the "Hand style" "fieldset" matches value "1"
     When I press "Undo"
     Then I should see "Undone." in the "[data-region='status']" "css_element"
     And the field "Robot" in the "Hand style" "fieldset" matches value "1"
@@ -312,3 +312,36 @@ Feature: Users design their own VR avatar
     And the field "High eyes" matches value "1"
     And the field "Balanced" matches value ""
     And the field "Pirate tricorne" matches value "1"
+
+  Scenario: Without JavaScript accessories and a tattoo are saved and kept
+    Given I log in as "student1"
+    And I visit "/local/vravatar/index.php"
+    When I set the field "Bow tie" to "1"
+    And I set the field "Hoops" in the "#local-vravatar-group-earrings" "css_element" to "1"
+    And I set the field "Watch" in the "#local-vravatar-group-wristleft" "css_element" to "1"
+    And I set the field "Anchor" in the "#local-vravatar-group-tattoo1" "css_element" to "1"
+    And I set the field "Left forearm" in the "#local-vravatar-group-tattoo1at" "css_element" to "1"
+    And I press "Save"
+    Then I should see "Your avatar was saved."
+    And the field "Bow tie" matches value "1"
+    And the field "Hoops" in the "#local-vravatar-group-earrings" "css_element" matches value "1"
+    And the field "Watch" in the "#local-vravatar-group-wristleft" "css_element" matches value "1"
+    And the field "Anchor" in the "#local-vravatar-group-tattoo1" "css_element" matches value "1"
+    And the field "Left forearm" in the "#local-vravatar-group-tattoo1at" "css_element" matches value "1"
+    And I should not see "Māori-style (kirituhi)"
+
+  Scenario: The site decides whether tattoos and the traditional cultural set are offered
+    Given the following config values are set as admin:
+      | config               | value | plugin         |
+      | allowculturaltattoos | 1     | local_vravatar |
+    And I log in as "student1"
+    When I visit "/local/vravatar/index.php"
+    Then I should see "Māori-style (kirituhi)"
+    And I should see "not either of them"
+    And the following config values are set as admin:
+      | config       | value | plugin         |
+      | allowtattoos | 0     | local_vravatar |
+    And I reload the page
+    And I should not see "Tattoo 1"
+    And I should not see "Māori-style (kirituhi)"
+    And I should see "Neck and chest"

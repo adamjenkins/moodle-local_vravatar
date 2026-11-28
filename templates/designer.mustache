@@ -542,6 +542,7 @@
                         {{#parts}}
                             <div class="local-vravatar-part" id="{{id}}" data-region="part"{{#label}} role="group" aria-labelledby="{{id}}-label"{{/label}}>
                                 {{#label}}<h4 class="h6 local-vravatar-partlabel" id="{{id}}-label">{{label}}</h4>{{/label}}
+                                {{#help}}<p class="local-vravatar-parthelp small text-muted">{{help}}</p>{{/help}}
                             {{#items}}
                                 {{#radio}}
                                     <fieldset class="local-vravatar-group" id="{{id}}">
@@ -552,6 +553,7 @@
                                         {{#groups}}
                                             <div class="local-vravatar-subgroup"{{#legend}} role="group" aria-labelledby="{{id}}-label"{{/legend}}>
                                                 {{#legend}}<div class="local-vravatar-sublegend" id="{{id}}-label">{{legend}}</div>{{/legend}}
+                                                {{#help}}<p class="local-vravatar-subhelp small text-muted">{{help}}</p>{{/help}}
                                                 <div class="local-vravatar-tiles{{#isswatch}} local-vravatar-swatchgrid{{/isswatch}}">
                                                     {{#options}}
                                                         <div class="local-vravatar-tile{{#isswatch}} local-vravatar-tile-swatch{{/isswatch}}">

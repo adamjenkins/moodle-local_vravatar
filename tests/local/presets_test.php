@@ -48,10 +48,10 @@ final class presets_test extends \advanced_testcase {
             }
             $this->assertStringNotContainsString('[[', get_string('preset_' . $id, 'local_vravatar'));
         }
-        // The people have a drawn face and cartoon hands in the user's skin tone; the robot keeps its screen.
+        // The people have a drawn face and natural hands in the user's skin tone; the robot keeps its screen.
         foreach (['explorer', 'scientist', 'artist', 'athlete', 'dreamer'] as $id) {
             $this->assertSame('drawn', $all[$id]['face'], $id);
-            $this->assertSame('cartoon', $all[$id]['hands'], $id);
+            $this->assertSame('natural', $all[$id]['hands'], $id);
             $this->assertSame('skin', $all[$id]['handcolor'], $id);
         }
         $this->assertSame('plate', $all['robot']['face']);

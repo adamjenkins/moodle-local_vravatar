@@ -41,6 +41,7 @@ import {createTiles} from 'local_vravatar/tiles';
 import {setupTabs, setupCostumeFilter, setupParts} from 'local_vravatar/tabs';
 import {buildHand} from 'local_vravatar/handmodels';
 import {setupCoach} from 'local_vravatar/coach';
+import * as Tattoo from 'vrroomruntime_builtin/live/avatartattoo';
 
 /** Speed of the idle sway (radians per second at its middle, halved). */
 const SPIN_SPEED = 0.25;
@@ -106,6 +107,11 @@ const CHOICES = [
     'hands', 'handcolor', 'face',
     'eyecolor', 'eyespace', 'browcolor', 'mouth', 'lips', 'earshape', 'freckles', 'cheeks', 'marks', 'lines', 'makeup',
     'hairgrey', 'beardcolor', 'eyewear', 'eyewearcolor', 'facelayout',
+    'neckwear', 'chest', 'earrings', 'hairflower', 'wristleft', 'wristright', 'ankleleft', 'ankleright', 'metal', 'fabric',
+    'tattoo1', 'tattoo1at', 'tattoo1size', 'tattoo1ink',
+    'tattoo2', 'tattoo2at', 'tattoo2size', 'tattoo2ink',
+    'tattoo3', 'tattoo3at', 'tattoo3size', 'tattoo3ink',
+    'tattoo4', 'tattoo4at', 'tattoo4size', 'tattoo4ink',
 ];
 
 /**
@@ -129,6 +135,19 @@ const SURPRISE_PLAIN = {
     marks: ['none', 0.75],
     lines: ['none', 0.65],
     makeup: ['none', 0.65],
+    // Accessories sparingly; tattoos never (a tattoo is chosen, not given).
+    neckwear: ['none', 0.75],
+    chest: ['none', 0.85],
+    earrings: ['none', 0.75],
+    hairflower: ['none', 0.9],
+    wristleft: ['none', 0.8],
+    wristright: ['none', 0.8],
+    ankleleft: ['none', 0.9],
+    ankleright: ['none', 0.9],
+    tattoo1: ['none', 1],
+    tattoo2: ['none', 1],
+    tattoo3: ['none', 1],
+    tattoo4: ['none', 1],
 };
 
 /** Keys Surprise me leaves alone: the skin tone is the user's own. */
@@ -1239,7 +1258,7 @@ export const init = async(config = null) => {
         const skin = design.skin === 'match' ? body : colourOf('skin', design.skin);
         const hand = design.handcolor === 'skin' ? skin : colourOf('colour', design.handcolor);
         const hair = colourOf('hair', design.haircolor);
-        const followed = {body, skin, hair, greying: hair};
+        const followed = {body, skin, hair, greying: hair, accent: colourOf('colour', design.accent)};
         root.querySelectorAll('[data-region="handpic"]').forEach((pic) => {
             pic.style.backgroundColor = hand;
         });
@@ -1355,7 +1374,42 @@ export const init = async(config = null) => {
      *
      * @param {boolean} record Whether this is a new step for Undo (not an Undo or Redo itself).
      */
+    /**
+     * Offer only the places a slot's tattoo design allows (the others disabled); a chosen place the
+     * design does not allow moves to the first it does.
+     *
+     * @param {number} n Slot 1..4.
+     * @returns {boolean} Whether a place was moved.
+     */
+    const fitTattooPlace = (n) => {
+        const chosen = form.querySelector('input[name="tattoo' + n + '"]:checked');
+        if (!chosen || typeof Tattoo.allowedPlacements !== 'function') {
+            return false;
+        }
+        const allowed = chosen.value === 'none' ? null : Tattoo.allowedPlacements(chosen.value);
+        let moved = false;
+        const places = Array.from(form.querySelectorAll('input[name="tattoo' + n + 'at"]'));
+        places.forEach((input) => {
+            input.disabled = !!allowed && allowed.indexOf(input.value) < 0;
+        });
+        const at = places.find((input) => input.checked);
+        if (allowed && allowed.length && (!at || at.disabled)) {
+            const first = places.find((input) => input.value === allowed[0]);
+            if (first) {
+                first.checked = true;
+                moved = true;
+            }
+        }
+        return moved;
+    };
+    for (let n = 1; n <= 4; n++) {
+        fitTattooPlace(n);
+    }
     const changed = (record) => {
+        // After Undo, Reset, a look or Surprise me too: only the places each tattoo allows.
+        for (let n = 1; n <= 4; n++) {
+            fitTattooPlace(n);
+        }
         const design = readForm(form, config.defaults);
         if (preview) {
             preview.update(design, readAssets(form));
@@ -1457,6 +1511,7 @@ export const init = async(config = null) => {
             status(await getString('presetdone', 'local_vravatar', name ? name.textContent.trim() : ''));
         });
     });
+
 
     form.addEventListener('change', (e) => {
         // A costume that brings a hat (the pirates' tricorne) puts it on when nothing else is on the head.

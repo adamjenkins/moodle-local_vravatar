@@ -27,6 +27,13 @@ All notable changes to this plugin are documented here. The format follows
 - `facelayout` (`balanced` by default; `higheyes`, `loweyes`, `longnose`, `compact`): the face's
   vertical layout, in the face tab's first section.
 - Hats `piratehat` (skull and crossbones, feather) and `fez`.
+- Accessory keys `neckwear`, `chest`, `earrings`, `hairflower`, `wristleft`, `wristright`,
+  `ankleleft`, `ankleright`, `metal` and `fabric` (VR room's `avataraccessory`), in a new
+  Accessories tab.
+- Tattoo keys `tattoo1`..`tattoo4` with `…at`, `…size` and `…ink` (VR room's `avatartattoo`);
+  `design::clean()` mirrors its `cleanTattoos()` and drops the sets the site does not allow
+  (`allowtattoos`, default on; `allowculturaltattoos`, default off; `design::refused_tattoos()`).
+- Hand style `natural` (the default, also for `design::standard()` and the looks).
 - `local_vravatar_save_design` and `local_vravatar_get_design` return the new keys.
 
 ### Changed
@@ -37,6 +44,8 @@ All notable changes to this plugin are documented here. The format follows
 
 ### Removed
 
+- Hand styles `sphere` and `mitten`: `design::clean()` reads them as `natural`
+  (`design::RETIRED_HANDS`), as VR room's `avatarhands` `HAND_FALLBACK`.
 - The costume models `blocky-a` to `blocky-r`, `pirate-captain`, `pirate-woman` and `hat-pirate`
   (models, thumbnails, manifest entries, strings, `thirdpartylibs.xml` entries, credits), the
   `pirate` costume category and `costumes::HATS`. `design::clean()` reads old designs as

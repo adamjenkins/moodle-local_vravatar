@@ -63,6 +63,32 @@ final class design_test extends \advanced_testcase {
         'hairgrey' => 'temples',
         'eyewear' => 'aviator',
         'eyewearcolor' => 'gold',
+        'neckwear' => 'pearls',
+        'chest' => 'star',
+        'earrings' => 'hoops',
+        'hairflower' => 'rose',
+        'wristleft' => 'watch',
+        'wristright' => 'beads',
+        'ankleleft' => 'chain',
+        'ankleright' => 'bells',
+        'metal' => 'silver',
+        'fabric' => 'teal',
+        'tattoo1' => 'anchor',
+        'tattoo1at' => 'forearmleft',
+        'tattoo1size' => 'large',
+        'tattoo1ink' => 'navy',
+        'tattoo2' => 'rose',
+        'tattoo2at' => 'calfright',
+        'tattoo2size' => 'small',
+        'tattoo2ink' => 'red',
+        'tattoo3' => 'none',
+        'tattoo3at' => 'forearmright',
+        'tattoo3size' => 'medium',
+        'tattoo3ink' => 'black',
+        'tattoo4' => 'none',
+        'tattoo4at' => 'forearmright',
+        'tattoo4size' => 'medium',
+        'tattoo4ink' => 'black',
         'picture' => true,
     ];
 
@@ -84,6 +110,32 @@ final class design_test extends \advanced_testcase {
         'hairgrey' => 'none',
         'eyewear' => 'none',
         'eyewearcolor' => 'dark',
+        'neckwear' => 'none',
+        'chest' => 'none',
+        'earrings' => 'none',
+        'hairflower' => 'none',
+        'wristleft' => 'none',
+        'wristright' => 'none',
+        'ankleleft' => 'none',
+        'ankleright' => 'none',
+        'metal' => 'gold',
+        'fabric' => 'accent',
+        'tattoo1' => 'none',
+        'tattoo1at' => 'forearmright',
+        'tattoo1size' => 'medium',
+        'tattoo1ink' => 'black',
+        'tattoo2' => 'none',
+        'tattoo2at' => 'forearmright',
+        'tattoo2size' => 'medium',
+        'tattoo2ink' => 'black',
+        'tattoo3' => 'none',
+        'tattoo3at' => 'forearmright',
+        'tattoo3size' => 'medium',
+        'tattoo3ink' => 'black',
+        'tattoo4' => 'none',
+        'tattoo4at' => 'forearmright',
+        'tattoo4size' => 'medium',
+        'tattoo4ink' => 'black',
     ];
 
     /**
@@ -107,7 +159,7 @@ final class design_test extends \advanced_testcase {
             'glasses' => false,
             'hat' => 'none',
             'outfit' => 'none',
-            'hands' => 'sphere',
+            'hands' => 'natural',
             'handcolor' => 'skin',
             'face' => 'plate',
         ] + self::MODULE_DEFAULTS + [
@@ -134,6 +186,10 @@ final class design_test extends \advanced_testcase {
      */
     public function test_every_choice_accepted(): void {
         foreach (design::choices() as $key => $values) {
+            if (preg_match('/^tattoo[1-4]/', $key)) {
+                // A tattoo slot's keys hold together: test_tattoos_cleaned.
+                continue;
+            }
             foreach ($values as $value) {
                 $this->assertSame($value, design::clean([$key => $value])[$key], "{$key}={$value}");
             }
@@ -207,6 +263,8 @@ final class design_test extends \advanced_testcase {
             $grouped = array_merge(...array_values($groups));
             $this->assertSame(array_unique($grouped), $grouped, $key);
             $offered = $key === 'hat' ? array_diff($grouped, array_keys(design::RETIRED_HATS)) : $grouped;
+            // The traditional cultural tattoos are not offered by default (allowculturaltattoos).
+            $offered = array_diff($offered, design::refused_tattoos());
             $this->assertSame([], array_values(array_diff($offered, $choices[$key])), $key);
             foreach ($grouped as $value) {
                 // The services return every name as PARAM_ALPHA.
@@ -252,8 +310,8 @@ final class design_test extends \advanced_testcase {
         $this->assertFalse($clean['ears']);
         $this->assertSame('none', $clean['beard']);
         $this->assertSame('none', $clean['outfit']);
-        // Hands as before hand styles existed: two balls in the skin colour.
-        $this->assertSame('sphere', $clean['hands']);
+        // Hands as before hand styles existed: since the round hands were retired (2026-11-28), natural ones.
+        $this->assertSame('natural', $clean['hands']);
         $this->assertSame('skin', $clean['handcolor']);
         // The face screen, as before face styles existed.
         $this->assertSame('plate', $clean['face']);
@@ -328,6 +386,79 @@ final class design_test extends \advanced_testcase {
     }
 
     /**
+     * Accessories: kept when allowed, an old design without them has none.
+     */
+    public function test_accessories_cleaned(): void {
+        $this->resetAfterTest();
+        $clean = design::clean(['neckwear' => 'pearls', 'earrings' => 'onehoop', 'wristleft' => 'watch',
+            'ankleright' => 'bells', 'metal' => 'silver', 'fabric' => 'teal', 'chest' => 'nonsense']);
+        $this->assertSame('pearls', $clean['neckwear']);
+        $this->assertSame('onehoop', $clean['earrings']);
+        $this->assertSame('watch', $clean['wristleft']);
+        $this->assertSame('bells', $clean['ankleright']);
+        $this->assertSame('silver', $clean['metal']);
+        $this->assertSame('teal', $clean['fabric']);
+        $this->assertSame('none', $clean['chest']);
+        $old = design::clean(['schema' => design::SCHEMA, 'hair' => 'bun']);
+        foreach (['neckwear', 'chest', 'earrings', 'hairflower', 'wristleft', 'wristright', 'ankleleft', 'ankleright'] as $key) {
+            $this->assertSame('none', $old[$key], $key);
+        }
+        $this->assertSame('gold', $old['metal']);
+        $this->assertSame('accent', $old['fabric']);
+    }
+
+    /**
+     * Tattoos as the avatar builder cleans them: a placement the design does not allow, a place
+     * already taken (a full-face design covers the cheeks and chin) or an unknown design empties the
+     * slot; henna designs are in henna; the settings refuse the sets they turn off.
+     */
+    public function test_tattoos_cleaned(): void {
+        $this->resetAfterTest();
+        $clean = design::clean(['tattoo1' => 'anchor', 'tattoo1at' => 'forearmleft', 'tattoo1ink' => 'navy',
+            'tattoo2' => 'anchor', 'tattoo2at' => 'cheekleft', 'tattoo3' => 'rose', 'tattoo3at' => 'forearmleft',
+            'tattoo4' => 'sun', 'tattoo4at' => 'calfright', 'tattoo4size' => 'large']);
+        $this->assertSame(['anchor', 'forearmleft', 'navy'], [$clean['tattoo1'], $clean['tattoo1at'], $clean['tattoo1ink']]);
+        // The anchor may not go on a cheek; the left forearm is taken.
+        $this->assertSame(
+            ['none', 'forearmright', 'medium', 'black'],
+            [$clean['tattoo2'], $clean['tattoo2at'], $clean['tattoo2size'], $clean['tattoo2ink']]
+        );
+        $this->assertSame('none', $clean['tattoo3']);
+        $this->assertSame(['sun', 'calfright', 'large'], [$clean['tattoo4'], $clean['tattoo4at'], $clean['tattoo4size']]);
+
+        // Cultural designs: off by default, so dropped (a saved one draws without it).
+        $cultural = ['tattoo1' => 'maoriface', 'tattoo1at' => 'fullface', 'tattoo2' => 'amazighcheek',
+            'tattoo2at' => 'cheekleft', 'tattoo3' => 'mehndiarm', 'tattoo3at' => 'forearmleft', 'tattoo3ink' => 'red'];
+        $this->assertSame('none', design::clean($cultural)['tattoo1']);
+        $this->assertNotContains('maoriface', design::choices()['tattoo1']);
+        set_config('allowculturaltattoos', 1, 'local_vravatar');
+        $clean = design::clean($cultural);
+        $this->assertSame('maoriface', $clean['tattoo1']);
+        // The whole face covers the cheeks; henna is always henna.
+        $this->assertSame('none', $clean['tattoo2']);
+        $this->assertSame(['mehndiarm', 'henna'], [$clean['tattoo3'], $clean['tattoo3ink']]);
+        // Tattoos off: none at all, whatever the cultural setting.
+        set_config('allowtattoos', 0, 'local_vravatar');
+        $this->assertSame('none', design::clean(['tattoo1' => 'anchor', 'tattoo1at' => 'forearmleft'])['tattoo1']);
+        $this->assertSame(['none'], design::choices()['tattoo2']);
+    }
+
+    /**
+     * The tattoo lists agree with each other: every design in exactly one set, with its places.
+     */
+    public function test_tattoo_lists(): void {
+        $all = array_merge(...array_values(design::TATTOO_SETS));
+        $this->assertSame(count($all), count(array_unique($all)));
+        $this->assertEqualsCanonicalizing($all, array_keys(design::TATTOO_PLACES));
+        $offered = array_diff(design::choices()['tattoo1'], ['none']);
+        $this->assertEmpty(array_diff($offered, $all));
+        $places = array_merge(...array_values(design::MODULE_KEYS['tattoo1at']));
+        foreach (design::TATTOO_PLACES as $id => $at) {
+            $this->assertEmpty(array_diff($at, $places), $id);
+        }
+    }
+
+    /**
      * A document with every key at its longest value still fits the size cap, with room to spare.
      */
     public function test_longest_document_fits(): void {
@@ -342,12 +473,17 @@ final class design_test extends \advanced_testcase {
             $longest[$flag] = true;
         }
         $json = json_encode($longest);
-        $this->assertLessThan(design::MAXBYTES / 2, strlen($json), $json);
+        // With the accessory and tattoo keys (2026-11-28) it still leaves a third of the cap free.
+        $this->assertLessThan(design::MAXBYTES * 2 / 3, strlen($json), $json);
         // A real document of the longest values (a costume id that exists) is kept whole.
         $real = $longest;
         $real['outfit'] = 'business-dude';
         $this->assertSame(array_keys(design::defaults()), array_keys(design::clean($real)));
         foreach ($real as $key => $value) {
+            if (preg_match('/^tattoo[1-4]/', $key)) {
+                // The longest tattoo values do not hold together (a design and a place it does not allow).
+                continue;
+            }
             $this->assertSame($value, design::clean(json_encode($real))[$key], $key);
         }
     }
@@ -364,9 +500,14 @@ final class design_test extends \advanced_testcase {
         }
         $this->assertSame('skin', design::handcolours()[0]);
         $clean = design::clean(['hands' => 'claw', 'handcolor' => 'gold']);
-        $this->assertSame('sphere', $clean['hands']);
+        $this->assertSame('natural', $clean['hands']);
         $this->assertSame('skin', $clean['handcolor']);
-        $this->assertSame('sphere', design::clean(['hands' => ['mitten']])['hands']);
+        $this->assertSame('natural', design::clean(['hands' => ['mitten']])['hands']);
+        // The retired round and mitten hands are natural hands now, keeping their colour.
+        $retired = design::clean(['hands' => 'mitten', 'handcolor' => 'teal']);
+        $this->assertSame(['natural', 'teal'], [$retired['hands'], $retired['handcolor']]);
+        $this->assertSame('natural', design::clean(['hands' => 'sphere'])['hands']);
+        $this->assertNotContains('sphere', design::choices()['hands']);
     }
 
     /**
@@ -618,8 +759,8 @@ final class design_test extends \advanced_testcase {
         $this->assertSame($a, design::clean($a));
         $this->assertSame('drawn', $a['face']);
         $this->assertSame('white', $a['accent']);
-        // Cartoon hands in the skin tone, not gloves; a natural hair and eye colour.
-        $this->assertSame('cartoon', $a['hands']);
+        // Natural hands in the skin tone (since 2026-11-28), not gloves; a natural hair and eye colour.
+        $this->assertSame('natural', $a['hands']);
         $this->assertSame('skin', $a['handcolor']);
         $this->assertContains($a['haircolor'], design::STANDARD_HAIRCOLOURS);
         $this->assertContains($a['eyecolor'], design::STANDARD_EYECOLOURS);

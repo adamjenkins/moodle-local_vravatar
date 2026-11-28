@@ -34,6 +34,7 @@
 import * as THREE from 'vrroomruntime_builtin/three';
 import * as AvatarModel from 'vrroomruntime_builtin/live/avatarmodel';
 import * as Wardrobe from 'vrroomruntime_builtin/live/avatarwardrobe';
+import * as Tattoo from 'vrroomruntime_builtin/live/avatartattoo';
 import Log from 'core/log';
 
 /** Size of a picture (px, before the device pixel ratio). */
@@ -86,6 +87,15 @@ const tileDesign = (design, key, value) => {
     if (EYE_KEYS.indexOf(key) >= 0) {
         shown.eyewear = 'none';
     }
+    // Anklets show on bare ankles: shorts for the picture. Earrings and a flower behind the ear show
+    // on short hair with no hat.
+    if (key === 'ankleleft' || key === 'ankleright') {
+        shown.outfit = 'summer';
+    }
+    if (key === 'earrings' || key === 'hairflower') {
+        shown.hair = 'short';
+        shown.ears = true;
+    }
     // Ear shapes show only with the ears on, and not under hair that covers them.
     if (key === 'earshape') {
         shown.ears = true;
@@ -94,6 +104,12 @@ const tileDesign = (design, key, value) => {
         }
     }
     shown[key] = value === '1' ? true : value;
+    // A tattoo design's tile is drawn flat: which design, in the slot's ink.
+    const slot = /^tattoo([1-4])$/.exec(key);
+    if (slot) {
+        shown.tattooshown = value;
+        shown.inkshown = design['tattoo' + slot[1] + 'ink'];
+    }
     if (typeof shown.eyewear === 'string') {
         shown.glasses = shown.eyewear !== 'none';
     }
@@ -185,7 +201,35 @@ export const createTiles = (config) => {
      * @param {number} size Picture size (px).
      * @returns {string} A data: URL.
      */
+    const flat = document.createElement('canvas');
+    /**
+     * A tattoo design drawn flat (its tile), in the slot's ink on the user's skin colour.
+     *
+     * @param {Object} design The design.
+     * @param {string} id Design id.
+     * @param {number} size Picture size (px).
+     * @returns {string} A data: URL.
+     */
+    const drawTattoo = (design, id, size) => {
+        const px = size * ratio;
+        flat.width = px;
+        flat.height = px;
+        const ctx = flat.getContext('2d');
+        const skins = AvatarModel.SKIN_TONES || {};
+        const colours = AvatarModel.COLOURS || {};
+        const skin = design.skin === 'match' ? colours[design.color] : skins[design.skin];
+        ctx.clearRect(0, 0, px, px);
+        if (typeof Tattoo.drawTattooTile === 'function') {
+            Tattoo.drawTattooTile(ctx, id, {x: 0, y: 0, size: px, ink: (Tattoo.INKS || {})[design.inkshown] || '#23252b',
+                skin: skin || '#c99266'});
+        }
+        return flat.toDataURL('image/png');
+    };
+
     const draw = (design, framing, size = SIZE) => {
+        if (framing === 'tattoo') {
+            return drawTattoo(design, design.tattooshown, size);
+        }
         if (size !== drawsize) {
             renderer.setSize(size, size, false);
             drawsize = size;
@@ -213,6 +257,28 @@ export const createTiles = (config) => {
         }
         avatar.group.updateMatrixWorld(true);
         const head = avatar.group.getObjectByName('head');
+        // A wrist or an ankle close up: around that joint.
+        const joint = {wristleft: 'leftcuff', wristright: 'rightcuff', ankleleft: 'leftankle', ankleright: 'rightankle'}[framing];
+        if (joint) {
+            const part = avatar.group.getObjectByName(joint);
+            if (part) {
+                const at = part.getWorldPosition(new THREE.Vector3());
+                const near = framing.startsWith('ankle') ? [0.03, 0.09] : [0.06, 0.05];
+                camera.position.set(at.x - 0.05, at.y + near[1], at.z - 0.36);
+                camera.lookAt(at.x, at.y - near[0], at.z);
+                renderer.render(scene, camera);
+                return canvas.toDataURL('image/png');
+            }
+        }
+        // An ear close up, from the side the earring (one ear: -X) or the flower (+X) is on.
+        if ((framing === 'earring' || framing === 'flower') && head) {
+            const at = head.getWorldPosition(new THREE.Vector3());
+            const side = framing === 'earring' ? -1 : 1;
+            camera.position.set(at.x + side * 0.42, at.y + 0.02, at.z - 0.2);
+            camera.lookAt(at.x + side * 0.08, at.y - 0.02, at.z);
+            renderer.render(scene, camera);
+            return canvas.toDataURL('image/png');
+        }
         const closeup = framing !== 'whole' && head && head.visible;
         const box = closeup ? visibleBox(head) : visibleBox(avatar.group);
         if (framing === 'bust' && !box.isEmpty()) {

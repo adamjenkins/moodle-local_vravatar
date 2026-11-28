@@ -45,8 +45,9 @@ final class presets {
             'nose' => 'wide', 'mouth' => 'grin', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
             'freckles' => 'none', 'cheeks' => 'sunkissed', 'marks' => 'none', 'lines' => 'crow', 'makeup' => 'none',
             'beard' => 'stubble', 'beardcolor' => 'greying', 'hat' => 'sunhat', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'explorer', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'explorer', 'hands' => 'natural', 'handcolor' => 'skin', 'face' => 'drawn',
             'facelayout' => 'balanced',
+            'neckwear' => 'bandana', 'fabric' => 'red', 'wristleft' => 'watch', 'metal' => 'silver',
         ],
         'scientist' => [
             'body' => 'slim', 'head' => 'oval', 'color' => 'white', 'accent' => 'teal',
@@ -55,8 +56,9 @@ final class presets {
             'nose' => 'aquiline', 'mouth' => 'soft', 'lips' => 'none', 'ears' => true, 'earshape' => 'lobe',
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'molecheek', 'lines' => 'gentle', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'round', 'eyewearcolor' => 'gold',
-            'glasses' => true, 'outfit' => 'labcoat', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => true, 'outfit' => 'labcoat', 'hands' => 'natural', 'handcolor' => 'skin', 'face' => 'drawn',
             'facelayout' => 'balanced',
+            'neckwear' => 'lanyard', 'earrings' => 'studs',
         ],
         'artist' => [
             'body' => 'capsule', 'head' => 'heart', 'color' => 'purple', 'accent' => 'yellow',
@@ -65,7 +67,7 @@ final class presets {
             'nose' => 'button', 'mouth' => 'smirk', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
             'freckles' => 'nose', 'cheeks' => 'none', 'marks' => 'star', 'lines' => 'none', 'makeup' => 'graphic',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'beret', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'natural', 'handcolor' => 'skin', 'face' => 'drawn',
             'facelayout' => 'balanced',
         ],
         'athlete' => [
@@ -75,7 +77,7 @@ final class presets {
             'nose' => 'straight', 'mouth' => 'teeth', 'lips' => 'none', 'ears' => true, 'earshape' => 'classic',
             'freckles' => 'none', 'cheeks' => 'none', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'cap', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'athlete', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'athlete', 'hands' => 'natural', 'handcolor' => 'skin', 'face' => 'drawn',
             'facelayout' => 'balanced',
         ],
         'dreamer' => [
@@ -85,7 +87,7 @@ final class presets {
             'nose' => 'snub', 'mouth' => 'braces', 'lips' => 'none', 'ears' => false, 'earshape' => 'classic',
             'freckles' => 'few', 'cheeks' => 'stars', 'marks' => 'none', 'lines' => 'none', 'makeup' => 'none',
             'beard' => 'none', 'beardcolor' => 'hair', 'hat' => 'none', 'eyewear' => 'none', 'eyewearcolor' => 'dark',
-            'glasses' => false, 'outfit' => 'none', 'hands' => 'cartoon', 'handcolor' => 'skin', 'face' => 'drawn',
+            'glasses' => false, 'outfit' => 'none', 'hands' => 'natural', 'handcolor' => 'skin', 'face' => 'drawn',
             'facelayout' => 'balanced',
         ],
         'robot' => [
@@ -100,6 +102,12 @@ final class presets {
         ],
     ];
 
+    /** @var string[] Keys of the accessories and tattoos a look may leave out (they are then none). */
+    private const ACCESSORY_KEYS = ['neckwear', 'chest', 'earrings', 'hairflower', 'wristleft', 'wristright', 'ankleleft',
+        'ankleright', 'metal', 'fabric', 'tattoo1', 'tattoo1at', 'tattoo1size', 'tattoo1ink', 'tattoo2', 'tattoo2at',
+        'tattoo2size', 'tattoo2ink', 'tattoo3', 'tattoo3at', 'tattoo3size', 'tattoo3ink', 'tattoo4', 'tattoo4at',
+        'tattoo4size', 'tattoo4ink'];
+
     /**
      * The presets, each as the keys it sets, cleaned: only allowed values are kept.
      *
@@ -109,6 +117,8 @@ final class presets {
         $all = [];
         $choices = design::choices();
         foreach (self::PRESETS as $id => $keys) {
+            // The accessory and tattoo keys a look does not name take their defaults (none).
+            $keys += array_intersect_key(design::MODULE_DEFAULTS, array_flip(self::ACCESSORY_KEYS));
             $preset = [];
             foreach ($keys as $key => $value) {
                 if (in_array($key, design::FLAGS, true)) {
