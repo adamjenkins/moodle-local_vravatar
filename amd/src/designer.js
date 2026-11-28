@@ -1052,12 +1052,17 @@ const setupCamera = (button, preview, status, str) => {
 /**
  * Start the designer.
  *
- * @param {Object} config {design, defaults, pictureurl, pictureallowed, name, seed}
+ * @param {Object|null} config {design, defaults, pictureurl, pictureallowed, name, seed}; null: read from the page
  */
-export const init = async(config) => {
+export const init = async(config = null) => {
     const pending = new Pending('local_vravatar/designer:init');
     const root = document.querySelector('[data-region="local-vravatar-designer"]');
-    if (!root) {
+    // The page's settings: given, or in the page's data attribute (too long to pass to js_call_amd).
+    const holder = document.querySelector('[data-region="local-vravatar-config"]');
+    if (!config && holder) {
+        config = JSON.parse(holder.dataset.config || 'null');
+    }
+    if (!root || !config) {
         pending.resolve();
         return;
     }

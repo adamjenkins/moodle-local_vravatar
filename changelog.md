@@ -15,9 +15,11 @@ All notable changes to this plugin are documented here. The format follows
   `glasses` now follows `eyewear` (an old document with glasses wears `classic`).
 - 50 costumes made in code by `avatarwardrobe` (`design::WARDROBE`): outfit values with no model
   and no asset, drawn live on the user's avatar in the designer, under 11 new costume categories.
+  The traditional dress among them is drawn from general knowledge (wrap and closure directions
+  included) and has not been reviewed by people who wear it.
 - The designer's Face, Hair and Extras tabs are split into sections shown one at a time
-  (`amd/src/tabs.js` `setupParts()`); costumes show one category at a time from the first; tile
-  pictures are drawn only for what is in view.
+  (`amd/src/tabs.js` `setupParts()`); costumes show one category at a time, opening on the
+  category of the costume worn; tile pictures are drawn only for what is in view.
 - The full-length preview with moving arms, walk and wave buttons.
 - `local_vravatar_save_design` and `local_vravatar_get_design` return the new keys.
 
@@ -35,6 +37,11 @@ All notable changes to this plugin are documented here. The format follows
   `pirate-captain` → `captain`, `pirate-woman` → `deckhand`, `blocky-*` → `none` and hat `pirate` →
   `tricorne` (`RETIRED_OUTFITS`, `RETIRED_HATS`, mirroring avatarmodel's `cleanAppearance()`), so
   the designer and live rooms show them alike; the hook sends no asset for them.
+
+### Fixed
+
+- The designer page passed its settings through `js_call_amd()` (over 1024 characters, a
+  debugging warning on sites with developer debugging); they are now in a data attribute.
 
 ### Dependencies
 

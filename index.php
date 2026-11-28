@@ -76,7 +76,8 @@ $user = \core_user::get_user($userid, design::picture_fields(), MUST_EXIST);
 $pictureurl = design::picture_url($user, $PAGE);
 
 $designer = new \local_vravatar\output\designer($current, $saved !== null, $pictureallowed, $pictureurl !== '', $url);
-$PAGE->requires->js_call_amd('local_vravatar/designer', 'init', [[
+// The designer's settings go in a data attribute: too long to pass to js_call_amd() (over 1024 characters).
+$config = [
     'design' => $current,
     // Reset to default goes back to the standard look.
     'defaults' => design::standard($userid),
@@ -84,8 +85,13 @@ $PAGE->requires->js_call_amd('local_vravatar/designer', 'init', [[
     'pictureallowed' => $pictureallowed,
     'name' => fullname($USER),
     'seed' => 'local-vravatar-' . $userid,
-]]);
+];
+$PAGE->requires->js_call_amd('local_vravatar/designer', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render($designer);
+echo html_writer::div('', 'd-none', [
+    'data-region' => 'local-vravatar-config',
+    'data-config' => json_encode($config, JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_TAG),
+]);
 echo $OUTPUT->footer();

@@ -252,3 +252,51 @@ Feature: Users design their own VR avatar
     And I should see "Mini Characters (character-male-a)"
     And I should not see "Blocky"
     And I should not see "Pirate hat"
+
+  @javascript
+  Scenario: Choose freckles in the Skin details section and the pilot from Travel, save and see them kept
+    Given I log in as "student1"
+    And I visit "/local/vravatar/index.php"
+    When I click on "Face" "button" in the "[role='tablist']" "css_element"
+    And I click on "Skin details" "button" in the "#local-vravatar-section-head" "css_element"
+    And I set the field "Many" in the "Freckles" "fieldset" to "1"
+    And I click on "Costume" "button" in the "[role='tablist']" "css_element"
+    # The costume tab opens on its first category, Travel, the costumes made in code.
+    And I set the field "Pilot" to "1"
+    And I click on "Extras" "button" in the "[role='tablist']" "css_element"
+    And I set the field "Pilot's cap" to "1"
+    And I press "Save"
+    And I should see "Your avatar was saved." in the "[data-region='status']" "css_element"
+    And I reload the page
+    And I click on "Face" "button" in the "[role='tablist']" "css_element"
+    And I click on "Skin details" "button" in the "#local-vravatar-section-head" "css_element"
+    Then the field "Many" in the "Freckles" "fieldset" matches value "1"
+    And I click on "Costume" "button" in the "[role='tablist']" "css_element"
+    And the field "Pilot" matches value "1"
+    And the field "No costume" matches value ""
+    And I click on "Extras" "button" in the "[role='tablist']" "css_element"
+    And the field "Pilot's cap" matches value "1"
+
+  @javascript
+  Scenario: A design saved with the retired pirate model and pirate hat opens as the pirate captain and tricorne
+    Given the following "user preferences" exist:
+      | user     | preference            | value                                                                    |
+      | student1 | local_vravatar_design | {"schema":"vrroom-avatar/1","outfit":"pirate-captain","hat":"pirate"} |
+    And I log in as "student1"
+    When I visit "/local/vravatar/index.php"
+    And I click on "Costume" "button" in the "[role='tablist']" "css_element"
+    # The tab opens on the category of the costume worn, so its tile is in view and chosen.
+    Then the field "Pirate captain" matches value "1"
+    And the field "No costume" matches value ""
+    And I click on "Extras" "button" in the "[role='tablist']" "css_element"
+    And the field "Tricorne" matches value "1"
+
+  Scenario: A design saved with a retired blocky character opens in plain clothes
+    Given the following "user preferences" exist:
+      | user     | preference            | value                                                   |
+      | student1 | local_vravatar_design | {"schema":"vrroom-avatar/1","outfit":"blocky-a","color":"red"} |
+    And I log in as "student1"
+    When I visit "/local/vravatar/index.php"
+    Then the field "No costume" matches value "1"
+    And the field "Red" in the "Body colour" "fieldset" matches value "1"
+    And I should not see "Blocky"

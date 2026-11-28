@@ -16,7 +16,9 @@ hair, hats, glasses, costumes and legs. The version numbers that state this (`ve
   celebration, dress-up) and 17 kinds of glasses and sunglasses in 13 frame colours.
 - **50 new costumes** made by the avatar builder itself, worn by your own avatar (your body, skin,
   face and hair): travel, work, service, health, science, school, everyday, formal, traditional
-  dress, sport, and fun and fantasy.
+  dress, sport, and fun and fantasy. The traditional dress (yukata, hanbok, sari, qipao, kurta,
+  dashiki, kilt) is a simplified drawing from general knowledge, not reviewed by people who wear
+  it; corrections are welcome.
 - **Easier to browse:** the Face, Hair and Extras tabs show one section at a time (for example
   Eyes, or Nose and mouth), costumes one category at a time, and long lists come under headings.
   Only the pictures in view are drawn.
