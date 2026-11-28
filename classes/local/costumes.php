@@ -36,7 +36,7 @@ final class costumes {
     public const OUTFIT_KINDS = ['body', 'device'];
 
     /** @var string[] The categories of the designer page, in page order. */
-    public const CATEGORIES = ['suit', 'plant', 'alien', 'robot', 'pc', 'characters'];
+    public const CATEGORIES = ['pc'];
 
     /** @var string[] Licences that need the author's credit shown. */
     public const ATTRIBUTION_LICENCES = ['CC-BY-3.0', 'CC-BY-4.0'];

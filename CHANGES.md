@@ -51,6 +51,14 @@ hair, hats, glasses, costumes and legs. The version numbers that state this (`ve
 - **Removed:** the 18 Blocky characters, the two pirate models and the pirate hat model. Avatars
   saved with them keep working: the pirates become the new pirate captain and deckhand, a Blocky
   character the plain clothes in your own colours, and the pirate hat the pirate tricorne.
+- **Removed: the costume models whose arms could not move** (they could not wave, dance, reach in a
+  headset, walk or sit): the two suits, the twelve Mini characters, the sunflower, the cactus, the
+  two aliens and the two robots. The Costume tab now offers the 50 costumes made in code and the
+  four screens (laptop, computer screen, old television, desktop computer). Avatars and room
+  characters saved with a removed model wear the nearest costume made in code: the suits the suit,
+  the Mini characters summer clothes, the police uniform, the suit, the office outfit, the skirt,
+  the tracksuit or the explorer, the aliens the astronaut, and the plants and robots the plain
+  clothes in your own colours.
 
 ## 0.2.0 (2026-11-27) — ALPHA
 

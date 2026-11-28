@@ -28,15 +28,10 @@ namespace local_vravatar\local;
 final class costumes_test extends \advanced_testcase {
     /**
      * @var string[] The costumes the owner chose (2026-10-10), in manifest order, without the pirates,
-     *     the pirate hat and the Blocky characters retired on 2026-11-27 (design::RETIRED_OUTFITS).
+     *     the pirate hat and the Blocky characters retired on 2026-11-27 and the one-piece models whose
+     *     arms could not move retired on 2026-11-28 (design::RETIRED_OUTFITS): the screen devices.
      */
-    private const IDS = [
-        'business-dude', 'suit-tie', 'sunflower', 'cactus',
-        'alien-green', 'alien-pink', 'robot-screen', 'lalobot', 'device-laptop', 'device-monitor', 'device-tv',
-        'device-computer',
-        'mini-male-a', 'mini-male-b', 'mini-male-c', 'mini-male-d', 'mini-male-e', 'mini-male-f',
-        'mini-female-a', 'mini-female-b', 'mini-female-c', 'mini-female-d', 'mini-female-e', 'mini-female-f',
-    ];
+    private const IDS = ['device-laptop', 'device-monitor', 'device-tv', 'device-computer'];
 
     /**
      * Forget the manifest between tests.
@@ -82,14 +77,14 @@ final class costumes_test extends \advanced_testcase {
     }
 
     /**
-     * Every category of the page has a name, and the CC BY models are the two that need a credit.
+     * Every category of the page has a name, and the CC BY model is the one that needs a credit.
      */
     public function test_categories_and_attribution(): void {
         foreach (costumes::CATEGORIES as $category) {
             $this->assertTrue(get_string_manager()->string_exists('costumecat_' . $category, 'local_vravatar'), $category);
         }
         $credited = array_keys(array_filter(costumes::all(), [costumes::class, 'needs_attribution']));
-        $this->assertSame(['suit-tie', 'device-computer'], $credited);
+        $this->assertSame(['device-computer'], $credited);
         $this->assertSame('CC BY 3.0', costumes::licence_label('CC-BY-3.0'));
     }
 
@@ -118,8 +113,8 @@ final class costumes_test extends \advanced_testcase {
      */
     public function test_outfit_ids_from_manifest(): void {
         $ids = costumes::outfit_ids();
-        $this->assertCount(24, $ids);
-        foreach (['device-laptop', 'device-monitor', 'device-tv', 'device-computer', 'robot-screen'] as $id) {
+        $this->assertCount(4, $ids);
+        foreach (['device-laptop', 'device-monitor', 'device-tv', 'device-computer'] as $id) {
             $this->assertSame('device', costumes::get($id)['kind'], $id);
             $this->assertContains($id, $ids);
         }
@@ -128,7 +123,7 @@ final class costumes_test extends \advanced_testcase {
         $this->assertNull(costumes::get('no-such-costume'));
         $dir = \core_component::get_component_directory('local_vravatar');
         $blocky = array_map(fn($c) => 'blocky-' . $c, range('a', 'r'));
-        $retired = array_merge(['hat-pirate', 'pirate-captain', 'pirate-woman'], $blocky);
+        $retired = array_merge(['hat-pirate'], array_keys(design::RETIRED_OUTFITS), $blocky);
         foreach ($retired as $id) {
             $this->assertNull(costumes::get($id), $id);
             $this->assertFileDoesNotExist($dir . '/costumes/' . $id . '.glb', $id);

@@ -249,7 +249,7 @@ final class designer_test extends \advanced_testcase {
     public function test_costume_picker(): void {
         global $PAGE;
         $this->resetAfterTest();
-        $current = design::clean(['outfit' => 'suit-tie']);
+        $current = design::clean(['outfit' => 'device-computer']);
         $designer = new designer($current, true, true, false, new \core\url('/local/vravatar/index.php'));
         $data = $designer->export_for_template($PAGE->get_renderer('core'));
 
@@ -289,10 +289,14 @@ final class designer_test extends \advanced_testcase {
             $this->assertSame(get_string(costumes::name_string($id), 'local_vravatar'), $option['label']);
             $this->assertStringContainsString('costumes/' . $id, $option['thumb']);
             $this->assertStringEndsWith('/local/vravatar/costumes/' . $id . '.glb', $option['model']);
-            $this->assertSame($id === 'suit-tie', $option['checked'], $id);
+            $this->assertSame($id === 'device-computer', $option['checked'], $id);
             $this->assertSame(costumes::needs_attribution(costumes::get($id)), $option['credit'] !== '', $id);
         }
-        $this->assertSame('by Ian MacGillivray, CC BY 3.0', $options['suit-tie']['credit']);
+        $this->assertSame('by Robert Schlyter, CC BY 3.0', $options['device-computer']['credit']);
+        // The one-piece models whose arms could not move are not offered (2026-11-28).
+        foreach (array_keys(design::RETIRED_OUTFITS) as $id) {
+            $this->assertArrayNotHasKey($id, $options, $id);
+        }
         $this->assertSame('device', $options['device-laptop']['kind']);
 
         // Every model, the hat too, is in the credits list.
@@ -327,7 +331,8 @@ final class designer_test extends \advanced_testcase {
         );
         // Tiles are real radio buttons with labels; the tools are hidden until the page starts them.
         $this->assertMatchesRegularExpression(
-            '~<input class="local-vravatar-tile-input" type="radio" name="hands" value="natural" id="local-vravatar-hands-natural"~',
+            '~<input class="local-vravatar-tile-input" type="radio" name="hands" value="natural"'
+                . ' id="local-vravatar-hands-natural"~',
             $html
         );
         $this->assertStringContainsString('<label class="local-vravatar-tile-label" for="local-vravatar-hands-natural">', $html);
@@ -386,10 +391,12 @@ final class designer_test extends \advanced_testcase {
         $this->assertMatchesRegularExpression('~id="local-vravatar-hat-tricorne"\s+checked>~', $html);
         // The retired pirate hat has no tile (the pirate tricorne, hat-piratehat, does).
         $this->assertStringNotContainsString('id="local-vravatar-hat-pirate"', $html);
-        $this->assertStringContainsString('by Ian MacGillivray, CC BY 3.0', $html);
+        $this->assertStringNotContainsString('Ian MacGillivray', $html);
+        $this->assertStringNotContainsString('local-vravatar-outfit-suit-tie', $html);
         $this->assertStringContainsString('by Robert Schlyter, CC BY 3.0', $html);
         $this->assertStringContainsString(get_string('costumecredits', 'local_vravatar'), $html);
-        $this->assertStringContainsString('href="https://kenney.nl/assets/mini-characters"', $html);
+        $this->assertStringContainsString('href="https://poly.pizza/m/GnbwSUiVty"', $html);
+        $this->assertStringNotContainsString('mini-characters', $html);
         $this->assertStringContainsString('aria-describedby="local-vravatar-outfit-help"', $html);
     }
 }

@@ -43,7 +43,7 @@ final class design_test extends \advanced_testcase {
         'beard' => 'goatee',
         'glasses' => true,
         'hat' => 'sunhat',
-        'outfit' => 'suit-tie',
+        'outfit' => 'device-computer',
         'hands' => 'glove',
         'handcolor' => 'cyan',
         'face' => 'drawn',
@@ -477,7 +477,7 @@ final class design_test extends \advanced_testcase {
         $this->assertLessThan(design::MAXBYTES * 2 / 3, strlen($json), $json);
         // A real document of the longest values (a costume id that exists) is kept whole.
         $real = $longest;
-        $real['outfit'] = 'business-dude';
+        $real['outfit'] = 'device-computer';
         $this->assertSame(array_keys(design::defaults()), array_keys(design::clean($real)));
         foreach ($real as $key => $value) {
             if (preg_match('/^tattoo[1-4]/', $key)) {
@@ -516,7 +516,7 @@ final class design_test extends \advanced_testcase {
      */
     public function test_outfit_costumes(): void {
         $this->assertSame('none', design::clean(['outfit' => 'none'])['outfit']);
-        foreach (['business-dude', 'suit-tie', 'device-laptop', 'robot-screen', 'mini-male-a', 'mini-female-f'] as $id) {
+        foreach (['device-laptop', 'device-monitor', 'device-tv', 'device-computer'] as $id) {
             $this->assertSame($id, design::clean(['outfit' => $id])['outfit'], $id);
             $this->assertSame($id, design::clean(json_encode(['outfit' => $id]))['outfit'], $id);
         }
@@ -530,13 +530,23 @@ final class design_test extends \advanced_testcase {
     }
 
     /**
-     * The retired pirate models become the pirates made in code, as in avatarmodel's
-     * cleanAppearance(), from an array or from JSON.
+     * The retired models (the pirates, and the one-piece models whose arms could not move, 2026-11-28)
+     * become costumes made in code or the plain clothes, as in avatarmodel's cleanAppearance(), from
+     * an array or from JSON.
      */
-    public function test_retired_pirates(): void {
-        $this->assertSame(['pirate-captain' => 'captain', 'pirate-woman' => 'deckhand'], design::RETIRED_OUTFITS);
+    public function test_retired_models(): void {
+        $this->assertSame('captain', design::RETIRED_OUTFITS['pirate-captain']);
+        $this->assertSame('deckhand', design::RETIRED_OUTFITS['pirate-woman']);
+        $this->assertSame('suit', design::RETIRED_OUTFITS['business-dude']);
+        $this->assertSame('astronaut', design::RETIRED_OUTFITS['alien-green']);
+        $this->assertCount(22, design::RETIRED_OUTFITS);
+        $minis = array_merge(...array_map(fn($c) => ['mini-male-' . $c, 'mini-female-' . $c], range('a', 'f')));
+        foreach (array_merge($minis, ['suit-tie', 'sunflower', 'cactus', 'alien-pink', 'lalobot', 'robot-screen']) as $id) {
+            $this->assertArrayHasKey($id, design::RETIRED_OUTFITS, $id);
+        }
         foreach (design::RETIRED_OUTFITS as $old => $new) {
-            $this->assertContains($new, design::wardrobe_ids(), $new);
+            $this->assertContains($new, array_merge(['none'], design::wardrobe_ids()), $new);
+            $this->assertNull(costumes::get($old), $old);
             $this->assertSame($new, design::clean(['outfit' => $old])['outfit'], $old);
             $this->assertSame($new, design::clean(json_encode(['outfit' => $old]))['outfit'], $old);
             $this->assertNotContains($old, design::choices()['outfit'], $old);

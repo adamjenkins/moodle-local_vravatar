@@ -52,6 +52,16 @@ All notable changes to this plugin are documented here. The format follows
   `pirate-captain` → `captain`, `pirate-woman` → `deckhand`, `blocky-*` → `none` and hat `pirate` →
   `piratehat` (`RETIRED_OUTFITS`, `RETIRED_HATS`, mirroring avatarmodel's `cleanAppearance()`), so
   the designer and live rooms show them alike; the hook sends no asset for them.
+- The one-piece costume models whose arms could not move: `business-dude`, `suit-tie`,
+  `mini-male-a` to `-f`, `mini-female-a` to `-f`, `sunflower`, `cactus`, `alien-green`, `alien-pink`,
+  `lalobot`, `robot-screen` (models, thumbnails, manifest entries, strings, `thirdpartylibs.xml`
+  entries, README credits) and the costume categories `suit`, `plant`, `alien`, `robot` and
+  `characters`. `design::clean()` reads them through `RETIRED_OUTFITS` (as avatarmodel's
+  `cleanAppearance()`): `business-dude`, `suit-tie`, `mini-male-d` → `suit`; `mini-male-a`, `-b`,
+  `mini-female-a`, `-b` → `summer`; `mini-male-c` → `police`; `mini-male-e` → `tracksuit`;
+  `mini-male-f`, `mini-female-f` → `explorer`; `mini-female-c` → `skirt`; `mini-female-d`, `-e` →
+  `office`; `alien-green`, `alien-pink` → `astronaut`; `sunflower`, `cactus`, `lalobot`,
+  `robot-screen` → `none`. The four screen devices stay.
 
 ### Fixed
 

@@ -683,14 +683,39 @@ final class design {
 
     /**
      * Costume models no longer shipped, and what a design that wears one wears now: the pirates
-     * become the pirate costumes made in code; the Blocky characters (blocky-a to blocky-r,
-     * RETIRED_OUTFIT_PATTERN) the plain clothes in the user's own colours ("none"). Mirrors
-     * RETIRED_OUTFITS and cleanAppearance() of vrroomruntime_builtin/live/avatarmodel (VR room), so
-     * the designer and the live rooms read old designs alike.
+     * become the pirate costumes made in code; the one-piece models whose arms could not move (the
+     * suits, the Mini characters, the plants, aliens and robots) the costume made in code nearest to
+     * each, or the plain clothes ("none"); the Blocky characters (blocky-a to blocky-r,
+     * RETIRED_OUTFIT_PATTERN) the plain clothes in the user's own colours. Mirrors RETIRED_OUTFITS
+     * and cleanAppearance() of vrroomruntime_builtin/live/avatarmodel (VR room), so the designer, the
+     * live rooms and the characters of a room read old designs alike.
      *
      * @var string[]
      */
-    public const RETIRED_OUTFITS = ['pirate-captain' => 'captain', 'pirate-woman' => 'deckhand'];
+    public const RETIRED_OUTFITS = [
+        'pirate-captain' => 'captain',
+        'pirate-woman' => 'deckhand',
+        'business-dude' => 'suit',
+        'suit-tie' => 'suit',
+        'mini-male-a' => 'summer',
+        'mini-male-b' => 'summer',
+        'mini-male-c' => 'police',
+        'mini-male-d' => 'suit',
+        'mini-male-e' => 'tracksuit',
+        'mini-male-f' => 'explorer',
+        'mini-female-a' => 'summer',
+        'mini-female-b' => 'summer',
+        'mini-female-c' => 'skirt',
+        'mini-female-d' => 'office',
+        'mini-female-e' => 'office',
+        'mini-female-f' => 'explorer',
+        'sunflower' => 'none',
+        'cactus' => 'none',
+        'alien-green' => 'astronaut',
+        'alien-pink' => 'astronaut',
+        'lalobot' => 'none',
+        'robot-screen' => 'none',
+    ];
 
     /** @var string The retired Blocky characters, read as "none". */
     public const RETIRED_OUTFIT_PATTERN = '/^blocky-[a-r]$/';

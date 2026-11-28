@@ -124,16 +124,18 @@ final class services_test extends \advanced_testcase {
 
     /**
      * A costume id (with hyphens) goes through both services; the retired pirate hat is saved as the
-     * tricorne and a retired pirate model as the pirate made in code.
+     * tricorne, a retired pirate model as the pirate made in code and a model whose arms could not
+     * move as the costume made in code nearest to it.
      */
     public function test_save_costume(): void {
         $this->resetAfterTest();
         $this->setUser($this->getDataGenerator()->create_user());
-        $result = $this->save(['outfit' => 'mini-female-c', 'hat' => 'pirate']);
-        $this->assertSame('mini-female-c', $result['design']['outfit']);
+        $result = $this->save(['outfit' => 'device-laptop', 'hat' => 'pirate']);
+        $this->assertSame('device-laptop', $result['design']['outfit']);
         $this->assertSame('piratehat', $result['design']['hat']);
         $this->assertSame('captain', $this->save(['outfit' => 'pirate-captain'])['design']['outfit']);
-        $result = $this->save(['outfit' => 'mini-female-c', 'hat' => 'pirate']);
+        $this->assertSame('skirt', $this->save(['outfit' => 'mini-female-c'])['design']['outfit']);
+        $result = $this->save(['outfit' => 'device-laptop', 'hat' => 'pirate']);
         $this->assertSame($result['design'], $this->get()['design']);
     }
 
