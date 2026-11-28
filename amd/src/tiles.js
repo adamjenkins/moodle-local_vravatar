@@ -254,12 +254,18 @@ export const createTiles = (config) => {
 
     let queue = [];
     let running = false;
+    // No pictures drawn until then (ms, performance.now()): the preview plays a move meanwhile.
+    let pauseduntil = 0;
     const run = () => {
         if (running) {
             return;
         }
         running = true;
         const step = () => {
+            if (performance.now() < pauseduntil) {
+                window.setTimeout(step, 100);
+                return;
+            }
             const job = queue.shift();
             if (!job) {
                 running = false;
@@ -276,6 +282,15 @@ export const createTiles = (config) => {
     };
 
     return {
+        /**
+         * Draw no pictures for a while (the preview plays a move and needs the frames).
+         *
+         * @param {number} ms How long.
+         */
+        pause(ms) {
+            pauseduntil = Math.max(pauseduntil, performance.now() + (Number(ms) || 0));
+        },
+
         /**
          * Draw the pictures of some tiles that are out of date, in order.
          *

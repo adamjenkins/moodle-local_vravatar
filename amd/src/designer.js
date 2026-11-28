@@ -697,6 +697,10 @@ const createPreview = (canvas, design, assets, config) => {
     let lastmove = null;
     let nextmove = performance.now() + MOVES_AUTO.first + Math.random() * MOVES_AUTO.spread * 0.4;
     let interacted = -Infinity;
+    // A move asked for, started on the preview's next frame (null, a name, or '' for the next one), and who
+    // is told how long a move lasts (the tile pictures pause meanwhile).
+    let pendingmove = null;
+    let onmove = () => null;
     const moving = () => typeof avatar.isMoving === 'function' && avatar.isMoving();
     /**
      * Play a move (one not just played, when no name is given).
@@ -715,6 +719,7 @@ const createPreview = (canvas, design, assets, config) => {
         const ms = pick ? avatar.move(pick) : 0;
         if (ms) {
             lastmove = pick;
+            onmove(ms);
         }
         return ms;
     };
@@ -764,6 +769,11 @@ const createPreview = (canvas, design, assets, config) => {
         const dt = Math.min((now - last) / 1000, 0.1);
         last = now;
         let moved = false;
+        if (pendingmove !== null) {
+            // Asked for between frames (the tile pictures may hold the page): it starts now, on a frame.
+            playMove(pendingmove || null);
+            pendingmove = null;
+        }
         if (returning && !dragging) {
             const angle = turntable.rotation.y;
             if (Math.abs(angle) < 0.002) {
@@ -945,8 +955,10 @@ const createPreview = (canvas, design, assets, config) => {
         const now = performance.now();
         interacted = now;
         if (what === 'move' || (what === 'wave' && framing === 'whole' && typeof avatar.move === 'function')) {
-            // Asked for: plays with reduced motion too (short, and only when asked).
-            playMove(what === 'wave' ? 'wave' : null);
+            // Asked for: plays with reduced motion too (short, and only when asked), from the next frame,
+            // with the tile pictures paused so the frames come.
+            pendingmove = what === 'wave' ? 'wave' : '';
+            onmove(4000);
             return;
         }
         if (still()) {
@@ -968,6 +980,14 @@ const createPreview = (canvas, design, assets, config) => {
 
     return {
         demo: demo,
+        /**
+         * Who is told how long a move plays (ms), to give the preview the frames.
+         *
+         * @param {Function} callback
+         */
+        onMove: (callback) => {
+            onmove = typeof callback === 'function' ? callback : () => null;
+        },
         update: (next, nextassets) => {
             const handschanged = next.hands !== look.hands || next.handcolor !== look.handcolor;
             const bodychanged = next.body !== look.body || next.outfit !== look.outfit;
@@ -1182,6 +1202,9 @@ export const init = async(config = null) => {
         }
     }
     const tilepainter = hasWebgl() ? createTiles(config) : null;
+    if (preview && tilepainter) {
+        preview.onMove((ms) => tilepainter.pause(ms + 300));
+    }
 
     /**
      * The colour of a palette entry: the avatar builder's own, else the page's swatch.
@@ -1435,7 +1458,16 @@ export const init = async(config = null) => {
         });
     });
 
-    form.addEventListener('change', () => {
+    form.addEventListener('change', (e) => {
+        // A costume that brings a hat (the pirates' tricorne) puts it on when nothing else is on the head.
+        const hats = AvatarModel.COSTUME_HATS || {};
+        if (e.target && e.target.name === 'outfit' && hats[e.target.value]) {
+            const none = form.querySelector('input[name="hat"][value="none"]');
+            const hat = form.querySelector('input[name="hat"][value="' + hats[e.target.value] + '"]');
+            if (none && none.checked && hat) {
+                hat.checked = true;
+            }
+        }
         changed(true);
         coach.changed(currentTab());
     });
