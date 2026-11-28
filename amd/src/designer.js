@@ -1000,6 +1000,22 @@ const createPreview = (canvas, design, assets, config) => {
     return {
         demo: demo,
         /**
+         * Play one move by name (the moves menu), from the next frame.
+         *
+         * @param {string} name Move name.
+         */
+        playNamed: (name) => {
+            interacted = performance.now();
+            pendingmove = name;
+            onmove(4000);
+        },
+        /**
+         * The moves the avatar can play now.
+         *
+         * @returns {string[]}
+         */
+        moves: () => (typeof avatar.moves === 'function' ? avatar.moves() : []),
+        /**
          * Who is told how long a move plays (ms), to give the preview the frames.
          *
          * @param {Function} callback
@@ -1148,6 +1164,86 @@ const setupCamera = (button, preview, status, str) => {
 };
 
 /**
+ * The list of moves beside Bust a move: a caret opens it (Enter, Space or a tap), the arrow keys move
+ * through it, Escape or a choice closes it; each item plays that move. Labels are the move_<id> strings.
+ *
+ * @param {HTMLElement} root The designer.
+ * @param {Object} preview The preview (moves(), playNamed()).
+ * @param {Function} whole Show the whole avatar.
+ */
+const setupMoveMenu = (root, preview, whole) => {
+    const button = root.querySelector('[data-action="movemenu"]');
+    const menu = root.querySelector('[data-region="movemenu"]');
+    if (!button || !menu || typeof preview.moves !== 'function') {
+        return;
+    }
+    button.hidden = false;
+    const items = () => Array.from(menu.querySelectorAll('[role="menuitem"]'));
+    const close = (focus) => {
+        menu.hidden = true;
+        button.setAttribute('aria-expanded', 'false');
+        if (focus) {
+            button.focus();
+        }
+    };
+    const open = async() => {
+        const names = preview.moves();
+        const labels = await getStrings(names.map((name) => ({key: 'move_' + name, component: 'local_vravatar'})));
+        menu.textContent = '';
+        names.forEach((name, i) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.setAttribute('role', 'menuitem');
+            item.tabIndex = -1;
+            item.textContent = labels[i];
+            item.addEventListener('click', () => {
+                close(true);
+                whole();
+                preview.playNamed(name);
+            });
+            menu.appendChild(item);
+        });
+        menu.hidden = false;
+        button.setAttribute('aria-expanded', 'true');
+        const first = items()[0];
+        if (first) {
+            first.focus();
+        }
+    };
+    button.addEventListener('click', () => {
+        if (menu.hidden) {
+            open();
+        } else {
+            close(false);
+        }
+    });
+    menu.addEventListener('keydown', (e) => {
+        const list = items();
+        const at = list.indexOf(document.activeElement);
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            close(true);
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const next = list[(at + (e.key === 'ArrowDown' ? 1 : list.length - 1)) % list.length];
+            if (next) {
+                next.focus();
+            }
+        } else if (e.key === 'Home' || e.key === 'End') {
+            e.preventDefault();
+            list[e.key === 'Home' ? 0 : list.length - 1].focus();
+        } else if (e.key === 'Tab') {
+            close(false);
+        }
+    });
+    document.addEventListener('click', (e) => {
+        if (!menu.hidden && !menu.contains(e.target) && !button.contains(e.target)) {
+            close(false);
+        }
+    });
+};
+
+/**
  * Start the designer.
  *
  * @param {Object|null} config {design, defaults, pictureurl, pictureallowed, name, seed}; null: read from the page
@@ -1204,6 +1300,7 @@ export const init = async(config = null) => {
             previewhelp.hidden = false;
             setZoom = setupZoom(zoombutton, preview);
             setupCamera(camerabutton, preview, status, str);
+            setupMoveMenu(root, preview, () => (setZoom ? setZoom.whole() : null));
             ['walk', 'wave', 'move'].forEach((what) => {
                 const button = root.querySelector('[data-action="demo' + what + '"]');
                 if (button) {

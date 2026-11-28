@@ -448,6 +448,8 @@
                     <span hidden data-hint="save" data-glow="save">{{#str}}coach_save, local_vravatar{{/str}}</span>
                     <span hidden data-hint="done" data-glow="">{{#str}}coach_done, local_vravatar{{/str}}</span>
                 </div>
+                <div class="local-vravatar-movemenu local-vravatar-glass" id="local-vravatar-movemenu" data-region="movemenu" role="menu"
+                    aria-label="{{#str}}movemenu, local_vravatar{{/str}}" hidden></div>
                 <div class="local-vravatar-tools local-vravatar-glass" role="group" aria-label="{{#str}}tools, local_vravatar{{/str}}"
                     data-region="tools" hidden>
                     <button type="button" class="local-vravatar-gbtn" data-action="surprise" title="{{#str}}surprise, local_vravatar{{/str}}" data-region="surprisetool" hidden>
@@ -470,6 +472,10 @@
                     </button>
                     <button type="button" class="local-vravatar-gbtn" data-action="demomove" title="{{#str}}demomove, local_vravatar{{/str}}" hidden>
                         <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span class="visually-hidden">{{#str}}demomove, local_vravatar{{/str}}</span>
+                    </button>
+                    <button type="button" class="local-vravatar-gbtn local-vravatar-gbtn-narrow" data-action="movemenu" title="{{#str}}movemenu, local_vravatar{{/str}}"
+                        aria-haspopup="true" aria-expanded="false" aria-controls="local-vravatar-movemenu" hidden>
+                        <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg><span class="visually-hidden">{{#str}}movemenu, local_vravatar{{/str}}</span>
                     </button>
                     <button type="button" class="local-vravatar-gbtn" data-action="camera" title="{{#str}}camerapreview, local_vravatar{{/str}}" aria-pressed="false" hidden>
                         <svg class="local-vravatar-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><span class="visually-hidden" data-region="cameralabel">{{#str}}camerapreview, local_vravatar{{/str}}</span>
